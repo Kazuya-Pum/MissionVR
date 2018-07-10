@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: d94425c893c940242a0871fb8f94ba1d
+timeCreated: 1523695145
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Flipbash Condensed
+  fontNames:
+  - Flipbash Condensed
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 7c5dd8bbaa1d06d41a2e1d28c77325df, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
