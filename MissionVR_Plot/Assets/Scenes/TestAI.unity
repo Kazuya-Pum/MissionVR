@@ -154,7 +154,6 @@ MonoBehaviour:
   exp: 0
   money: 0
   moveSpeed: 0
-  minion: {fileID: 0}
 --- !u!23 &273647846
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -236,12 +235,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 0
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 273647849}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 1
   instantiationId: 1
@@ -392,6 +391,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1186694062}
   - component: {fileID: 1186694061}
+  - component: {fileID: 1186694063}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -493,6 +493,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1186694063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1186694060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7dea13571f25d9469b5819a3151e1f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1295505753
 GameObject:
   m_ObjectHideFlags: 0
@@ -553,7 +564,6 @@ MonoBehaviour:
   exp: 0
   money: 0
   moveSpeed: 0
-  minion: {fileID: 273647845}
 --- !u!114 &1295505756
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -595,10 +605,10 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1295505755}
         m_MethodName: test
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 273647845}
+          m_ObjectArgumentAssemblyTypeName: MinionBase, Assembly-CSharp
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

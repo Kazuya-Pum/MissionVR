@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class MinionMelee : MinionBase {
 
-    public MinionBase minion;
-    public void test()
+    public void test(MinionBase minion)
     {
         Attack( 5, minion );
     }
