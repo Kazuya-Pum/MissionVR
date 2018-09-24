@@ -70,4 +70,5 @@ MonoBehaviour:
   - Damaged
   - Attack
   - Death
+  - SetUp
   DisableAutoOpenWizard: 1

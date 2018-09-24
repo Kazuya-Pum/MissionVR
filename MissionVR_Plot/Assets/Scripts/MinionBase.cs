@@ -19,11 +19,31 @@ public class MinionBase : Photon.MonoBehaviour
     [SerializeField] private float moveSpeed;
     #endregion
 
+    private void Awake()
+    {
+        PhotonNetwork.offlineMode = true;
+        
+    }
+
+    private void Start()
+    {
+        Debug.Log( PhotonNetwork.offlineMode );
+        Debug.Log( photonView.viewID );
+
+        photonView.RPC( "SetUp", PhotonTargets.All );
+    }
+
+    [PunRPC]
+    private void SetUp()
+    {
+        Debug.Log( photonView.viewID );
+    }
+
     [PunRPC]
     protected virtual void Attack(int damageValue, MinionBase target)
     {
-        target.Damaged( damageValue );
-        //target.photonView.RPC( "Damaged", PhotonTargets.MasterClient, damageValue );
+        //target.Damaged( damageValue );
+        target.photonView.RPC( "Damaged", PhotonTargets.MasterClient, damageValue );
     }
 
     [PunRPC]
@@ -33,15 +53,15 @@ public class MinionBase : Photon.MonoBehaviour
 
         if ( CheckDeath() )
         {
-            Death();
-            //photonView.RPC( "Death", PhotonTargets.All );
+            //Death();
+            photonView.RPC( "Death", PhotonTargets.All );
         }
     }
 
     [PunRPC]
     private void Death()
     {
-        Destroy( gameObject );
+        PhotonNetwork.Destroy( gameObject );
     }
 
     private bool CheckDeath()
