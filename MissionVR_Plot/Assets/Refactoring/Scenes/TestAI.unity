@@ -144,8 +144,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 192f0361667b453418d13f1aa3340413, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 11
-  mana: 0
+  team: 0
+  maxHp: 11
+  maxMana: 0
   physicalAttack: 0
   physicalDefense: 0
   magicAttack: 0
@@ -393,7 +394,7 @@ GameObject:
   - component: {fileID: 1186694061}
   - component: {fileID: 1186694063}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: NetworkManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -554,8 +555,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 192f0361667b453418d13f1aa3340413, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 0
-  mana: 0
+  team: 1
+  maxHp: 0
+  maxMana: 0
   physicalAttack: 0
   physicalDefense: 0
   magicAttack: 0

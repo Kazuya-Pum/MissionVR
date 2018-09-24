@@ -9,8 +9,8 @@ public class MinionMelee : MinionBase {
         Attack( 5, minion );
     }
 
-    protected override void Attack(int damageValue, MinionBase target)
+    protected override void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL, int id = 0 )
     {
-        base.Attack( damageValue, target );
+        base.Attack( damageValue, target, damageType, id );
     }
 }

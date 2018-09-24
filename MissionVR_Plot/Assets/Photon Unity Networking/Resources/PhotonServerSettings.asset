@@ -71,4 +71,5 @@ MonoBehaviour:
   - Attack
   - Death
   - SetUp
+  - GetReward
   DisableAutoOpenWizard: 1

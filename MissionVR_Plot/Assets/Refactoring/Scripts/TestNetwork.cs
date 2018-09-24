@@ -2,16 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestNetwork : MonoBehaviour {
+public class TestNetwork : Photon.MonoBehaviour {
 
-	// Use this for initialization
 	void Awake () {
         PhotonNetwork.offlineMode = true;
         PhotonNetwork.CreateRoom( "Test" );
     }
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }
