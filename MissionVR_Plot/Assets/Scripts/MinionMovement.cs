@@ -12,7 +12,7 @@ public class MinionMovement : MonoBehaviour
     [SerializeField]
     NavMeshAgent agent;
 
-    TeamColor opponent;//相手のチームカラー
+    TeamColor opponent; //相手のチームカラー
 
     /*
      * ミニオンがレーンの真ん中を移動するようにポイントを指定した際に利用するオブジェクト
@@ -22,7 +22,7 @@ public class MinionMovement : MonoBehaviour
     [SerializeField]
     private Transform[] points;
 
-    private int destPoint = 0;//上記のポイントの何番目にいるかを数えるためのカウント
+    private int destPoint = 0;  //上記のポイントの何番目にいるかを数えるためのカウント
     LocalVariables localVariables;
     // NavMeshAgentに設定するmask
     private int topMask = 1 << 3, midMask = 1 << 4, botMask = 1 << 5;
@@ -30,7 +30,6 @@ public class MinionMovement : MonoBehaviour
 
     #endregion
 
-    // Use this for initialization
     void Start()
     {
         destPoint = 0;
@@ -94,7 +93,6 @@ public class MinionMovement : MonoBehaviour
                                 destPoint = 2;
                                 break;
                             case 2:
-                                NavMeshPath path = new NavMeshPath();
                                 agent.destination = points[5].position;
                                 destPoint = 3;
                                 break;
