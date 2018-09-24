@@ -67,4 +67,7 @@ MonoBehaviour:
   - Send_Exp_Money
   - DamageTower
   - MinionKillMinion
+  - Damaged
+  - Attack
+  - Death
   DisableAutoOpenWizard: 1
