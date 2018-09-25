@@ -33,19 +33,19 @@ public class EntityBase : Photon.MonoBehaviour
     [PunRPC]
     protected virtual void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL, int id = 0 )
     {
-        if(id == 0)
+        if ( id == 0 )
         {
             id = photonView.viewID;
         }
 
         if ( target.team != team )
         {
-            target.photonView.RPC( "Damaged", PhotonTargets.MasterClient, damageValue, damageType, id);
+            target.photonView.RPC( "Damaged", PhotonTargets.MasterClient, damageValue, damageType, id );
         }
     }
 
     [PunRPC]
-    public void Damaged( int value, DamageType damageType, int id)
+    public void Damaged( int value, DamageType damageType, int id )
     {
         switch ( damageType )
         {
@@ -62,9 +62,11 @@ public class EntityBase : Photon.MonoBehaviour
 
         if ( CheckDeath() )
         {
-            if(PhotonView.Find(id).gameObject.GetComponent<EntityBase>().objectType == ObjectType.Champion )
+            //TODO
+            EntityBase killer = PhotonView.Find( id ).gameObject.GetComponent<EntityBase>();
+            if ( killer.objectType == ObjectType.Champion )
             {
-
+                killer.photonView.RPC( "GetReward", PhotonTargets.MasterClient, sendingExp, sendingMoney );
             }
             photonView.RPC( "Death", PhotonTargets.All );
         }
