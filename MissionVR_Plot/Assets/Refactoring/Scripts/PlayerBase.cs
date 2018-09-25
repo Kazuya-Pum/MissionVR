@@ -2,27 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase : EntityBase,IPunObservable
+public class PlayerBase : EntityBase
 {
-    [SerializeField] protected int myExp;
-    [SerializeField] protected int myMoney;
+    [SerializeField] private int myExp;
+    [SerializeField] private int myMoney;
     private int level;
 
-    public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
-    {
-        throw new System.NotImplementedException();
-    }
+    #region growthValue
+    [SerializeField] private int growthHp;
+    //[SerializeField] private int growthMana;
+    [SerializeField] private int growthPhysicalAtk;
+    [SerializeField] private int growthPhysicalDfe;
+    [SerializeField] private int growthMagicAtk;
+    [SerializeField] private int growthMagicDfe;
+    #endregion
 
     [PunRPC]
     protected void GetReward( int exp = 0, int money = 0 )
     {
         myExp += exp;
+        myMoney += money;
+
         if ( myExp >= level * 100 )
         {
             photonView.RPC( "LevelUp", PhotonTargets.MasterClient );
         }
-
-        myMoney += money;
     }
 
     [PunRPC]
@@ -30,6 +34,14 @@ public class PlayerBase : EntityBase,IPunObservable
     {
         myExp -= level * 100;
         level++;
+
+        maxHp += growthHp;
+        //maxMana += growthMana;
+        physicalAttack += growthPhysicalAtk;
+        physicalDefense += growthPhysicalDfe;
+        magicAttack += growthMagicAtk;
+        magicDifense += growthMagicDfe;
+
 
         if ( myExp >= level * 100 )
         {
