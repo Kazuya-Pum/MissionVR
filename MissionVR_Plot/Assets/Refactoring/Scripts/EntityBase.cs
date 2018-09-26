@@ -50,9 +50,10 @@ public class EntityBase : Photon.MonoBehaviour
         switch ( damageType )
         {
             case DamageType.PHYSICAL:
-
+                value *= value / physicalDefense;
                 break;
             case DamageType.MAGIC:
+                value *= value / magicDifense;
                 break;
             case DamageType.THROUGH:
                 break;
