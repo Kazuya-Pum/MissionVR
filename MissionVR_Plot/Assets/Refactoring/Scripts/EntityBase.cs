@@ -28,6 +28,11 @@ public class EntityBase : Photon.MonoBehaviour
     {
         hp = maxHp;
         mana = maxMana;
+
+        physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
+        physicalDefense = ( physicalDefense <= 0 ) ? 1 : physicalDefense;
+        magicAttack = ( magicAttack <= 0 ) ? 1 : magicAttack;
+        magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
     }
 
     [PunRPC]
@@ -63,8 +68,7 @@ public class EntityBase : Photon.MonoBehaviour
 
         if ( CheckDeath() )
         {
-            //TODO
-            EntityBase killer = PhotonView.Find( id ).gameObject.GetComponent<EntityBase>();
+            EntityBase killer = PhotonView.Find( id ).GetComponent<EntityBase>();
             if ( killer.objectType == ObjectType.Champion )
             {
                 killer.photonView.RPC( "GetReward", PhotonTargets.MasterClient, sendingExp, sendingMoney );
@@ -73,14 +77,17 @@ public class EntityBase : Photon.MonoBehaviour
         }
     }
 
-    [PunRPC]
-    protected void Death()
-    {
-        PhotonNetwork.Destroy( gameObject );
-    }
-
     private bool CheckDeath()
     {
         return ( hp <= 0 ) ? true : false;
+    }
+
+    [PunRPC]
+    protected virtual void Death()
+    {
+        if ( objectType != ObjectType.Champion )
+        {
+            Destroy( gameObject );
+        }
     }
 }

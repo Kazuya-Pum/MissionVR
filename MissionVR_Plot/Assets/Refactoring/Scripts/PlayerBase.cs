@@ -29,6 +29,7 @@ public class PlayerBase : EntityBase
         }
     }
 
+
     [PunRPC]
     protected void LevelUp()
     {
@@ -47,5 +48,17 @@ public class PlayerBase : EntityBase
         {
             LevelUp();
         }
+    }
+
+
+    [PunRPC]
+    protected override void Death()
+    {
+        ReSpawn();
+    }
+
+    private void ReSpawn()
+    {
+        Debug.Log( "respawn" );
     }
 }
