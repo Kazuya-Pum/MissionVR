@@ -8,14 +8,29 @@ public class PlayerBase : EntityBase
     [SerializeField] private int myMoney;
     private int level;
 
-    #region growthValue
-    [SerializeField] private int growthHp;
-    //[SerializeField] private int growthMana;
-    [SerializeField] private int growthPhysicalAtk;
-    [SerializeField] private int growthPhysicalDfe;
-    [SerializeField] private int growthMagicAtk;
-    [SerializeField] private int growthMagicDfe;
-    #endregion
+    [SerializeField] private GrowthValues growthValues;
+
+    private void Update()
+    {
+        if ( photonView.isMine )
+        {
+            GetKey();
+        }
+    }
+
+    private void GetKey()
+    {
+        float x = Input.GetAxis( "Horizontal" ) * Time.deltaTime * moveSpeed;
+        float z = Input.GetAxis( "Vertical" ) * Time.deltaTime * moveSpeed;
+
+        Move( x, z );
+    }
+
+    private void Move( float x, float z )
+    {
+        tfCache.Translate( x, 0, z );
+    }
+
 
     [PunRPC]
     protected void GetReward( int exp = 0, int money = 0 )
@@ -29,19 +44,18 @@ public class PlayerBase : EntityBase
         }
     }
 
-
     [PunRPC]
     protected void LevelUp()
     {
         myExp -= level * 100;
         level++;
 
-        maxHp += growthHp;
-        //maxMana += growthMana;
-        physicalAttack += growthPhysicalAtk;
-        physicalDefense += growthPhysicalDfe;
-        magicAttack += growthMagicAtk;
-        magicDifense += growthMagicDfe;
+        maxHp += growthValues.hp;
+        //maxMana += growthValues.mana;
+        physicalAttack += growthValues.phycalAttack;
+        physicalDefense += growthValues.physicalDefense;
+        magicAttack += growthValues.magicAttack;
+        magicDifense += growthValues.magicDefense;
 
 
         if ( myExp >= level * 100 )
@@ -61,4 +75,18 @@ public class PlayerBase : EntityBase
     {
         Debug.Log( "respawn" );
     }
+}
+
+/// <summary>
+/// レベルアップ時のステータス上昇値
+/// </summary>
+[System.Serializable]
+public class GrowthValues
+{
+    public int hp;
+    public int mana;
+    public int phycalAttack;
+    public int physicalDefense;
+    public int magicAttack;
+    public int magicDefense;
 }

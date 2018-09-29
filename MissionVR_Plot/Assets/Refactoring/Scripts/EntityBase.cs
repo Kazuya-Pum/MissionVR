@@ -21,7 +21,10 @@ public class EntityBase : Photon.MonoBehaviour
     [SerializeField] protected int sendingExp;
     [SerializeField] protected int sendingMoney;
 
-    [SerializeField] private float moveSpeed;
+    [SerializeField] protected float moveSpeed;
+
+    protected Transform tfCache;
+    protected Vector3 prev;
     #endregion
 
     protected virtual void Awake()
@@ -29,10 +32,19 @@ public class EntityBase : Photon.MonoBehaviour
         hp = maxHp;
         mana = maxMana;
 
+        #region NULLチェック
         physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
         physicalDefense = ( physicalDefense <= 0 ) ? 1 : physicalDefense;
         magicAttack = ( magicAttack <= 0 ) ? 1 : magicAttack;
         magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
+        moveSpeed = ( moveSpeed <= 0 ) ? 1 : moveSpeed;
+        #endregion
+    }
+
+    private void Start()
+    {
+        tfCache = transform;
+        prev = tfCache.position;
     }
 
     [PunRPC]
