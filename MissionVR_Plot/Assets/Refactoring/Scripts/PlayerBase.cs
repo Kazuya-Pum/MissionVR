@@ -10,7 +10,30 @@ public class PlayerBase : EntityBase
 
     [SerializeField] private GrowthValues growthValues;
 
-    private void Update()
+    // TODO 設定ファイル等に移設
+    [SerializeField] private float sensitivity;
+
+    private Transform head;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        sensitivity = ( sensitivity <= 0 ) ? 1 : sensitivity;
+    }
+
+
+    protected override void Start()
+    {
+        base.Start();
+
+        if ( photonView.isMine )
+        {
+            head = tfCache.Find( "Visor" );
+            head.Find( "Main Camera" ).gameObject.SetActive( true );
+        }
+    }
+
+    protected void Update()
     {
         if ( photonView.isMine )
         {
@@ -23,12 +46,31 @@ public class PlayerBase : EntityBase
         float x = Input.GetAxis( "Horizontal" ) * Time.deltaTime * moveSpeed;
         float z = Input.GetAxis( "Vertical" ) * Time.deltaTime * moveSpeed;
 
-        Move( x, z );
+        if ( x != 0 || z != 0 )
+        {
+            photonView.RPC( "Move", PhotonTargets.All, x, z );
+        }
+
+        float mouse_x = Input.GetAxis( "Mouse X" ) * Time.deltaTime * sensitivity;
+        float mouse_y = Input.GetAxis( "Mouse Y" ) * Time.deltaTime * sensitivity;
+
+        if ( mouse_x != 0 || mouse_y != 0 )
+        {
+            photonView.RPC( "Rotate", PhotonTargets.All, mouse_x, mouse_y );
+        }
     }
 
-    private void Move( float x, float z )
+    [PunRPC]
+    protected void Move( float x = 0, float z = 0 )
     {
         tfCache.Translate( x, 0, z );
+    }
+
+    [PunRPC]
+    protected void Rotate( float x = 0, float y = 0 )
+    {
+        tfCache.Rotate( 0, x, 0 );
+        head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );
     }
 
 

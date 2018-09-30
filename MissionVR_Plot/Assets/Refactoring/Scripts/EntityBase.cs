@@ -32,7 +32,7 @@ public class EntityBase : Photon.MonoBehaviour
         hp = maxHp;
         mana = maxMana;
 
-        #region NULLチェック
+        #region 値チェック
         physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
         physicalDefense = ( physicalDefense <= 0 ) ? 1 : physicalDefense;
         magicAttack = ( magicAttack <= 0 ) ? 1 : magicAttack;
@@ -41,7 +41,7 @@ public class EntityBase : Photon.MonoBehaviour
         #endregion
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         tfCache = transform;
         prev = tfCache.position;

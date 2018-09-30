@@ -72,4 +72,6 @@ MonoBehaviour:
   - Death
   - SetUp
   - GetReward
+  - Move
+  - Rotate
   DisableAutoOpenWizard: 1

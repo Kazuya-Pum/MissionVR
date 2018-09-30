@@ -28,7 +28,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1856034666191440
 GameObject:
   m_ObjectHideFlags: 0
@@ -77,7 +77,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1633122607711322}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0.24}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4620792546441694}
@@ -127,7 +127,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.24
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -242,7 +242,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 84
   m_CollisionDetection: 0
 --- !u!65 &65408951286866462
 BoxCollider:
@@ -295,6 +295,7 @@ MonoBehaviour:
     physicalDefense: 0
     magicAttack: 0
     magicDefense: 0
+  sensitivity: 200
 --- !u!114 &114681819047676678
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -381,6 +382,7 @@ MonoBehaviour:
   ownershipTransfer: 0
   ObservedComponents:
   - {fileID: 114681819047676678}
+  - {fileID: 114930109375837662}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
