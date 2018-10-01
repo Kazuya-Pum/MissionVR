@@ -26,9 +26,10 @@ public class PlayerBase : EntityBase
     {
         base.Start();
 
+        head = tfCache.Find( "Visor" );
+
         if ( photonView.isMine )
         {
-            head = tfCache.Find( "Visor" );
             head.Find( "Main Camera" ).gameObject.SetActive( true );
         }
     }
@@ -69,7 +70,7 @@ public class PlayerBase : EntityBase
     [PunRPC]
     protected void Rotate( float x = 0, float y = 0 )
     {
-        tfCache.Rotate( 0, x, 0 );
+        tfCache.localEulerAngles = new Vector3( 0, tfCache.localEulerAngles.y + x, 0 );
         head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );
     }
 
