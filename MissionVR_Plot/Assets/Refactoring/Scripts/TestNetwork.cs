@@ -25,13 +25,15 @@ public class TestNetwork : Photon.MonoBehaviour
         PhotonNetwork.Instantiate( "Player", new Vector3( 0, 0, 0 ), Quaternion.Euler( Vector3.zero ), 0 );
     }
 
-
+    [PunRPC]
     public void Summon()
     {
-        if ( PhotonNetwork.isMasterClient )
-        {
-            PhotonNetwork.Instantiate( "Minion", transform.position, Quaternion.identity, 0 );
-        }
+        PhotonNetwork.InstantiateSceneObject( "Minion", Vector3.zero, Quaternion.identity, 0, null );
     }
 
+
+    public void testSummon()
+    {
+        photonView.RPC( "Summon", PhotonTargets.MasterClient );
+    }
 }

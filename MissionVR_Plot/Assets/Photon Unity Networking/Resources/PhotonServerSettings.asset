@@ -74,4 +74,6 @@ MonoBehaviour:
   - GetReward
   - Move
   - Rotate
+  - FetchID
+  - Summon
   DisableAutoOpenWizard: 1
