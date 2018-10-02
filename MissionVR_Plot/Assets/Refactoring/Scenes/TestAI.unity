@@ -217,12 +217,12 @@ Prefab:
     - target: {fileID: 114468233145244806, guid: c3a21bc88476e3b4db32ed3a45841df9,
         type: 2}
       propertyPath: viewIdField
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 114468233145244806, guid: c3a21bc88476e3b4db32ed3a45841df9,
         type: 2}
       propertyPath: instantiationId
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c3a21bc88476e3b4db32ed3a45841df9, type: 2}
@@ -544,8 +544,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 0}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 3
-  instantiationId: 3
+  viewIdField: 1
+  instantiationId: 1
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!4 &1186694062
@@ -626,7 +626,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 1
   objectType: 1
-  maxHp: 0
+  maxHp: 125
   maxMana: 0
   physicalAttack: 0
   physicalDefense: 0

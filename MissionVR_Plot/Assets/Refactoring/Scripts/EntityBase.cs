@@ -22,9 +22,11 @@ public class EntityBase : Photon.MonoBehaviour
     [SerializeField] protected int sendingMoney;
 
     [SerializeField] protected float moveSpeed;
+    [SerializeField] protected float dashRate;
+    protected bool dashFlag = false;
 
     protected Transform tfCache;
-    protected Vector3 prev;
+
     #endregion
 
     protected virtual void Awake()
@@ -38,13 +40,15 @@ public class EntityBase : Photon.MonoBehaviour
         magicAttack = ( magicAttack <= 0 ) ? 1 : magicAttack;
         magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
         moveSpeed = ( moveSpeed <= 0 ) ? 1 : moveSpeed;
+        dashRate = ( dashRate < 1 ) ? 1 : dashRate;
         #endregion
+
+        tfCache = transform;
     }
 
     protected virtual void Start()
     {
-        tfCache = transform;
-        prev = tfCache.position;
+
     }
 
     [PunRPC]
@@ -85,7 +89,7 @@ public class EntityBase : Photon.MonoBehaviour
             {
                 killer.photonView.RPC( "GetReward", PhotonTargets.MasterClient, sendingExp, sendingMoney );
             }
-            photonView.RPC( "Death", PhotonTargets.All );
+            photonView.RPC( "Death", PhotonTargets.MasterClient );
         }
     }
 
@@ -97,9 +101,18 @@ public class EntityBase : Photon.MonoBehaviour
     [PunRPC]
     protected virtual void Death()
     {
-        if ( objectType != ObjectType.Champion )
+        PhotonNetwork.Destroy( gameObject );
+    }
+
+    [PunRPC]
+    protected virtual void Move( float x, float z )
+    {
+        if ( dashFlag )
         {
-            Destroy( gameObject );
+            x *= dashRate;
+            z *= dashRate;
         }
+
+        tfCache.Translate( x * moveSpeed, 0, z * moveSpeed );
     }
 }

@@ -19,12 +19,6 @@ public class PlayerBase : EntityBase
     {
         base.Awake();
         sensitivity = ( sensitivity <= 0 ) ? 1 : sensitivity;
-    }
-
-
-    protected override void Start()
-    {
-        base.Start();
 
         head = tfCache.Find( "Visor" );
 
@@ -44,8 +38,8 @@ public class PlayerBase : EntityBase
 
     private void GetKey()
     {
-        float x = Input.GetAxis( "Horizontal" ) * Time.deltaTime * moveSpeed;
-        float z = Input.GetAxis( "Vertical" ) * Time.deltaTime * moveSpeed;
+        float x = Input.GetAxis( "Horizontal" ) * Time.deltaTime;
+        float z = Input.GetAxis( "Vertical" ) * Time.deltaTime;
 
         if ( x != 0 || z != 0 )
         {
@@ -59,21 +53,29 @@ public class PlayerBase : EntityBase
         {
             photonView.RPC( "Rotate", PhotonTargets.All, mouse_x, mouse_y );
         }
-    }
 
-    [PunRPC]
-    protected void Move( float x = 0, float z = 0 )
-    {
-        tfCache.Translate( x, 0, z );
+        if ( Input.GetKeyDown( KeyCode.LeftShift ) )
+        {
+            photonView.RPC( "SetDashFlag", PhotonTargets.All, true );
+        }
+        else if ( Input.GetKeyUp( KeyCode.LeftShift ) )
+        {
+            photonView.RPC( "SetDashFlag", PhotonTargets.All, false );
+        }
     }
 
     [PunRPC]
     protected void Rotate( float x = 0, float y = 0 )
     {
         tfCache.localEulerAngles = new Vector3( 0, tfCache.localEulerAngles.y + x, 0 );
-        head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );
+        head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );   // TODO 角度の上限作成
     }
 
+    [PunRPC]
+    protected void SetDashFlag(bool flag)
+    {
+        dashFlag = flag;
+    }
 
     [PunRPC]
     protected void GetReward( int exp = 0, int money = 0 )
