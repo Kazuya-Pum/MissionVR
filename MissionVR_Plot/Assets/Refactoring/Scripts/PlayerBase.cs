@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase : EntityBase
+public class PlayerBase : MobBase
 {
     [SerializeField] private int myExp;
     [SerializeField] private int myMoney;
@@ -13,19 +13,18 @@ public class PlayerBase : EntityBase
     // TODO 設定ファイル等に移設
     [SerializeField] private float sensitivity;
 
-    private Transform head;
+    // TODO 銃の設定から取得
+    [SerializeField] private float gunFireRate;
+    private WaitForSeconds fireRate;
+
 
     protected override void Awake()
     {
         base.Awake();
-        sensitivity = ( sensitivity <= 0 ) ? 1 : sensitivity;
+        sensitivity = ( sensitivity <= 0 ) ? 1f : sensitivity;
+        gunFireRate = ( gunFireRate <= 0 ) ? 0.1f : gunFireRate;
 
-        head = tfCache.Find( "Visor" );
-
-        if ( photonView.isMine )
-        {
-            head.Find( "Main Camera" ).gameObject.SetActive( true );
-        }
+        fireRate = new WaitForSeconds( gunFireRate );
     }
 
     protected void Update()
@@ -36,6 +35,7 @@ public class PlayerBase : EntityBase
         }
     }
 
+    // TODO InputManagerからキーを設定し、そちらを使用
     private void GetKey()
     {
         float x = Input.GetAxis( "Horizontal" ) * Time.deltaTime;
@@ -62,13 +62,15 @@ public class PlayerBase : EntityBase
         {
             photonView.RPC( "SetDashFlag", PhotonTargets.All, false );
         }
-    }
 
-    [PunRPC]
-    protected void Rotate( float x = 0, float y = 0 )
-    {
-        tfCache.localEulerAngles = new Vector3( 0, tfCache.localEulerAngles.y + x, 0 );
-        head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );   // TODO 角度の上限作成
+        if ( Input.GetKeyDown( KeyCode.Mouse0 ) )
+        {
+            photonView.RPC( "PullTheTrigger", PhotonTargets.AllViaServer, true );
+        }
+        else if ( Input.GetKeyUp( KeyCode.Mouse0 ) )
+        {
+            photonView.RPC( "PullTheTrigger", PhotonTargets.AllViaServer, false );
+        }
     }
 
     [PunRPC]
@@ -113,6 +115,29 @@ public class PlayerBase : EntityBase
     private void ReSpawn()
     {
         Debug.Log( "respawn" );
+    }
+
+    [PunRPC]
+    protected void PullTheTrigger( bool trigger )
+    {
+        if ( trigger )
+        {
+            StartCoroutine( "Shooting" );
+        }
+        else
+        {
+            StopCoroutine( "Shooting" );
+        }
+
+    }
+
+    protected IEnumerator Shooting()
+    {
+        while ( true )
+        {
+            Debug.Log( "shoot" );
+            yield return fireRate;
+        }
     }
 }
 

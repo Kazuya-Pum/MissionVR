@@ -2,15 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MinionBase : EntityBase
+public class MinionBase : MobBase
 {
 
     protected Vector3 prev;
-
-    protected override void Awake()
-    {
-        base.Awake();
-    }
 
     protected override void Start()
     {
@@ -30,11 +25,17 @@ public class MinionBase : EntityBase
 
         Vector3 diff = tfCache.position - prev;
 
+        Rotate( diff );
+
+        prev = tfCache.position;
+    }
+
+    //[PunRPC]
+    protected void Rotate( Vector3 diff )
+    {
         if ( diff.magnitude > 0.01 )
         {
             tfCache.rotation = Quaternion.LookRotation( diff );
         }
-
-        prev = tfCache.position;
     }
 }

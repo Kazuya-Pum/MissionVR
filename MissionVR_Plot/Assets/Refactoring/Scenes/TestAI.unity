@@ -224,6 +224,16 @@ Prefab:
       propertyPath: instantiationId
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 114837586834237960, guid: c3a21bc88476e3b4db32ed3a45841df9,
+        type: 2}
+      propertyPath: sendingExp
+      value: 154
+      objectReference: {fileID: 0}
+    - target: {fileID: 114837586834237960, guid: c3a21bc88476e3b4db32ed3a45841df9,
+        type: 2}
+      propertyPath: sendingMoney
+      value: 206
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c3a21bc88476e3b4db32ed3a45841df9, type: 2}
   m_IsPrefabParent: 0
@@ -619,14 +629,14 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1295505753}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 192f0361667b453418d13f1aa3340413, type: 3}
+  m_Script: {fileID: 11500000, guid: ee06db71a52f26345ab911bf237df40f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   team: 1
-  objectType: 1
-  maxHp: 125
+  objectType: 0
+  maxHp: 99
   maxMana: 0
   physicalAttack: 0
   physicalDefense: 0
@@ -636,6 +646,17 @@ MonoBehaviour:
   sendingExp: 0
   sendingMoney: 0
   moveSpeed: 0
+  dashRate: 0
+  myExp: 0
+  myMoney: 0
+  growthValues:
+    hp: 0
+    mana: 0
+    phycalAttack: 0
+    physicalDefense: 0
+    magicAttack: 0
+    magicDefense: 0
+  sensitivity: 0
 --- !u!114 &1295505756
 MonoBehaviour:
   m_ObjectHideFlags: 0

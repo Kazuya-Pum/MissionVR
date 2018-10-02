@@ -272,7 +272,8 @@ MonoBehaviour:
   attackSpeed: 0
   sendingExp: 0
   sendingMoney: 0
-  moveSpeed: 0
+  moveSpeed: 1
+  dashRate: 1.5
   myExp: 0
   myMoney: 0
   growthValues:

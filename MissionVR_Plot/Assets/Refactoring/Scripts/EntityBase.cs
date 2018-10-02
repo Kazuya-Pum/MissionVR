@@ -21,12 +21,7 @@ public class EntityBase : Photon.MonoBehaviour
     [SerializeField] protected int sendingExp;
     [SerializeField] protected int sendingMoney;
 
-    [SerializeField] protected float moveSpeed;
-    [SerializeField] protected float dashRate;
-    protected bool dashFlag = false;
-
     protected Transform tfCache;
-
     #endregion
 
     protected virtual void Awake()
@@ -39,8 +34,6 @@ public class EntityBase : Photon.MonoBehaviour
         physicalDefense = ( physicalDefense <= 0 ) ? 1 : physicalDefense;
         magicAttack = ( magicAttack <= 0 ) ? 1 : magicAttack;
         magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
-        moveSpeed = ( moveSpeed <= 0 ) ? 1 : moveSpeed;
-        dashRate = ( dashRate < 1 ) ? 1 : dashRate;
         #endregion
 
         tfCache = transform;
@@ -102,23 +95,5 @@ public class EntityBase : Photon.MonoBehaviour
     protected virtual void Death()
     {
         PhotonNetwork.Destroy( gameObject );
-    }
-
-    [PunRPC]
-    protected virtual void Move( float x, float z )
-    {
-        if ( dashFlag )
-        {
-            x *= dashRate;
-            z *= dashRate;
-        }
-
-        tfCache.Translate( x * moveSpeed, 0, z * moveSpeed );
-    }
-
-    [PunRPC]
-    protected void SetDashFlag( bool flag )
-    {
-        dashFlag = flag;
     }
 }

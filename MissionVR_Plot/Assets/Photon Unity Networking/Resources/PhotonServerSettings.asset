@@ -76,4 +76,5 @@ MonoBehaviour:
   - Rotate
   - FetchID
   - Summon
+  - SetDashFlag
   DisableAutoOpenWizard: 1
