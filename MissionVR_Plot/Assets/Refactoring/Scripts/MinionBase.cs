@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class MinionBase : MobBase
 {
+    // TODO ミニオンのAIを作成
+
 
     protected Vector3 prev;
 

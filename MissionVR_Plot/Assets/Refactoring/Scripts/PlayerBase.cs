@@ -15,9 +15,9 @@ public class PlayerBase : MobBase
 
     private WaitForSeconds fireRate;
 
-    #region SHOOT_TEST
+    // TODO indexを元にデータ一覧から取得するようにする
+    // TODO EntityBaseに移動
     [SerializeField] protected GunInfo gunInfo;
-    #endregion
 
 
     protected override void Awake()

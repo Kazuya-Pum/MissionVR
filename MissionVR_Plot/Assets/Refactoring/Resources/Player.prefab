@@ -365,14 +365,13 @@ MonoBehaviour:
   team: 0
   entityType: 0
   maxHp: 50
-  maxMana: 0
+  maxMana: 1
   physicalAttack: 53
-  physicalDefense: 0
-  magicAttack: 0
-  magicDifense: 0
-  attackSpeed: 0
-  sendingExp: 0
-  sendingMoney: 0
+  physicalDefense: 1
+  magicAttack: 1
+  magicDifense: 1
+  sendingExp: 1
+  sendingMoney: 1
   head: {fileID: 0}
   muzzle: {fileID: 4289894769701186}
   moveSpeed: 1
@@ -380,12 +379,12 @@ MonoBehaviour:
   myExp: 0
   myMoney: 0
   growthValues:
-    hp: 0
-    mana: 0
-    phycalAttack: 0
-    physicalDefense: 0
-    magicAttack: 0
-    magicDefense: 0
+    hp: 1
+    mana: 1
+    phycalAttack: 1
+    physicalDefense: 1
+    magicAttack: 1
+    magicDefense: 1
   sensitivity: 200
   gunInfo:
     name: Test
@@ -479,8 +478,8 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 114681819047676678}
   ObservedComponentsFoldoutOpen: 1
-  viewIdField: 2
-  instantiationId: 2
+  viewIdField: 0
+  instantiationId: -1
   currentMasterID: -1
   isRuntimeInstantiated: 0
 --- !u!114 &114930109375837662

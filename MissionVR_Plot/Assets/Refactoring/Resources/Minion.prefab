@@ -298,9 +298,8 @@ MonoBehaviour:
   physicalDefense: 0
   magicAttack: 0
   magicDifense: 0
-  attackSpeed: 0
-  sendingExp: 0
-  sendingMoney: 0
+  sendingExp: 10
+  sendingMoney: 10
   head: {fileID: 0}
   muzzle: {fileID: 0}
   moveSpeed: 0

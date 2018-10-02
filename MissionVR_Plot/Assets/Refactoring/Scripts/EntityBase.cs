@@ -25,7 +25,14 @@ public class EntityBase : Photon.MonoBehaviour
     [SerializeField] protected int sendingMoney;
 
     protected Transform tfCache;
+
+    /// <summary>
+    /// 視点を取得するゲームオブジェクト
+    /// </summary>
     [SerializeField] protected Transform head;
+    /// <summary>
+    /// 銃撃時の銃弾の生成位置
+    /// </summary>
     [SerializeField] protected Transform muzzle;
     #endregion
 
