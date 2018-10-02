@@ -72,12 +72,6 @@ public class PlayerBase : EntityBase
     }
 
     [PunRPC]
-    protected void SetDashFlag(bool flag)
-    {
-        dashFlag = flag;
-    }
-
-    [PunRPC]
     protected void GetReward( int exp = 0, int money = 0 )
     {
         myExp += exp;

@@ -115,4 +115,10 @@ public class EntityBase : Photon.MonoBehaviour
 
         tfCache.Translate( x * moveSpeed, 0, z * moveSpeed );
     }
+
+    [PunRPC]
+    protected void SetDashFlag( bool flag )
+    {
+        dashFlag = flag;
+    }
 }
