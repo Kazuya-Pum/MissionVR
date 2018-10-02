@@ -7,6 +7,12 @@ public class MinionBase : MobBase
 
     protected Vector3 prev;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        entityType = EntityType.MINION;
+    }
+
     protected override void Start()
     {
         prev = tfCache.position;

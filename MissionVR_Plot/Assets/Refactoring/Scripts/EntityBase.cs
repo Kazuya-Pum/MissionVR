@@ -4,11 +4,15 @@ using UnityEngine;
 
 public enum DamageType { PHYSICAL, MAGIC, THROUGH }
 
+public enum Team { WHITE, BLACK }
+
+public enum EntityType { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
+
 public class EntityBase : Photon.MonoBehaviour
 {
     #region variable
-    public TeamColor team;
-    public ObjectType objectType;
+    public Team team;
+    public EntityType entityType;
     [SerializeField] protected int maxHp;
     protected int hp;
     [SerializeField] protected int maxMana;
@@ -17,12 +21,14 @@ public class EntityBase : Photon.MonoBehaviour
     [SerializeField] protected int physicalDefense;
     [SerializeField] protected int magicAttack;
     [SerializeField] protected int magicDifense;
-    [SerializeField] protected float attackSpeed;
     [SerializeField] protected int sendingExp;
     [SerializeField] protected int sendingMoney;
 
     protected Transform tfCache;
+    [SerializeField] protected Transform head;
+    [SerializeField] protected Transform muzzle;
     #endregion
+
 
     protected virtual void Awake()
     {
@@ -78,7 +84,7 @@ public class EntityBase : Photon.MonoBehaviour
         if ( CheckDeath() )
         {
             EntityBase killer = PhotonView.Find( id ).GetComponent<EntityBase>();
-            if ( killer.objectType == ObjectType.Champion )
+            if ( killer.entityType == EntityType.CHANPION )
             {
                 killer.photonView.RPC( "GetReward", PhotonTargets.MasterClient, sendingExp, sendingMoney );
             }
@@ -96,4 +102,14 @@ public class EntityBase : Photon.MonoBehaviour
     {
         PhotonNetwork.Destroy( gameObject );
     }
+}
+
+[System.Serializable]
+public class GunInfo
+{
+    public string name;
+    public GameObject bullet;
+    public float fireRate;
+    public float range;
+    //public GameObject model;
 }

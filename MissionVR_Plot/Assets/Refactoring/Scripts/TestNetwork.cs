@@ -5,6 +5,7 @@ using UnityEngine;
 public class TestNetwork : Photon.MonoBehaviour
 {
     [SerializeField] private GameObject[] minions;
+    [SerializeField] public GunInfo[] gunList;
 
     void Awake()
     {

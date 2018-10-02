@@ -13,18 +13,26 @@ public class PlayerBase : MobBase
     // TODO 設定ファイル等に移設
     [SerializeField] private float sensitivity;
 
-    // TODO 銃の設定から取得
-    [SerializeField] private float gunFireRate;
     private WaitForSeconds fireRate;
+
+    #region SHOOT_TEST
+    [SerializeField] protected GunInfo gunInfo;
+    #endregion
 
 
     protected override void Awake()
     {
         base.Awake();
         sensitivity = ( sensitivity <= 0 ) ? 1f : sensitivity;
-        gunFireRate = ( gunFireRate <= 0 ) ? 0.1f : gunFireRate;
 
-        fireRate = new WaitForSeconds( gunFireRate );
+        entityType = EntityType.CHANPION;
+
+        fireRate = new WaitForSeconds( gunInfo.fireRate );
+
+        if ( photonView.isMine )
+        {
+            head.Find( "Main Camera" ).gameObject.SetActive( true );
+        }
     }
 
     protected void Update()
@@ -92,7 +100,7 @@ public class PlayerBase : MobBase
         level++;
 
         maxHp += growthValues.hp;
-        //maxMana += growthValues.mana;
+        maxMana += growthValues.mana;
         physicalAttack += growthValues.phycalAttack;
         physicalDefense += growthValues.physicalDefense;
         magicAttack += growthValues.magicAttack;
@@ -128,17 +136,34 @@ public class PlayerBase : MobBase
         {
             StopCoroutine( "Shooting" );
         }
-
     }
 
     protected IEnumerator Shooting()
     {
         while ( true )
         {
-            Debug.Log( "shoot" );
+            Shoot();
             yield return fireRate;
         }
     }
+
+
+    protected void Shoot()
+    {
+        GameObject bullet = Instantiate( gunInfo.bullet, muzzle.position, head.rotation );
+
+        BulletBase bulletBase = bullet.GetComponent<BulletBase>();
+
+        if ( PhotonNetwork.isMasterClient )
+        {
+            bulletBase.ownerId = photonView.viewID;
+            bulletBase.damageValue = physicalAttack;
+            bulletBase.damageType = DamageType.PHYSICAL;
+        }
+        bulletBase.range = gunInfo.range;
+    }
+
+    // TODO 自動回復関数作成
 }
 
 /// <summary>

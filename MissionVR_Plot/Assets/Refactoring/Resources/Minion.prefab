@@ -290,8 +290,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 192f0361667b453418d13f1aa3340413, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: 0
-  objectType: 1
+  team: 1
+  entityType: 0
   maxHp: 50
   maxMana: 0
   physicalAttack: 0
@@ -301,7 +301,10 @@ MonoBehaviour:
   attackSpeed: 0
   sendingExp: 0
   sendingMoney: 0
+  head: {fileID: 0}
+  muzzle: {fileID: 0}
   moveSpeed: 0
+  dashRate: 0
 --- !u!136 &136099947009413468
 CapsuleCollider:
   m_ObjectHideFlags: 1

@@ -77,4 +77,5 @@ MonoBehaviour:
   - FetchID
   - Summon
   - SetDashFlag
+  - PullTheTrigger
   DisableAutoOpenWizard: 1

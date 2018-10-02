@@ -10,7 +10,6 @@ public class MobBase : EntityBase {
     protected bool dashFlag = false;
     #endregion
 
-    protected Transform head;
 
     protected override void Awake()
     {
@@ -18,12 +17,7 @@ public class MobBase : EntityBase {
         moveSpeed = ( moveSpeed <= 0 ) ? 1 : moveSpeed;
         dashRate = ( dashRate < 1 ) ? 1 : dashRate;
 
-        head = tfCache.Find( "Visor" );
-
-        if ( photonView.isMine )
-        {
-            head.Find( "Main Camera" ).gameObject.SetActive( true );
-        }
+        head = tfCache.Find( "Head" );
     }
 
     [PunRPC]
