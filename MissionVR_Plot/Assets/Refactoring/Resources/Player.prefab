@@ -372,6 +372,11 @@ MonoBehaviour:
   magicDifense: 1
   sendingExp: 1
   sendingMoney: 1
+  gunInfo:
+    name: Test
+    bullet: {fileID: 1503088935260778, guid: ae925eb7f2953834dac520ef743ce652, type: 2}
+    fireRate: 0.3
+    range: 30
   head: {fileID: 0}
   muzzle: {fileID: 4289894769701186}
   moveSpeed: 1
@@ -386,12 +391,6 @@ MonoBehaviour:
     physicalDefense: 1
     magicAttack: 1
     magicDefense: 1
-  sensitivity: 200
-  gunInfo:
-    name: Test
-    bullet: {fileID: 1503088935260778, guid: ae925eb7f2953834dac520ef743ce652, type: 2}
-    fireRate: 0.3
-    range: 30
 --- !u!114 &114681819047676678
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -479,6 +478,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 114681819047676678}
   - {fileID: 114930109375837662}
+  - {fileID: 114590224186255274}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1

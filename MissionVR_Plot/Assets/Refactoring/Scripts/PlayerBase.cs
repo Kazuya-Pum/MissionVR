@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase : MobBase
+public class PlayerBase : MobBase, IPunObservable
 {
     [SerializeField] private int myExp;
     [SerializeField] private int myMoney;
@@ -14,7 +14,7 @@ public class PlayerBase : MobBase
     protected override void Awake()
     {
         base.Awake();
-        
+
         autoRecoverSpam = ( autoRecoverSpam <= 0 ) ? 1f : autoRecoverSpam;
 
         entityType = EntityType.CHANPION;
@@ -108,10 +108,32 @@ public class PlayerBase : MobBase
     protected void AutoRecover()
     {
         autoRecoverTime += Time.deltaTime;
-        if(autoRecoverTime >= autoRecoverSpam )
+        if ( autoRecoverTime >= autoRecoverSpam )
         {
             Recover( 1, 1 );
             autoRecoverTime -= autoRecoverSpam;
+        }
+    }
+
+    public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    {
+        if ( stream.isWriting && PhotonNetwork.isMasterClient )
+        {
+            stream.SendNext( maxHp );
+            stream.SendNext( Hp );
+            stream.SendNext( maxMana );
+            stream.SendNext( Mana );
+            stream.SendNext( myExp );
+            stream.SendNext( myMoney );
+        }
+        else if ( stream.isReading )
+        {
+            maxHp = (int)stream.ReceiveNext();
+            Hp = (int)stream.ReceiveNext();
+            maxMana = (int)stream.ReceiveNext();
+            Mana = (int)stream.ReceiveNext();
+            myExp = (int)stream.ReceiveNext();
+            myMoney = (int)stream.ReceiveNext();
         }
     }
 }
