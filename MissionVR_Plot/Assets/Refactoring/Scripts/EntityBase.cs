@@ -14,9 +14,9 @@ public class EntityBase : Photon.MonoBehaviour
     public Team team;
     public EntityType entityType;
     [SerializeField] protected int maxHp;
-    protected int hp;
+    private int hp;
     [SerializeField] protected int maxMana;
-    protected int mana;
+    private int mana;
     [SerializeField] protected int physicalAttack;
     [SerializeField] protected int physicalDefense;
     [SerializeField] protected int magicAttack;
@@ -34,13 +34,54 @@ public class EntityBase : Photon.MonoBehaviour
     /// 銃撃時の銃弾の生成位置
     /// </summary>
     [SerializeField] protected Transform muzzle;
+
+    protected int Hp
+    {
+        get
+        {
+            return hp;
+        }
+
+        set
+        {
+            if ( value >= maxHp )
+            {
+                hp = maxHp;
+            }
+            else
+            { 
+                hp = value;
+            }
+        }
+    }
+
+    protected int Mana
+    {
+        get
+        {
+            return mana;
+        }
+
+        set
+        {
+            if ( value >= maxMana )
+            {
+                mana = maxMana;
+            }
+            else
+            {
+                mana = value;
+            }
+        }
+    }
+
     #endregion
 
 
     protected virtual void Awake()
     {
-        hp = maxHp;
-        mana = maxMana;
+        Hp = maxHp;
+        Mana = maxMana;
 
         #region 値チェック
         physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
@@ -86,7 +127,7 @@ public class EntityBase : Photon.MonoBehaviour
                 break;
         }
 
-        hp -= value;
+        Hp -= value;
 
         if ( CheckDeath() )
         {
@@ -101,7 +142,7 @@ public class EntityBase : Photon.MonoBehaviour
 
     private bool CheckDeath()
     {
-        return ( hp <= 0 ) ? true : false;
+        return ( Hp <= 0 ) ? true : false;
     }
 
     [PunRPC]

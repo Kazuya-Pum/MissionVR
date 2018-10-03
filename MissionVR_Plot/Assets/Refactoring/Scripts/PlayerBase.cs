@@ -164,6 +164,12 @@ public class PlayerBase : MobBase
     }
 
     // TODO 自動回復関数作成
+
+    protected void Recover()
+    {
+        Hp++;
+        Mana++;
+    }
 }
 
 /// <summary>
