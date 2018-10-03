@@ -11,80 +11,26 @@ public class PlayerBase : MobBase
 
     [SerializeField] private GrowthValues growthValues;
 
-    // TODO 設定ファイル等に移設
-    [SerializeField] private float sensitivity;
-
-    private WaitForSeconds fireRate;
-
-    // TODO indexを元にデータ一覧から取得するようにする
-    // TODO EntityBaseに移動
-    [SerializeField] protected GunInfo gunInfo;
-
-
     protected override void Awake()
     {
         base.Awake();
-        sensitivity = ( sensitivity <= 0 ) ? 1f : sensitivity;
+        
         autoRecoverSpam = ( autoRecoverSpam <= 0 ) ? 1f : autoRecoverSpam;
 
         entityType = EntityType.CHANPION;
 
-        fireRate = new WaitForSeconds( gunInfo.fireRate );
-
         if ( photonView.isMine )
         {
             head.Find( "Main Camera" ).gameObject.SetActive( true );
+            GameObject.FindGameObjectWithTag( "Controller" ).GetComponent<PlayerController>().player = this;
         }
     }
 
     protected void Update()
     {
-        if ( photonView.isMine )
-        {
-            GetKey();
-        }
-
         if ( PhotonNetwork.isMasterClient )
         {
             AutoRecover();
-        }
-    }
-
-    // TODO InputManagerからキーを設定し、そちらを使用
-    private void GetKey()
-    {
-        float x = Input.GetAxis( "Horizontal" ) * Time.deltaTime;
-        float z = Input.GetAxis( "Vertical" ) * Time.deltaTime;
-
-        if ( x != 0 || z != 0 )
-        {
-            photonView.RPC( "Move", PhotonTargets.All, x, z );
-        }
-
-        float mouse_x = Input.GetAxis( "Mouse X" ) * Time.deltaTime * sensitivity;
-        float mouse_y = Input.GetAxis( "Mouse Y" ) * Time.deltaTime * sensitivity;
-
-        if ( mouse_x != 0 || mouse_y != 0 )
-        {
-            photonView.RPC( "Rotate", PhotonTargets.All, mouse_x, mouse_y );
-        }
-
-        if ( Input.GetKeyDown( KeyCode.LeftShift ) )
-        {
-            photonView.RPC( "SetDashFlag", PhotonTargets.All, true );
-        }
-        else if ( Input.GetKeyUp( KeyCode.LeftShift ) )
-        {
-            photonView.RPC( "SetDashFlag", PhotonTargets.All, false );
-        }
-
-        if ( Input.GetKeyDown( KeyCode.Mouse0 ) )
-        {
-            photonView.RPC( "PullTheTrigger", PhotonTargets.AllViaServer, true );
-        }
-        else if ( Input.GetKeyUp( KeyCode.Mouse0 ) )
-        {
-            photonView.RPC( "PullTheTrigger", PhotonTargets.AllViaServer, false );
         }
     }
 
@@ -132,6 +78,8 @@ public class PlayerBase : MobBase
         Debug.Log( "respawn" );
     }
 
+
+    // 連打で高速で撃ててしまう
     [PunRPC]
     protected void PullTheTrigger( bool trigger )
     {
@@ -143,31 +91,6 @@ public class PlayerBase : MobBase
         {
             StopCoroutine( "Shooting" );
         }
-    }
-
-    protected IEnumerator Shooting()
-    {
-        while ( true )
-        {
-            Shoot();
-            yield return fireRate;
-        }
-    }
-
-
-    protected void Shoot()
-    {
-        GameObject bullet = Instantiate( gunInfo.bullet, muzzle.position, head.rotation );
-
-        BulletBase bulletBase = bullet.GetComponent<BulletBase>();
-
-        if ( PhotonNetwork.isMasterClient )
-        {
-            bulletBase.ownerId = photonView.viewID;
-            bulletBase.damageValue = physicalAttack;
-            bulletBase.damageType = DamageType.PHYSICAL;
-        }
-        bulletBase.range = gunInfo.range;
     }
 
     /// <summary>

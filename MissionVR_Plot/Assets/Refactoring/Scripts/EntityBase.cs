@@ -13,6 +13,9 @@ public class EntityBase : Photon.MonoBehaviour
     #region variable
     public Team team;
     public EntityType entityType;
+
+    // クラス作ってもいいかも
+    #region Status
     [SerializeField] protected int maxHp;
     private int hp;
     [SerializeField] protected int maxMana;
@@ -23,8 +26,13 @@ public class EntityBase : Photon.MonoBehaviour
     [SerializeField] protected int magicDifense;
     [SerializeField] protected int sendingExp;
     [SerializeField] protected int sendingMoney;
+    #endregion
 
     protected Transform tfCache;
+
+    // TODO indexを元にデータ一覧から取得するようにする
+    [SerializeField] protected GunInfo gunInfo;
+    private WaitForSeconds fireRate;
 
     /// <summary>
     /// 視点を取得するゲームオブジェクト
@@ -49,7 +57,7 @@ public class EntityBase : Photon.MonoBehaviour
                 hp = maxHp;
             }
             else
-            { 
+            {
                 hp = value;
             }
         }
@@ -90,6 +98,8 @@ public class EntityBase : Photon.MonoBehaviour
         magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
         #endregion
 
+        fireRate = new WaitForSeconds( gunInfo.fireRate );
+
         tfCache = transform;
     }
 
@@ -110,6 +120,30 @@ public class EntityBase : Photon.MonoBehaviour
         {
             target.photonView.RPC( "Damaged", PhotonTargets.MasterClient, damageValue, damageType, id );
         }
+    }
+
+    protected IEnumerator Shooting()
+    {
+        while ( true )
+        {
+            Shoot();
+            yield return fireRate;
+        }
+    }
+
+    protected void Shoot()
+    {
+        GameObject bullet = Instantiate( gunInfo.bullet, muzzle.position, head.rotation );
+
+        BulletBase bulletBase = bullet.GetComponent<BulletBase>();
+
+        if ( PhotonNetwork.isMasterClient )
+        {
+            bulletBase.ownerId = photonView.viewID;
+            bulletBase.damageValue = physicalAttack;
+            bulletBase.damageType = DamageType.PHYSICAL;
+        }
+        bulletBase.range = gunInfo.range;
     }
 
     [PunRPC]
