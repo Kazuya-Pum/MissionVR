@@ -115,12 +115,12 @@ public class PlayerBase : MobBase, IPunObservable
         }
     }
 
-    public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    public override void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
     {
+        base.OnPhotonSerializeView( stream, info );
+
         if ( stream.isWriting && PhotonNetwork.isMasterClient )
         {
-            stream.SendNext( maxHp );
-            stream.SendNext( Hp );
             stream.SendNext( maxMana );
             stream.SendNext( Mana );
             stream.SendNext( myExp );
@@ -128,16 +128,11 @@ public class PlayerBase : MobBase, IPunObservable
         }
         else if ( stream.isReading && !PhotonNetwork.isMasterClient )
         {
-            maxHp = (int)stream.ReceiveNext();
-            Hp = (int)stream.ReceiveNext();
             maxMana = (int)stream.ReceiveNext();
             Mana = (int)stream.ReceiveNext();
             myExp = (int)stream.ReceiveNext();
             myMoney = (int)stream.ReceiveNext();
         }
-
-        hpSlider.maxValue = maxHp;
-        hpSlider.value = Hp;
     }
 }
 

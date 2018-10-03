@@ -9,7 +9,7 @@ public enum Team { WHITE, BLACK }
 
 public enum EntityType { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
 
-public class EntityBase : Photon.MonoBehaviour
+public class EntityBase : Photon.MonoBehaviour, IPunObservable
 {
     #region variable
     public Team team;
@@ -186,6 +186,23 @@ public class EntityBase : Photon.MonoBehaviour
     protected virtual void Death()
     {
         PhotonNetwork.Destroy( gameObject );
+    }
+
+    public virtual void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    {
+        if ( stream.isWriting && PhotonNetwork.isMasterClient )
+        {
+            stream.SendNext( maxHp );
+            stream.SendNext( Hp );
+        }
+        else if ( stream.isReading && !PhotonNetwork.isMasterClient )
+        {
+            maxHp = (int)stream.ReceiveNext();
+            Hp = (int)stream.ReceiveNext();
+        }
+
+        hpSlider.maxValue = maxHp;
+        hpSlider.value = Hp;
     }
 }
 
