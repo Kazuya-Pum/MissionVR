@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum DamageType { PHYSICAL, MAGIC, THROUGH }
 
@@ -29,6 +30,8 @@ public class EntityBase : Photon.MonoBehaviour
     #endregion
 
     protected Transform tfCache;
+
+    [SerializeField] protected Slider hpSlider;
 
     // TODO indexを元にデータ一覧から取得するようにする
     [SerializeField] protected GunInfo gunInfo;

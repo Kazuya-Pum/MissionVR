@@ -126,7 +126,7 @@ public class PlayerBase : MobBase, IPunObservable
             stream.SendNext( myExp );
             stream.SendNext( myMoney );
         }
-        else if ( stream.isReading )
+        else if ( stream.isReading && !PhotonNetwork.isMasterClient )
         {
             maxHp = (int)stream.ReceiveNext();
             Hp = (int)stream.ReceiveNext();
@@ -135,6 +135,9 @@ public class PlayerBase : MobBase, IPunObservable
             myExp = (int)stream.ReceiveNext();
             myMoney = (int)stream.ReceiveNext();
         }
+
+        hpSlider.maxValue = maxHp;
+        hpSlider.value = Hp;
     }
 }
 
