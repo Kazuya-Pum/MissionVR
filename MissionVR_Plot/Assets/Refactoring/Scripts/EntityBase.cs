@@ -32,6 +32,8 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     protected Transform tfCache;
 
     [SerializeField] protected Slider hpSlider;
+    protected Transform tfSliderCache;
+    protected Transform playerCamera;
 
     // TODO indexを元にデータ一覧から取得するようにする
     [SerializeField] protected GunInfo gunInfo;
@@ -104,11 +106,17 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         fireRate = new WaitForSeconds( gunInfo.fireRate );
 
         tfCache = transform;
+        tfSliderCache = hpSlider.transform;
     }
 
     protected virtual void Start()
     {
+        playerCamera = GameObject.Find( "Main Camera" ).transform;
+    }
 
+    protected virtual void Update()
+    {
+        tfSliderCache.LookAt( playerCamera );
     }
 
     [PunRPC]
