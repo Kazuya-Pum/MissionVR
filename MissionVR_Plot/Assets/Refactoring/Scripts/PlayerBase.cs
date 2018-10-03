@@ -170,8 +170,6 @@ public class PlayerBase : MobBase
         bulletBase.range = gunInfo.range;
     }
 
-    // TODO 自動回復関数作成->Update
-
     /// <summary>
     /// HP、Manaの回復
     /// </summary>

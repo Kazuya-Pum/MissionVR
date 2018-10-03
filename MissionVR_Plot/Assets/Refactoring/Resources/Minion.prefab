@@ -42,8 +42,8 @@ GameObject:
   - component: {fileID: 114837586834237960}
   - component: {fileID: 114468233145244806}
   - component: {fileID: 54730392952429718}
-  - component: {fileID: 114609206969606628}
   - component: {fileID: 114108410098190130}
+  - component: {fileID: 114609206969606628}
   m_Layer: 0
   m_Name: Minion
   m_TagString: Untagged
@@ -261,6 +261,7 @@ MonoBehaviour:
   ownershipTransfer: 0
   ObservedComponents:
   - {fileID: 114108410098190130}
+  - {fileID: 114609206969606628}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
@@ -278,7 +279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_SynchronizeVelocity: 1
-  m_SynchronizeAngularVelocity: 1
+  m_SynchronizeAngularVelocity: 0
 --- !u!114 &114837586834237960
 MonoBehaviour:
   m_ObjectHideFlags: 1
