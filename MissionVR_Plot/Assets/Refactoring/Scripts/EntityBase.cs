@@ -32,6 +32,8 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     protected Transform tfCache;
 
     [SerializeField] protected Slider hpSlider;
+    [SerializeField] private Color allyColor;
+    [SerializeField] private Color enemyColor;
     protected Transform tfSliderCache;
     protected Transform playerCamera;
 
@@ -112,11 +114,15 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     protected virtual void Start()
     {
         playerCamera = GameObject.Find( "Main Camera" ).transform;
+
+        SetBarColor( playerCamera.root.GetComponent<EntityBase>().team );
     }
 
     protected virtual void Update()
     {
         tfSliderCache.LookAt( playerCamera );
+        hpSlider.maxValue = maxHp;
+        hpSlider.value = Hp;
     }
 
     [PunRPC]
@@ -196,6 +202,18 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         PhotonNetwork.Destroy( gameObject );
     }
 
+    private void SetBarColor( Team playerTeam )
+    {
+        if ( playerTeam == team )
+        {
+            tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = allyColor;
+        }
+        else
+        {
+            tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = enemyColor;
+        }
+    }
+
     public virtual void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
     {
         if ( stream.isWriting && PhotonNetwork.isMasterClient )
@@ -208,9 +226,6 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
             maxHp = (int)stream.ReceiveNext();
             Hp = (int)stream.ReceiveNext();
         }
-
-        hpSlider.maxValue = maxHp;
-        hpSlider.value = Hp;
     }
 }
 

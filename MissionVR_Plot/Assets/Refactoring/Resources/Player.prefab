@@ -531,6 +531,8 @@ MonoBehaviour:
   sendingExp: 1
   sendingMoney: 1
   hpSlider: {fileID: 114706735399193270}
+  allyColor: {r: 0, g: 1, b: 0, a: 1}
+  enemyColor: {r: 1, g: 0, b: 0, a: 1}
   gunInfo:
     name: Test
     bullet: {fileID: 1503088935260778, guid: ae925eb7f2953834dac520ef743ce652, type: 2}

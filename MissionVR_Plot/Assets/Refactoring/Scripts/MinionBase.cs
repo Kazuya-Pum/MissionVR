@@ -17,11 +17,13 @@ public class MinionBase : MobBase
 
     protected override void Start()
     {
+        base.Start();
         prev = tfCache.position;
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         Move( 0, 0 );
         //photonView.RPC( "Move", PhotonTargets.All, 0f, 0f );
     }
