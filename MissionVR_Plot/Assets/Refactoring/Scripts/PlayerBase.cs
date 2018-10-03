@@ -7,6 +7,7 @@ public class PlayerBase : MobBase
     [SerializeField] private int myExp;
     [SerializeField] private int myMoney;
     private int level;
+    [SerializeField] private float autoRecoverSpam;
 
     [SerializeField] private GrowthValues growthValues;
 
@@ -24,6 +25,7 @@ public class PlayerBase : MobBase
     {
         base.Awake();
         sensitivity = ( sensitivity <= 0 ) ? 1f : sensitivity;
+        autoRecoverSpam = ( autoRecoverSpam <= 0 ) ? 1f : autoRecoverSpam;
 
         entityType = EntityType.CHANPION;
 
@@ -40,6 +42,11 @@ public class PlayerBase : MobBase
         if ( photonView.isMine )
         {
             GetKey();
+        }
+
+        if ( PhotonNetwork.isMasterClient )
+        {
+            AutoRecover();
         }
     }
 
@@ -163,12 +170,28 @@ public class PlayerBase : MobBase
         bulletBase.range = gunInfo.range;
     }
 
-    // TODO 自動回復関数作成
+    // TODO 自動回復関数作成->Update
 
-    protected void Recover()
+    /// <summary>
+    /// HP、Manaの回復
+    /// </summary>
+    /// <param name="cHp">HPの回復値</param>
+    /// <param name="cMana">Manaの回復値（省略可）</param>
+    protected void Recover( int cHp, int cMana = 0 )
     {
-        Hp++;
-        Mana++;
+        Hp += cHp;
+        Mana += cMana;
+    }
+
+    float autoRecoverTime;
+    protected void AutoRecover()
+    {
+        autoRecoverTime += Time.deltaTime;
+        if(autoRecoverTime >= autoRecoverSpam )
+        {
+            Recover( 1, 1 );
+            autoRecoverTime -= autoRecoverSpam;
+        }
     }
 }
 
