@@ -76,7 +76,6 @@ public class PlayerBase : MobBase
         magicAttack += growthValues.magicAttack;
         magicDifense += growthValues.magicDefense;
 
-
         if ( myExp >= level * 100 )
         {
             LevelUp();
@@ -90,6 +89,7 @@ public class PlayerBase : MobBase
         ReSpawn();
     }
 
+    // TODO リスポーン処理作成
     private void ReSpawn()
     {
         Debug.Log( "respawn" );
@@ -100,14 +100,7 @@ public class PlayerBase : MobBase
     [PunRPC]
     protected void PullTheTrigger( bool trigger )
     {
-        if ( trigger )
-        {
-            StartCoroutine( "Shooting" );
-        }
-        else
-        {
-            StopCoroutine( "Shooting" );
-        }
+        this.trigger = trigger;
     }
 
     /// <summary>

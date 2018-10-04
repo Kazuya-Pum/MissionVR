@@ -37,7 +37,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     public int gunIndex;
     protected GunInfo gunInfo;
-    private WaitForSeconds fireRate;
+    protected bool trigger;
 
     /// <summary>
     /// 視点を取得するゲームオブジェクト
@@ -104,7 +104,6 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         #endregion
 
         gunInfo = TestNetwork.instance.DataBase.gunInfos[gunIndex];
-        fireRate = new WaitForSeconds( gunInfo.fireRate );
 
         tfCache = transform;
         tfSliderCache = hpSlider.transform;
@@ -122,6 +121,8 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         tfSliderCache.LookAt( playerCamera );
         hpSlider.maxValue = maxHp;
         hpSlider.value = Hp;
+
+        Shooting( trigger );
     }
 
     [PunRPC]
@@ -144,12 +145,20 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         }
     }
 
-    protected IEnumerator Shooting()
+    float interval;
+    protected void Shooting( bool trigger )
     {
-        while ( true )
+        if ( interval >= gunInfo.fireRate )
         {
-            Shoot();
-            yield return fireRate;
+            if ( trigger )
+            {
+                Shoot();
+                interval = 0;
+            }
+        }
+        else
+        {
+            interval += Time.deltaTime;
         }
     }
 
