@@ -144,7 +144,7 @@ public class PlayerBase : MobBase
     /// <param name="myMoney"></param>
     /// <param name="level"></param>
     [PunRPC]
-    public void FetchLocalParams( int maxHp, int hp, int maxMana, int mana, int myExp, int myMoney, int level )
+    protected void FetchLocalParams( int maxHp, int hp, int maxMana, int mana, int myExp, int myMoney, int level )
     {
         this.maxHp = maxHp;
         Hp = hp;

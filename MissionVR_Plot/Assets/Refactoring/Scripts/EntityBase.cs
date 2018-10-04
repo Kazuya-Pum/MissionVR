@@ -166,6 +166,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
             bulletBase.damageType = DamageType.PHYSICAL;
         }
         bulletBase.range = gunInfo.range;
+        bulletBase.team = team;
     }
 
     [PunRPC]

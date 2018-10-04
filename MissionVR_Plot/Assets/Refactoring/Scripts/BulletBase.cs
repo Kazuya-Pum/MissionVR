@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent( typeof( Rigidbody ) )]
 public class BulletBase : Photon.MonoBehaviour
 {
     #region 発射時に受け取る値
@@ -10,6 +10,7 @@ public class BulletBase : Photon.MonoBehaviour
     public int damageValue;
     public DamageType damageType;
     public float range;
+    public Team team;
     #endregion
 
     /// <summary>
@@ -47,12 +48,15 @@ public class BulletBase : Photon.MonoBehaviour
 
     private void OnTriggerEnter( Collider other )
     {
-        // TODO 味方に当たった場合は消えずにすり抜けさせる
-        if ( ownerId > 0 && other.GetComponent<EntityBase>() )
-        {
-            PhotonView.Find( ownerId ).photonView.RPC( "Attack", PhotonTargets.MasterClient, damageValue, other.GetComponent<EntityBase>(), damageType, ownerId );
-        }
+        EntityBase hit = other.GetComponent<EntityBase>();
 
-        Destroy( gameObject );
+        if ( !hit || hit.team != team )
+        {
+            if ( ownerId > 0 && hit )
+            {
+                PhotonView.Find( ownerId ).photonView.RPC( "Attack", PhotonTargets.MasterClient, damageValue, hit, damageType, ownerId );
+            }
+            Destroy( gameObject );
+        }
     }
 }
