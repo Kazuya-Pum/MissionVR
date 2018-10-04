@@ -121,14 +121,14 @@ public class PlayerBase : MobBase, IPunObservable
     {
         base.OnPhotonSerializeView( stream, info );
 
-        if ( stream.isWriting && PhotonNetwork.isMasterClient )
+        if ( stream.isWriting )
         {
             stream.SendNext( maxMana );
             stream.SendNext( Mana );
             stream.SendNext( myExp );
             stream.SendNext( myMoney );
         }
-        else if ( stream.isReading && !PhotonNetwork.isMasterClient )
+        else if ( stream.isReading )
         {
             maxMana = (int)stream.ReceiveNext();
             Mana = (int)stream.ReceiveNext();

@@ -78,4 +78,5 @@ MonoBehaviour:
   - Summon
   - SetDashFlag
   - PullTheTrigger
+  - FetchTeam
   DisableAutoOpenWizard: 1

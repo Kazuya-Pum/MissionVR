@@ -520,7 +520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee06db71a52f26345ab911bf237df40f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: 0
+  team: 1
   entityType: 0
   maxHp: 50
   maxMana: 1
@@ -531,13 +531,7 @@ MonoBehaviour:
   sendingExp: 1
   sendingMoney: 1
   hpSlider: {fileID: 114706735399193270}
-  allyColor: {r: 0, g: 1, b: 0, a: 1}
-  enemyColor: {r: 1, g: 0, b: 0, a: 1}
-  gunInfo:
-    name: Test
-    bullet: {fileID: 1503088935260778, guid: ae925eb7f2953834dac520ef743ce652, type: 2}
-    fireRate: 0.3
-    range: 30
+  gunIndex: 0
   head: {fileID: 0}
   muzzle: {fileID: 4289894769701186}
   moveSpeed: 1

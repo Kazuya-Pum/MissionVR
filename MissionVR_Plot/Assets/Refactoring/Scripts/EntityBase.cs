@@ -32,13 +32,11 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     protected Transform tfCache;
 
     [SerializeField] protected Slider hpSlider;
-    [SerializeField] private Color allyColor;
-    [SerializeField] private Color enemyColor;
     protected Transform tfSliderCache;
     protected Transform playerCamera;
 
-    // TODO indexを元にデータ一覧から取得するようにする
-    [SerializeField] protected GunInfo gunInfo;
+    public int gunIndex;
+    protected GunInfo gunInfo;
     private WaitForSeconds fireRate;
 
     /// <summary>
@@ -105,6 +103,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
         #endregion
 
+        gunInfo = TestNetwork.instance.DataBase.gunInfos[gunIndex];
         fireRate = new WaitForSeconds( gunInfo.fireRate );
 
         tfCache = transform;
@@ -123,6 +122,12 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         tfSliderCache.LookAt( playerCamera );
         hpSlider.maxValue = maxHp;
         hpSlider.value = Hp;
+    }
+
+    [PunRPC]
+    public void FetchTeam( Team remoteTeam )
+    {
+        team = remoteTeam;
     }
 
     [PunRPC]
@@ -206,35 +211,28 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {
         if ( playerTeam == team )
         {
-            tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = allyColor;
+            tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = TestNetwork.instance.DataBase.allyColor;
         }
         else
         {
-            tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = enemyColor;
+            tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = TestNetwork.instance.DataBase.enemyColor;
         }
     }
 
+    // TODO デリゲートとジェネリック作る
     public virtual void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
     {
-        if ( stream.isWriting && PhotonNetwork.isMasterClient )
+        if ( stream.isWriting )
         {
             stream.SendNext( maxHp );
             stream.SendNext( Hp );
+            stream.SendNext( head.rotation );
         }
-        else if ( stream.isReading && !PhotonNetwork.isMasterClient )
+        else if ( stream.isReading )
         {
             maxHp = (int)stream.ReceiveNext();
             Hp = (int)stream.ReceiveNext();
+            head.rotation = (Quaternion)stream.ReceiveNext();
         }
     }
-}
-
-[System.Serializable]
-public class GunInfo
-{
-    public string name;
-    public GameObject bullet;
-    public float fireRate;
-    public float range;
-    //public GameObject model;
 }

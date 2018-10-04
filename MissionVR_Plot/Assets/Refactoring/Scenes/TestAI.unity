@@ -480,9 +480,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7dea13571f25d9469b5819a3151e1f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minions:
-  - {fileID: 1577573244882704, guid: c3a21bc88476e3b4db32ed3a45841df9, type: 2}
-  gunList: []
+  dataBase:
+    allyColor: {r: 0, g: 1, b: 0, a: 1}
+    enemyColor: {r: 1, g: 0, b: 0, a: 1}
+    gunInfos:
+    - name: Test
+      bullet: {fileID: 1503088935260778, guid: ae925eb7f2953834dac520ef743ce652, type: 2}
+      fireRate: 0.3
+      range: 50
 --- !u!1 &1791961479
 GameObject:
   m_ObjectHideFlags: 0
