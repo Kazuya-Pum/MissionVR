@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : Photon.MonoBehaviour
 {
+    public static PlayerController instance;
 
     public PlayerBase player;
 
@@ -12,6 +13,15 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        if ( instance == null )
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy( gameObject );
+        }
+
         sensitivity = ( sensitivity <= 0 ) ? 100f : sensitivity;
     }
 
@@ -35,8 +45,8 @@ public class PlayerController : MonoBehaviour
             player.photonView.RPC( "Move", PhotonTargets.All, x, z );
         }
 
-        float mouse_x = Input.GetAxis( "Mouse X" ) * Time.deltaTime * sensitivity;
-        float mouse_y = Input.GetAxis( "Mouse Y" ) * Time.deltaTime * sensitivity;
+        float mouse_x = Input.GetAxis( "Mouse X" ) * Time.deltaTime;
+        float mouse_y = Input.GetAxis( "Mouse Y" ) * Time.deltaTime;
 
         if ( mouse_x != 0 || mouse_y != 0 )
         {

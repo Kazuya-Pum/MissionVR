@@ -18,9 +18,9 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     // クラス作ってもいいかも
     #region Status
     [SerializeField] protected int maxHp;
-    private int hp;
+    [SerializeField] private int hp;
     [SerializeField] protected int maxMana;
-    private int mana;
+    [SerializeField] private int mana;
     [SerializeField] protected int physicalAttack;
     [SerializeField] protected int physicalDefense;
     [SerializeField] protected int magicAttack;
@@ -112,9 +112,9 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     protected virtual void Start()
     {
-        playerCamera = GameObject.Find( "Main Camera" ).transform;
+        playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
-        SetBarColor( playerCamera.root.GetComponent<EntityBase>().team );
+        SetBarColor( PlayerController.instance.player.team );
     }
 
     protected virtual void Update()
@@ -125,7 +125,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     }
 
     [PunRPC]
-    public void FetchTeam( Team remoteTeam )
+    protected void FetchTeam( Team remoteTeam )
     {
         team = remoteTeam;
     }
@@ -185,7 +185,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
         Hp -= value;
 
-        if ( CheckDeath() )
+        if ( Hp <= 0 )
         {
             EntityBase killer = PhotonView.Find( id ).GetComponent<EntityBase>();
             if ( killer.entityType == EntityType.CHANPION )
@@ -194,11 +194,6 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
             }
             photonView.RPC( "Death", PhotonTargets.MasterClient );
         }
-    }
-
-    private bool CheckDeath()
-    {
-        return ( Hp <= 0 ) ? true : false;
     }
 
     [PunRPC]
@@ -222,13 +217,13 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     // TODO デリゲートとジェネリック作る
     public virtual void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
     {
-        if ( stream.isWriting )
+        if ( stream.isWriting && PhotonNetwork.isMasterClient )
         {
             stream.SendNext( maxHp );
             stream.SendNext( Hp );
             stream.SendNext( head.rotation );
         }
-        else if ( stream.isReading )
+        if ( stream.isReading && !PhotonNetwork.isMasterClient )
         {
             maxHp = (int)stream.ReceiveNext();
             Hp = (int)stream.ReceiveNext();

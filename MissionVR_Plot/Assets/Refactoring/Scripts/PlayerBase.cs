@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase : MobBase, IPunObservable
+public class PlayerBase : MobBase
 {
     [SerializeField] private int myExp;
     [SerializeField] private int myMoney;
-    private int level;
+    [SerializeField] private int level;
     [SerializeField] private float autoRecoverSpam;
 
     [SerializeField] private GrowthValues growthValues;
+
+    private float localSensitivity;
 
     protected override void Awake()
     {
@@ -22,7 +24,6 @@ public class PlayerBase : MobBase, IPunObservable
         if ( photonView.isMine )
         {
             head.Find( "Main Camera" ).gameObject.SetActive( true );
-            GameObject.FindGameObjectWithTag( "Controller" ).GetComponent<PlayerController>().player = this;
         }
     }
 
@@ -33,8 +34,22 @@ public class PlayerBase : MobBase, IPunObservable
         if ( PhotonNetwork.isMasterClient )
         {
             AutoRecover();
+            photonView.RPC( "FetchLocalParams", PhotonTargets.Others, maxHp, Hp, maxMana, Mana, myExp, myMoney, level );
         }
     }
+
+    [PunRPC]
+    public void FetchSetting( float sensitivity )
+    {
+        localSensitivity = sensitivity;
+    }
+
+    [PunRPC]
+    protected override void Rotate( float x = 0, float y = 0 )
+    {
+        base.Rotate( x * localSensitivity, y * localSensitivity );
+    }
+
 
     [PunRPC]
     protected void GetReward( int exp = 0, int money = 0 )
@@ -42,7 +57,7 @@ public class PlayerBase : MobBase, IPunObservable
         myExp += exp;
         myMoney += money;
 
-        if ( myExp >= level * 100 )
+        if ( myExp >= level * 100 + 50 )
         {
             photonView.RPC( "LevelUp", PhotonTargets.MasterClient );
         }
@@ -81,7 +96,7 @@ public class PlayerBase : MobBase, IPunObservable
     }
 
 
-    // 連打で高速で撃ててしまう
+    // TODO 連打で高速で撃ててしまうため要修正
     [PunRPC]
     protected void PullTheTrigger( bool trigger )
     {
@@ -117,24 +132,27 @@ public class PlayerBase : MobBase, IPunObservable
         }
     }
 
-    public override void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    /// <summary>
+    /// マスタークライアントで処理した各プレイヤーの変数をそれぞれローカルに反映させる。
+    /// 更新処理部分で必要な変数のみ更新するようにするべき？
+    /// </summary>
+    /// <param name="maxHp"></param>
+    /// <param name="hp"></param>
+    /// <param name="maxMana"></param>
+    /// <param name="mana"></param>
+    /// <param name="myExp"></param>
+    /// <param name="myMoney"></param>
+    /// <param name="level"></param>
+    [PunRPC]
+    public void FetchLocalParams( int maxHp, int hp, int maxMana, int mana, int myExp, int myMoney, int level )
     {
-        base.OnPhotonSerializeView( stream, info );
-
-        if ( stream.isWriting )
-        {
-            stream.SendNext( maxMana );
-            stream.SendNext( Mana );
-            stream.SendNext( myExp );
-            stream.SendNext( myMoney );
-        }
-        else if ( stream.isReading )
-        {
-            maxMana = (int)stream.ReceiveNext();
-            Mana = (int)stream.ReceiveNext();
-            myExp = (int)stream.ReceiveNext();
-            myMoney = (int)stream.ReceiveNext();
-        }
+        this.maxHp = maxHp;
+        Hp = hp;
+        this.maxMana = maxMana;
+        Mana = mana;
+        this.myExp = myExp;
+        this.myMoney = myMoney;
+        this.level = level;
     }
 }
 

@@ -47,6 +47,7 @@ public class BulletBase : Photon.MonoBehaviour
 
     private void OnTriggerEnter( Collider other )
     {
+        // TODO 味方に当たった場合は消えずにすり抜けさせる
         if ( ownerId > 0 && other.GetComponent<EntityBase>() )
         {
             PhotonView.Find( ownerId ).photonView.RPC( "Attack", PhotonTargets.MasterClient, damageValue, other.GetComponent<EntityBase>(), damageType, ownerId );
