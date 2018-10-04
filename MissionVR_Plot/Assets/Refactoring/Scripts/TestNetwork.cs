@@ -5,12 +5,10 @@ using UnityEngine.UI;
 
 public class TestNetwork : Photon.MonoBehaviour
 {
-
     public static TestNetwork instance;
-
     [SerializeField] private DataBaseFormat dataBase;
-
     public Transform[] spawnPoint;
+
 
     public DataBaseFormat DataBase
     {
@@ -50,25 +48,30 @@ public class TestNetwork : Photon.MonoBehaviour
         InstantiatePlayer( ( PhotonNetwork.room.PlayerCount % 2 == 0 ) ? Team.WHITE : Team.BLACK );
     }
 
-    PlayerBase player;
     void InstantiatePlayer( Team team )
     {
-        player = PhotonNetwork.Instantiate( "Player", spawnPoint[(int)team].position, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
-        player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
-        PlayerController.instance.player = player;
-        player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
+        PlayerController.player = PhotonNetwork.Instantiate( "Player", spawnPoint[(int)team].position, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
+        PlayerController.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
+        PlayerController.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
     }
 
     [PunRPC]
-    public void Summon()
+    public void Summon( int index, Team team )
     {
-        PhotonNetwork.InstantiateSceneObject( "Minion", Vector3.zero, Quaternion.identity, 0, null );
+        MinionBase minion;
+        minion = PhotonNetwork.InstantiateSceneObject( DataBase.entityInfos[index].name, Vector3.zero, Quaternion.identity, 0, null ).GetComponent<MinionBase>();
+        minion.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
     }
 
-
-    public void testSummon()
+    /// <summary>
+    /// ミニオンの生成デバッグ用
+    /// </summary>
+    /// <param name="white">true: White, false: Black</param>
+    public void TestSummon( bool white )
     {
-        photonView.RPC( "Summon", PhotonTargets.MasterClient );
+        int index = 0;
+        Team team = ( white ) ? Team.WHITE : Team.BLACK;
+        photonView.RPC( "Summon", PhotonTargets.MasterClient, index, team );
     }
 }
 
@@ -79,6 +82,9 @@ public class DataBaseFormat
     public Color enemyColor;
 
     public GunInfo[] gunInfos;
+
+    public GameObject[] entityInfos;
+
 }
 
 [System.Serializable]

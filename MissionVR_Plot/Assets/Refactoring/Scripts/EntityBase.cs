@@ -111,9 +111,9 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     protected virtual void Start()
     {
-        playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
+        playerCamera = PlayerController.player.head.Find( "Main Camera" ).transform;
 
-        SetBarColor( PlayerController.instance.player.team );
+        SetBarColor( PlayerController.player.team );
     }
 
     protected virtual void Update()
@@ -123,6 +123,11 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         hpSlider.value = Hp;
 
         Shooting( trigger );
+
+        if ( !photonView.isMine )
+        {
+            UpdateRotation();
+        }
     }
 
     [PunRPC]
@@ -224,20 +229,32 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         }
     }
 
-    // TODO デリゲートとジェネリック作る
+    Quaternion networkHeadRotation;
+    void UpdateRotation()
+    {
+        head.localRotation = Quaternion.RotateTowards( head.localRotation, networkHeadRotation, 180 * Time.deltaTime );
+    }
+
     public virtual void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
     {
-        if ( stream.isWriting && PhotonNetwork.isMasterClient )
+        if ( stream.isWriting )
         {
-            stream.SendNext( maxHp );
-            stream.SendNext( Hp );
-            stream.SendNext( head.rotation );
+            if ( PhotonNetwork.isMasterClient )
+            {
+                stream.SendNext( maxHp );
+                stream.SendNext( Hp );
+            }
+            stream.SendNext( head.localRotation );
+            networkHeadRotation = head.localRotation;
         }
-        if ( stream.isReading && !PhotonNetwork.isMasterClient )
+        else
         {
-            maxHp = (int)stream.ReceiveNext();
-            Hp = (int)stream.ReceiveNext();
-            head.rotation = (Quaternion)stream.ReceiveNext();
+            if ( !PhotonNetwork.isMasterClient )
+            {
+                maxHp = (int)stream.ReceiveNext();
+                Hp = (int)stream.ReceiveNext();
+            }
+            networkHeadRotation = (Quaternion)stream.ReceiveNext();
         }
     }
 }

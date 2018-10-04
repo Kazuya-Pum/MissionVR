@@ -6,7 +6,7 @@ public class PlayerController : Photon.MonoBehaviour
 {
     public static PlayerController instance;
 
-    public PlayerBase player;
+    public static PlayerBase player;
 
     // TODO 設定ファイル等に移設
     public float sensitivity;
@@ -35,6 +35,10 @@ public class PlayerController : Photon.MonoBehaviour
     }
 
     // TODO InputManagerからキーを設定し、そちらを使用
+    //
+    // 操作性重視　PhotonTargets.All : プレイヤーは入力した直後に動き出すが他のクライアントでは少しラグがあるため、位置を同期した際少しワープする
+    //      ↕
+    // ロールバック対策　PhotonTargets.AllViaServer : 全員が同じタイミングで動き出すが、プレイヤーにとっては入力してから少し動き出しにラグが生まれる
     private void GetKey()
     {
         float x = Input.GetAxis( "Horizontal" ) * Time.deltaTime;
@@ -42,7 +46,7 @@ public class PlayerController : Photon.MonoBehaviour
 
         if ( x != 0 || z != 0 )
         {
-            player.photonView.RPC( "Move", PhotonTargets.All, x, z );
+            player.photonView.RPC( "Move", PhotonTargets.AllViaServer, x, z );
         }
 
         float mouse_x = Input.GetAxis( "Mouse X" ) * Time.deltaTime;
@@ -50,16 +54,16 @@ public class PlayerController : Photon.MonoBehaviour
 
         if ( mouse_x != 0 || mouse_y != 0 )
         {
-            player.photonView.RPC( "Rotate", PhotonTargets.All, mouse_x, mouse_y );
+            player.photonView.RPC( "Rotate", PhotonTargets.AllViaServer, mouse_x, mouse_y );
         }
 
         if ( Input.GetKeyDown( KeyCode.LeftShift ) )
         {
-            player.photonView.RPC( "SetDashFlag", PhotonTargets.All, true );
+            player.photonView.RPC( "SetDashFlag", PhotonTargets.AllViaServer, true );
         }
         else if ( Input.GetKeyUp( KeyCode.LeftShift ) )
         {
-            player.photonView.RPC( "SetDashFlag", PhotonTargets.All, false );
+            player.photonView.RPC( "SetDashFlag", PhotonTargets.AllViaServer, false );
         }
 
         if ( Input.GetKeyDown( KeyCode.Mouse0 ) )

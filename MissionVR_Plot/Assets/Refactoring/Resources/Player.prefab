@@ -523,7 +523,9 @@ MonoBehaviour:
   team: 1
   entityType: 0
   maxHp: 50
+  hp: 0
   maxMana: 1
+  mana: 0
   physicalAttack: 2
   physicalDefense: 1
   magicAttack: 1
@@ -538,6 +540,7 @@ MonoBehaviour:
   dashRate: 1.5
   myExp: 0
   myMoney: 0
+  level: 0
   autoRecoverSpam: 0
   growthValues:
     hp: 1

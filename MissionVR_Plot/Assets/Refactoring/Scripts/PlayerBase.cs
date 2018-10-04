@@ -95,8 +95,6 @@ public class PlayerBase : MobBase
         Debug.Log( "respawn" );
     }
 
-
-    // TODO 連打で高速で撃ててしまうため要修正
     [PunRPC]
     protected void PullTheTrigger( bool trigger )
     {

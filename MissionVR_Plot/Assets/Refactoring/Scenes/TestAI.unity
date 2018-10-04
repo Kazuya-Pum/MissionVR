@@ -354,8 +354,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1186694063}
-        m_MethodName: testSummon
-        m_Mode: 1
+        m_MethodName: TestSummon
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -426,7 +426,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1be2d92cd687a644fa31dd0eeecf38ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
   sensitivity: 100
 --- !u!4 &1041085127
 Transform:
@@ -512,10 +511,12 @@ MonoBehaviour:
     allyColor: {r: 0, g: 1, b: 0, a: 1}
     enemyColor: {r: 1, g: 0, b: 0, a: 1}
     gunInfos:
-    - name: Test
+    - name: BasicGun
       bullet: {fileID: 1503088935260778, guid: ae925eb7f2953834dac520ef743ce652, type: 2}
-      fireRate: 0.3
+      fireRate: 0.2
       range: 50
+    entityInfos:
+    - {fileID: 1577573244882704, guid: c3a21bc88476e3b4db32ed3a45841df9, type: 2}
   spawnPoint:
   - {fileID: 1896678537}
   - {fileID: 313041161}

@@ -80,4 +80,5 @@ MonoBehaviour:
   - PullTheTrigger
   - FetchTeam
   - FetchLocalParams
+  - FetchSetting
   DisableAutoOpenWizard: 1
