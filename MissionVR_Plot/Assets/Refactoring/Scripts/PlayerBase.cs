@@ -14,6 +14,7 @@ namespace Refactoring
 
         [SerializeField] private GrowthValues growthValues;
 
+        [SerializeField] protected GameObject model;
         [SerializeField] private Transform modelRotate;
 
         private float localSensitivity;
