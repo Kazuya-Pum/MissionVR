@@ -520,6 +520,7 @@ MonoBehaviour:
   spawnPoint:
   - {fileID: 1896678537}
   - {fileID: 313041161}
+  setRespawnTime: 3
 --- !u!1 &1791961479
 GameObject:
   m_ObjectHideFlags: 0

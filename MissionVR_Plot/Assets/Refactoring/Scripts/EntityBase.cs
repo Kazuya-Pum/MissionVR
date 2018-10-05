@@ -3,258 +3,271 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum DamageType { PHYSICAL, MAGIC, THROUGH }
-
-public enum Team { WHITE, BLACK }
-
-public enum EntityType { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
-
-public class EntityBase : Photon.MonoBehaviour, IPunObservable
+namespace Refactoring
 {
-    #region variable
-    public Team team;
-    public EntityType entityType;
+    public enum DamageType { PHYSICAL, MAGIC, THROUGH }
 
-    // クラス作ってもいいかも
-    #region Status
-    [SerializeField] protected int maxHp;
-    [SerializeField] private int hp;
-    [SerializeField] protected int maxMana;
-    [SerializeField] private int mana;
-    [SerializeField] protected int physicalAttack;
-    [SerializeField] protected int physicalDefense;
-    [SerializeField] protected int magicAttack;
-    [SerializeField] protected int magicDifense;
-    [SerializeField] protected int sendingExp;
-    [SerializeField] protected int sendingMoney;
-    #endregion
+    public enum Team { WHITE, BLACK }
 
-    protected Transform tfCache;
+    public enum EntityType { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
 
-    [SerializeField] protected Slider hpSlider;
-    protected Transform tfSliderCache;
-    protected Transform playerCamera;
+    public enum EntityState { ALIVE, DEATH }
 
-    public int gunIndex;
-    protected GunInfo gunInfo;
-    protected bool trigger;
+    public enum PlayerState { PLAY, SHOP, WAIT }
 
-    /// <summary>
-    /// 視点を取得するゲームオブジェクト
-    /// </summary>
-    [SerializeField] protected Transform head;
-    /// <summary>
-    /// 銃撃時の銃弾の生成位置
-    /// </summary>
-    [SerializeField] protected Transform muzzle;
+    public enum GameState { GAME, WAIT }
 
-    protected int Hp
+    public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {
-        get
-        {
-            return hp;
-        }
+        #region variable
+        public Team team;
+        public EntityType entityType;
+        public EntityState entityState;
 
-        set
-        {
-            if ( value >= maxHp )
-            {
-                hp = maxHp;
-            }
-            else
-            {
-                hp = value;
-            }
-        }
-    }
-
-    protected int Mana
-    {
-        get
-        {
-            return mana;
-        }
-
-        set
-        {
-            if ( value >= maxMana )
-            {
-                mana = maxMana;
-            }
-            else
-            {
-                mana = value;
-            }
-        }
-    }
-
-    #endregion
-
-
-    protected virtual void Awake()
-    {
-        Hp = maxHp;
-        Mana = maxMana;
-
-        #region 値チェック
-        physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
-        physicalDefense = ( physicalDefense <= 0 ) ? 1 : physicalDefense;
-        magicAttack = ( magicAttack <= 0 ) ? 1 : magicAttack;
-        magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
+        // クラス作ってもいいかも
+        #region Status
+        [SerializeField] protected int maxHp;
+        [SerializeField] private int hp;
+        [SerializeField] protected int maxMana;
+        [SerializeField] private int mana;
+        [SerializeField] protected int physicalAttack;
+        [SerializeField] protected int physicalDefense;
+        [SerializeField] protected int magicAttack;
+        [SerializeField] protected int magicDifense;
+        [SerializeField] protected int sendingExp;
+        [SerializeField] protected int sendingMoney;
         #endregion
 
-        gunInfo = TestNetwork.instance.DataBase.gunInfos[gunIndex];
+        protected Transform tfCache;
 
-        tfCache = transform;
-        tfSliderCache = hpSlider.transform;
-    }
+        [SerializeField] protected Slider hpSlider;
+        protected Transform tfSliderCache;
+        protected Transform playerCamera;
 
-    protected virtual void Start()
-    {
-        playerCamera = PlayerController.player.head.Find( "Main Camera" ).transform;
+        [SerializeField] private int gunIndex;
+        protected GunInfo gunInfo;
+        public bool trigger;
 
-        SetBarColor( PlayerController.player.team );
-    }
+        /// <summary>
+        /// 視点を取得するゲームオブジェクト
+        /// </summary>
+        [SerializeField] protected Transform head;
+        /// <summary>
+        /// 銃撃時の銃弾の生成位置
+        /// </summary>
+        [SerializeField] protected Transform muzzle;
 
-    protected virtual void Update()
-    {
-        tfSliderCache.LookAt( playerCamera );
-        hpSlider.maxValue = maxHp;
-        hpSlider.value = Hp;
-
-        Shooting( trigger );
-
-        if ( !photonView.isMine )
+        protected int Hp
         {
-            UpdateRotation();
-        }
-    }
-
-    [PunRPC]
-    protected void FetchTeam( Team remoteTeam )
-    {
-        team = remoteTeam;
-    }
-
-    [PunRPC]
-    protected virtual void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL, int id = 0 )
-    {
-        if ( id == 0 )
-        {
-            id = photonView.viewID;
-        }
-
-        if ( target.team != team )
-        {
-            target.photonView.RPC( "Damaged", PhotonTargets.MasterClient, damageValue, damageType, id );
-        }
-    }
-
-    float interval;
-    protected void Shooting( bool trigger )
-    {
-        if ( interval >= gunInfo.fireRate )
-        {
-            if ( trigger )
+            get
             {
-                Shoot();
-                interval = 0;
+                return hp;
+            }
+
+            set
+            {
+                if ( value >= maxHp )
+                {
+                    hp = maxHp;
+                }
+                else
+                {
+                    hp = value;
+                }
             }
         }
-        else
+
+        protected int Mana
         {
-            interval += Time.deltaTime;
-        }
-    }
-
-    protected void Shoot()
-    {
-        GameObject bullet = Instantiate( gunInfo.bullet, muzzle.position, head.rotation );
-
-        BulletBase bulletBase = bullet.GetComponent<BulletBase>();
-
-        if ( PhotonNetwork.isMasterClient )
-        {
-            bulletBase.ownerId = photonView.viewID;
-            bulletBase.damageValue = physicalAttack;
-            bulletBase.damageType = DamageType.PHYSICAL;
-        }
-        bulletBase.range = gunInfo.range;
-        bulletBase.team = team;
-    }
-
-    [PunRPC]
-    public void Damaged( int value, DamageType damageType, int id )
-    {
-        switch ( damageType )
-        {
-            case DamageType.PHYSICAL:
-                value *= value / physicalDefense;
-                break;
-            case DamageType.MAGIC:
-                value *= value / magicDifense;
-                break;
-            case DamageType.THROUGH:
-                break;
-        }
-
-        Hp -= value;
-
-        if ( Hp <= 0 )
-        {
-            EntityBase killer = PhotonView.Find( id ).GetComponent<EntityBase>();
-            if ( killer.entityType == EntityType.CHANPION )
+            get
             {
-                killer.photonView.RPC( "GetReward", PhotonTargets.MasterClient, sendingExp, sendingMoney );
+                return mana;
             }
-            photonView.RPC( "Death", PhotonTargets.MasterClient );
+
+            set
+            {
+                if ( value >= maxMana )
+                {
+                    mana = maxMana;
+                }
+                else
+                {
+                    mana = value;
+                }
+            }
         }
-    }
 
-    [PunRPC]
-    protected virtual void Death()
-    {
-        PhotonNetwork.Destroy( gameObject );
-    }
+        #endregion
 
-    private void SetBarColor( Team playerTeam )
-    {
-        if ( playerTeam == team )
+
+        protected virtual void Awake()
         {
-            tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = TestNetwork.instance.DataBase.allyColor;
+            Hp = maxHp;
+            Mana = maxMana;
+
+            #region 値チェック
+            physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
+            physicalDefense = ( physicalDefense <= 0 ) ? 1 : physicalDefense;
+            magicAttack = ( magicAttack <= 0 ) ? 1 : magicAttack;
+            magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
+            #endregion
+
+            gunInfo = GameManager.instance.DataBase.gunInfos[gunIndex];
+
+            tfCache = transform;
+            tfSliderCache = hpSlider.transform;
         }
-        else
+
+        protected virtual void Start()
         {
-            tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = TestNetwork.instance.DataBase.enemyColor;
+            playerCamera = PlayerController.player.head.Find( "Main Camera" ).transform;
+
+            SetBarColor( PlayerController.player.team );
         }
-    }
 
-    Quaternion networkHeadRotation;
-    void UpdateRotation()
-    {
-        head.localRotation = Quaternion.RotateTowards( head.localRotation, networkHeadRotation, 180 * Time.deltaTime );
-    }
-
-    public virtual void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
-    {
-        if ( stream.isWriting )
+        protected virtual void Update()
         {
+            tfSliderCache.LookAt( playerCamera );
+            hpSlider.maxValue = maxHp;
+            hpSlider.value = Hp;
+
+            Shooting( trigger );
+
+            if ( !photonView.isMine )
+            {
+                UpdateRotation();
+            }
+        }
+
+        [PunRPC]
+        protected void FetchTeam( Team remoteTeam )
+        {
+            team = remoteTeam;
+        }
+
+        [PunRPC]
+        protected virtual void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL, int id = 0 )
+        {
+            if ( id == 0 )
+            {
+                id = photonView.viewID;
+            }
+
+            if ( target.team != team )
+            {
+                target.photonView.RPC( "Damaged", PhotonTargets.MasterClient, damageValue, damageType, id );
+            }
+        }
+
+        float interval;
+        protected void Shooting( bool trigger )
+        {
+            if ( interval >= gunInfo.fireRate )
+            {
+                if ( trigger )
+                {
+                    photonView.RPC( "Shoot", PhotonTargets.AllViaServer, head.rotation );
+                    interval = 0;
+                }
+            }
+            else
+            {
+                interval += Time.deltaTime;
+            }
+        }
+
+        // TODO オブジェクトプール
+        [PunRPC]
+        protected void Shoot( Quaternion direction )
+        {
+            GameObject bullet = Instantiate( gunInfo.bullet, muzzle.position, direction );
+
+            BulletBase bulletBase = bullet.GetComponent<BulletBase>();
+
             if ( PhotonNetwork.isMasterClient )
             {
-                stream.SendNext( maxHp );
-                stream.SendNext( Hp );
+                bulletBase.ownerId = photonView.viewID;
+                bulletBase.damageValue = physicalAttack;
+                bulletBase.damageType = DamageType.PHYSICAL;
             }
-            stream.SendNext( head.localRotation );
-            networkHeadRotation = head.localRotation;
+            bulletBase.range = gunInfo.range;
+            bulletBase.team = team;
         }
-        else
+
+        [PunRPC]
+        public void Damaged( int value, DamageType damageType, int id )
         {
-            if ( !PhotonNetwork.isMasterClient )
+            switch ( damageType )
             {
-                maxHp = (int)stream.ReceiveNext();
-                Hp = (int)stream.ReceiveNext();
+                case DamageType.PHYSICAL:
+                    value *= value / physicalDefense;
+                    break;
+                case DamageType.MAGIC:
+                    value *= value / magicDifense;
+                    break;
+                case DamageType.THROUGH:
+                    break;
             }
-            networkHeadRotation = (Quaternion)stream.ReceiveNext();
+
+            Hp -= value;
+
+            if ( Hp <= 0 )
+            {
+                EntityBase killer = PhotonView.Find( id ).GetComponent<EntityBase>();
+                if ( killer.entityType == EntityType.CHANPION )
+                {
+                    killer.photonView.RPC( "GetReward", PhotonTargets.MasterClient, sendingExp, sendingMoney );
+                }
+                photonView.RPC( "Death", PhotonTargets.MasterClient );
+            }
+        }
+
+        [PunRPC]
+        protected virtual void Death()
+        {
+            PhotonNetwork.Destroy( gameObject );
+        }
+
+        private void SetBarColor( Team playerTeam )
+        {
+            if ( playerTeam == team )
+            {
+                tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = GameManager.instance.DataBase.allyColor;
+            }
+            else
+            {
+                tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = GameManager.instance.DataBase.enemyColor;
+            }
+        }
+
+        Quaternion networkHeadRotation;
+        void UpdateRotation()
+        {
+            head.localRotation = Quaternion.RotateTowards( head.localRotation, networkHeadRotation, 180 * Time.deltaTime );
+        }
+
+        public virtual void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+        {
+            if ( stream.isWriting )
+            {
+                if ( PhotonNetwork.isMasterClient )
+                {
+                    stream.SendNext( maxHp );
+                    stream.SendNext( Hp );
+                }
+                stream.SendNext( head.localRotation );
+                networkHeadRotation = head.localRotation;
+            }
+            else
+            {
+                if ( !PhotonNetwork.isMasterClient )
+                {
+                    maxHp = (int)stream.ReceiveNext();
+                    Hp = (int)stream.ReceiveNext();
+                }
+                networkHeadRotation = (Quaternion)stream.ReceiveNext();
+            }
         }
     }
+
 }

@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StaticObjBase : EntityBase {
+namespace Refactoring
+{
+    public class StaticObjBase : EntityBase
+    {
 
-    // TODO タワーやネクサス等の処理
+        // TODO タワーやネクサス等の処理
+    }
 }

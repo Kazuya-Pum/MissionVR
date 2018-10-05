@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MinionMelee : MinionBase
+namespace Refactoring
 {
+    public class MinionMelee : MinionBase
+    {
 
 
+    }
 }

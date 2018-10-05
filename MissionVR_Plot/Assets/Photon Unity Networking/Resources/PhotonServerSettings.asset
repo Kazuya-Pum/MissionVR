@@ -81,4 +81,7 @@ MonoBehaviour:
   - FetchTeam
   - FetchLocalParams
   - FetchSetting
+  - ToAliveState
+  - ToDeathState
+  - Shoot
   DisableAutoOpenWizard: 1

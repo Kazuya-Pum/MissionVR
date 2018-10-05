@@ -2,61 +2,69 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent( typeof( Rigidbody ) )]
-public class BulletBase : Photon.MonoBehaviour
+namespace Refactoring
 {
-    #region 発射時に受け取る値
-    public int ownerId;
-    public int damageValue;
-    public DamageType damageType;
-    public float range;
-    public Team team;
-    #endregion
 
-    /// <summary>
-    /// 銃弾のインスタンスが消えるまでの時間
-    /// </summary>
-    [SerializeField] private float ttl;
-    [SerializeField] private float speed;
-
-    private Vector3 prev;
-    private Transform tfCache;
-
-    private void Awake()
+    [RequireComponent( typeof( Rigidbody ) )]
+    public class BulletBase : Photon.MonoBehaviour
     {
-        ttl = ( ttl <= 0 ) ? 5 : ttl;
-        range = ( range <= 0 ) ? 50 : range;
+        // TODO 読み込んだScriptableObjectによって挙動を変える
+        // →スキル系の変更が必要になるため後回し
 
-        tfCache = transform;
-    }
 
-    private void Start()
-    {
-        prev = tfCache.position;
-        GetComponent<Rigidbody>().AddForce( transform.forward * 10 * speed, ForceMode.Impulse );
-    }
+        #region 発射時に受け取る値
+        public int ownerId;
+        public int damageValue;
+        public DamageType damageType;
+        public float range;
+        public Team team;
+        #endregion
 
-    private void Update()
-    {
-        ttl -= Time.deltaTime;
+        /// <summary>
+        /// 銃弾のインスタンスが消えるまでの時間
+        /// </summary>
+        [SerializeField] private float ttl;
+        [SerializeField] private float speed;
 
-        if ( Vector3.Distance( prev, tfCache.position ) >= range || ttl <= 0 )
+        private Vector3 prev;
+        private Transform tfCache;
+
+        private void Awake()
         {
-            Destroy( gameObject );
+            ttl = ( ttl <= 0 ) ? 5 : ttl;
+            range = ( range <= 0 ) ? 50 : range;
+
+            tfCache = transform;
         }
-    }
 
-    private void OnTriggerEnter( Collider other )
-    {
-        EntityBase hit = other.GetComponent<EntityBase>();
-
-        if ( !hit || hit.team != team )
+        private void Start()
         {
-            if ( ownerId > 0 && hit )
+            prev = tfCache.position;
+            GetComponent<Rigidbody>().AddForce( transform.forward * 10 * speed, ForceMode.Impulse );
+        }
+
+        private void Update()
+        {
+            ttl -= Time.deltaTime;
+
+            if ( Vector3.Distance( prev, tfCache.position ) >= range || ttl <= 0 )
             {
-                PhotonView.Find( ownerId ).photonView.RPC( "Attack", PhotonTargets.MasterClient, damageValue, hit, damageType, ownerId );
+                Destroy( gameObject );
             }
-            Destroy( gameObject );
+        }
+
+        private void OnTriggerEnter( Collider other )
+        {
+            EntityBase hit = other.GetComponent<EntityBase>();
+
+            if ( !hit || hit.team != team )
+            {
+                if ( ownerId > 0 && hit )
+                {
+                    PhotonView.Find( ownerId ).photonView.RPC( "Attack", PhotonTargets.MasterClient, damageValue, hit, damageType, ownerId );
+                }
+                Destroy( gameObject );
+            }
         }
     }
 }

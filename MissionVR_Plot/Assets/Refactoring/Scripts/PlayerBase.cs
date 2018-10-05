@@ -2,161 +2,178 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase : MobBase
+namespace Refactoring
 {
-    [SerializeField] private int myExp;
-    [SerializeField] private int myMoney;
-    [SerializeField] private int level;
-    [SerializeField] private float autoRecoverSpam;
 
-    [SerializeField] private GrowthValues growthValues;
-
-    private float localSensitivity;
-
-    protected override void Awake()
+    public class PlayerBase : MobBase
     {
-        base.Awake();
+        [SerializeField] private int myExp;
+        [SerializeField] private int myMoney;
+        [SerializeField] private int level;
+        [SerializeField] private float autoRecoverSpam;
 
-        autoRecoverSpam = ( autoRecoverSpam <= 0 ) ? 1f : autoRecoverSpam;
+        [SerializeField] private GrowthValues growthValues;
 
-        entityType = EntityType.CHANPION;
+        private float localSensitivity;
 
-        if ( photonView.isMine )
+        protected override void Awake()
         {
-            head.Find( "Main Camera" ).gameObject.SetActive( true );
+            base.Awake();
+
+            autoRecoverSpam = ( autoRecoverSpam <= 0 ) ? 1f : autoRecoverSpam;
+
+            entityType = EntityType.CHANPION;
+
+            if ( photonView.isMine )
+            {
+                head.Find( "Main Camera" ).gameObject.SetActive( true );
+            }
         }
-    }
 
-    protected override void Update()
-    {
-        base.Update();
-
-        if ( PhotonNetwork.isMasterClient )
+        protected override void Update()
         {
-            AutoRecover();
-            photonView.RPC( "FetchLocalParams", PhotonTargets.Others, maxHp, Hp, maxMana, Mana, myExp, myMoney, level );
+            base.Update();
+
+            if ( PhotonNetwork.isMasterClient )
+            {
+                AutoRecover();
+                photonView.RPC( "FetchLocalParams", PhotonTargets.Others, maxHp, Hp, maxMana, Mana, myExp, myMoney, level );
+            }
         }
-    }
 
-    [PunRPC]
-    public void FetchSetting( float sensitivity )
-    {
-        localSensitivity = sensitivity;
-    }
-
-    [PunRPC]
-    protected override void Rotate( float x = 0, float y = 0 )
-    {
-        base.Rotate( x * localSensitivity, y * localSensitivity );
-    }
-
-
-    [PunRPC]
-    protected void GetReward( int exp = 0, int money = 0 )
-    {
-        myExp += exp;
-        myMoney += money;
-
-        if ( myExp >= level * 100 + 50 )
+        [PunRPC]
+        public void FetchSetting( float sensitivity )
         {
-            photonView.RPC( "LevelUp", PhotonTargets.MasterClient );
+            localSensitivity = sensitivity;
         }
-    }
 
-    [PunRPC]
-    protected void LevelUp()
-    {
-        myExp -= level * 100;
-        level++;
-
-        maxHp += growthValues.hp;
-        maxMana += growthValues.mana;
-        physicalAttack += growthValues.phycalAttack;
-        physicalDefense += growthValues.physicalDefense;
-        magicAttack += growthValues.magicAttack;
-        magicDifense += growthValues.magicDefense;
-
-        if ( myExp >= level * 100 )
+        [PunRPC]
+        protected override void Rotate( float x = 0, float y = 0 )
         {
-            LevelUp();
+            base.Rotate( x * localSensitivity, y * localSensitivity );
         }
-    }
 
 
-    [PunRPC]
-    protected override void Death()
-    {
-        ReSpawn();
-    }
+        [PunRPC]
+        protected void GetReward( int exp = 0, int money = 0 )
+        {
+            myExp += exp;
+            myMoney += money;
 
-    // TODO リスポーン処理作成
-    private void ReSpawn()
-    {
-        Debug.Log( "respawn" );
-    }
+            if ( myExp >= level * 100 + 50 )
+            {
+                photonView.RPC( "LevelUp", PhotonTargets.MasterClient );
+            }
+        }
 
-    [PunRPC]
-    protected void PullTheTrigger( bool trigger )
-    {
-        this.trigger = trigger;
+        [PunRPC]
+        protected void LevelUp()
+        {
+            myExp -= level * 100;
+            level++;
+
+            maxHp += growthValues.hp;
+            maxMana += growthValues.mana;
+            physicalAttack += growthValues.phycalAttack;
+            physicalDefense += growthValues.physicalDefense;
+            magicAttack += growthValues.magicAttack;
+            magicDifense += growthValues.magicDefense;
+
+            if ( myExp >= level * 100 )
+            {
+                LevelUp();
+            }
+        }
+
+
+        [PunRPC]
+        protected override void Death()
+        {
+            photonView.RPC( "ToDeathState", PhotonTargets.All );
+
+            StartCoroutine( "Respawn" );
+        }
+
+        [PunRPC]
+        protected void ToDeathState()
+        {
+            entityState = EntityState.DEATH;
+            model.SetActive( false );
+        }
+
+        private IEnumerator Respawn()
+        {
+            yield return GameManager.instance.respawnTime;
+
+            photonView.RPC( "ToAliveState", PhotonTargets.All );
+        }
+
+        [PunRPC]
+        protected void ToAliveState()
+        {
+            Hp = maxHp;
+
+            entityState = EntityState.ALIVE;
+            model.SetActive( true );
+        }
+
+        /// <summary>
+        /// HP、Manaの回復
+        /// </summary>
+        /// <param name="cHp">HPの回復値</param>
+        /// <param name="cMana">Manaの回復値（省略可）</param>
+        protected void Recover( int cHp, int cMana = 0 )
+        {
+            Hp += cHp;
+            Mana += cMana;
+        }
+
+        float autoRecoverTime;
+        protected void AutoRecover()
+        {
+            autoRecoverTime += Time.deltaTime;
+            if ( autoRecoverTime >= autoRecoverSpam )
+            {
+                Recover( 1, 1 );
+                autoRecoverTime -= autoRecoverSpam;
+            }
+        }
+
+        /// <summary>
+        /// マスタークライアントで処理した各プレイヤーの変数をそれぞれローカルに反映させる。
+        /// 更新処理部分で必要な変数のみ更新するようにするべき？
+        /// </summary>
+        /// <param name="maxHp"></param>
+        /// <param name="hp"></param>
+        /// <param name="maxMana"></param>
+        /// <param name="mana"></param>
+        /// <param name="myExp"></param>
+        /// <param name="myMoney"></param>
+        /// <param name="level"></param>
+        [PunRPC]
+        protected void FetchLocalParams( int maxHp, int hp, int maxMana, int mana, int myExp, int myMoney, int level )
+        {
+            this.maxHp = maxHp;
+            Hp = hp;
+            this.maxMana = maxMana;
+            Mana = mana;
+            this.myExp = myExp;
+            this.myMoney = myMoney;
+            this.level = level;
+        }
     }
 
     /// <summary>
-    /// HP、Manaの回復
+    /// レベルアップ時のステータス上昇値
     /// </summary>
-    /// <param name="cHp">HPの回復値</param>
-    /// <param name="cMana">Manaの回復値（省略可）</param>
-    protected void Recover( int cHp, int cMana = 0 )
+    [System.Serializable]
+    public class GrowthValues
     {
-        Hp += cHp;
-        Mana += cMana;
+        public int hp;
+        public int mana;
+        public int phycalAttack;
+        public int physicalDefense;
+        public int magicAttack;
+        public int magicDefense;
     }
-
-    float autoRecoverTime;
-    protected void AutoRecover()
-    {
-        autoRecoverTime += Time.deltaTime;
-        if ( autoRecoverTime >= autoRecoverSpam )
-        {
-            Recover( 1, 1 );
-            autoRecoverTime -= autoRecoverSpam;
-        }
-    }
-
-    /// <summary>
-    /// マスタークライアントで処理した各プレイヤーの変数をそれぞれローカルに反映させる。
-    /// 更新処理部分で必要な変数のみ更新するようにするべき？
-    /// </summary>
-    /// <param name="maxHp"></param>
-    /// <param name="hp"></param>
-    /// <param name="maxMana"></param>
-    /// <param name="mana"></param>
-    /// <param name="myExp"></param>
-    /// <param name="myMoney"></param>
-    /// <param name="level"></param>
-    [PunRPC]
-    protected void FetchLocalParams( int maxHp, int hp, int maxMana, int mana, int myExp, int myMoney, int level )
-    {
-        this.maxHp = maxHp;
-        Hp = hp;
-        this.maxMana = maxMana;
-        Mana = mana;
-        this.myExp = myExp;
-        this.myMoney = myMoney;
-        this.level = level;
-    }
-}
-
-/// <summary>
-/// レベルアップ時のステータス上昇値
-/// </summary>
-[System.Serializable]
-public class GrowthValues
-{
-    public int hp;
-    public int mana;
-    public int phycalAttack;
-    public int physicalDefense;
-    public int magicAttack;
-    public int magicDefense;
 }
