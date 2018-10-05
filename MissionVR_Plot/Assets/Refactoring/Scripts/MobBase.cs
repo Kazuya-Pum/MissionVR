@@ -21,8 +21,6 @@ namespace Refactoring
             base.Awake();
             moveSpeed = ( moveSpeed <= 0 ) ? 1 : moveSpeed;
             dashRate = ( dashRate < 1 ) ? 1 : dashRate;
-
-            head = tfCache.Find( "Head" );
         }
 
         [PunRPC]

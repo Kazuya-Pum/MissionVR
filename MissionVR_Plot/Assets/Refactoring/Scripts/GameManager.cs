@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 namespace Refactoring
 {
+    public enum PlayerState { WAIT, PLAY, SHOP }
+
+    public enum GameState { GAME, WAIT }
+
     public class GameManager : Photon.MonoBehaviour
     {
         public static GameManager instance;
@@ -54,7 +58,7 @@ namespace Refactoring
             InstantiatePlayer( ( PhotonNetwork.room.PlayerCount % 2 == 0 ) ? Team.WHITE : Team.BLACK );
         }
 
-        void InstantiatePlayer( Team team )
+        private void InstantiatePlayer( Team team )
         {
             PlayerController.player = PhotonNetwork.Instantiate( "Player", spawnPoint[(int)team].position, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
             PlayerController.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
@@ -67,7 +71,7 @@ namespace Refactoring
         }
 
         [PunRPC]
-        public void Summon( int index, Team team )
+        protected void Summon( int index, Team team )
         {
             MinionBase minion;
             minion = PhotonNetwork.InstantiateSceneObject( DataBase.entityInfos[index].name, Vector3.zero, Quaternion.identity, 0, null ).GetComponent<MinionBase>();

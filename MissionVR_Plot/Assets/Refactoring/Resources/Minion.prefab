@@ -431,8 +431,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 1
   entityType: 0
+  entityState: 0
   maxHp: 50
+  hp: 0
   maxMana: 0
+  mana: 0
   physicalAttack: 0
   physicalDefense: 0
   magicAttack: 0
@@ -441,10 +444,12 @@ MonoBehaviour:
   sendingMoney: 10
   hpSlider: {fileID: 114848972261253428}
   gunIndex: 0
-  head: {fileID: 0}
+  trigger: 0
+  head: {fileID: 4104982863535832}
   muzzle: {fileID: 0}
   moveSpeed: 0
   dashRate: 0
+  model: {fileID: 0}
 --- !u!114 &114848972261253428
 MonoBehaviour:
   m_ObjectHideFlags: 1

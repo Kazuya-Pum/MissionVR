@@ -14,6 +14,8 @@ namespace Refactoring
 
         [SerializeField] private GrowthValues growthValues;
 
+        [SerializeField] private Transform modelRotate;
+
         private float localSensitivity;
 
         protected override void Awake()
@@ -51,6 +53,13 @@ namespace Refactoring
         protected override void Rotate( float x = 0, float y = 0 )
         {
             base.Rotate( x * localSensitivity, y * localSensitivity );
+            modelRotate.localRotation = head.localRotation;
+        }
+
+        protected override void UpdateRotation()
+        {
+            base.UpdateRotation();
+            modelRotate.localRotation = head.localRotation;
         }
 
 
@@ -105,13 +114,14 @@ namespace Refactoring
         {
             yield return GameManager.instance.respawnTime;
 
-            photonView.RPC( "ToAliveState", PhotonTargets.All );
+            photonView.RPC( "ToAliveState", PhotonTargets.AllViaServer );
         }
 
         [PunRPC]
         protected void ToAliveState()
         {
             Hp = maxHp;
+            tfCache.position = GameManager.instance.spawnPoint[(int)team].position;
 
             entityState = EntityState.ALIVE;
             model.SetActive( true );

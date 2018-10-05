@@ -13,10 +13,6 @@ namespace Refactoring
 
     public enum EntityState { ALIVE, DEATH }
 
-    public enum PlayerState { PLAY, SHOP, WAIT }
-
-    public enum GameState { GAME, WAIT }
-
     public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {
         #region variable
@@ -46,7 +42,7 @@ namespace Refactoring
 
         [SerializeField] private int gunIndex;
         protected GunInfo gunInfo;
-        public bool trigger;
+        [HideInInspector] public bool trigger;
 
         /// <summary>
         /// 視点を取得するゲームオブジェクト
@@ -180,9 +176,7 @@ namespace Refactoring
         [PunRPC]
         protected void Shoot( Quaternion direction )
         {
-            GameObject bullet = Instantiate( gunInfo.bullet, muzzle.position, direction );
-
-            BulletBase bulletBase = bullet.GetComponent<BulletBase>();
+            BulletBase bulletBase = Instantiate( gunInfo.bullet, muzzle.position, direction ).GetComponent<BulletBase>();
 
             if ( PhotonNetwork.isMasterClient )
             {
@@ -241,7 +235,7 @@ namespace Refactoring
         }
 
         Quaternion networkHeadRotation;
-        void UpdateRotation()
+        protected virtual void UpdateRotation()
         {
             head.localRotation = Quaternion.RotateTowards( head.localRotation, networkHeadRotation, 180 * Time.deltaTime );
         }
@@ -269,5 +263,4 @@ namespace Refactoring
             }
         }
     }
-
 }
