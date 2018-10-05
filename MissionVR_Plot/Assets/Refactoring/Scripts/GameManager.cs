@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -64,11 +65,22 @@ namespace Refactoring
             PlayerController.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
             PlayerController.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
 
+            PlayerController.playerCamera = PlayerController.player.head.Find( "Main Camera" ).transform;
+
             if ( gameState == GameState.GAME )
             {
                 PlayerController.instance.playerState = PlayerState.PLAY;
             }
+
+            EntityBase[] entities = FindObjectsOfType<EntityBase>();
+            foreach ( EntityBase entity in entities )
+            {
+                entity.OnSetPlayer();
+            }
+
+
         }
+
 
         [PunRPC]
         protected void Summon( int index, Team team )

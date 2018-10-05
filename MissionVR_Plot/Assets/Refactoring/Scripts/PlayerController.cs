@@ -11,6 +11,8 @@ namespace Refactoring
 
         public static PlayerBase player;
 
+        public static Transform playerCamera;
+
         public PlayerState playerState;
 
         // TODO 設定ファイル等に移設

@@ -47,11 +47,13 @@ namespace Refactoring
         /// <summary>
         /// 視点を取得するゲームオブジェクト
         /// </summary>
-        [SerializeField] protected Transform head;
+        [SerializeField] public Transform head;
         /// <summary>
         /// 銃撃時の銃弾の生成位置
         /// </summary>
         [SerializeField] protected Transform muzzle;
+
+        [SerializeField] protected GameObject objectGroup;
 
         protected int Hp
         {
@@ -108,16 +110,27 @@ namespace Refactoring
             magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
             #endregion
 
-            gunInfo = GameManager.instance.DataBase.gunInfos[gunIndex];
 
             tfCache = transform;
-            tfSliderCache = hpSlider.transform;
+            tfSliderCache = hpSlider.transform.parent;
+
+            objectGroup = ( objectGroup == null ) ? gameObject : objectGroup;
         }
 
         protected virtual void Start()
         {
-            playerCamera = PlayerController.player.head.Find( "Main Camera" ).transform;
+            gunInfo = GameManager.instance.DataBase.gunInfos[gunIndex];
 
+            if ( PlayerController.player )
+            {
+                OnSetPlayer();
+            }
+        }
+
+
+        public void OnSetPlayer()
+        {
+            playerCamera = PlayerController.playerCamera;
             SetBarColor( PlayerController.player.team );
         }
 
@@ -219,18 +232,18 @@ namespace Refactoring
         [PunRPC]
         protected virtual void Death()
         {
-            PhotonNetwork.Destroy( gameObject );
+            PhotonNetwork.Destroy( objectGroup );
         }
 
         private void SetBarColor( Team playerTeam )
         {
             if ( playerTeam == team )
             {
-                tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = GameManager.instance.DataBase.allyColor;
+                tfSliderCache.Find( "HP_Slider/Fill Area/Fill" ).GetComponent<Image>().color = GameManager.instance.DataBase.allyColor;
             }
             else
             {
-                tfSliderCache.Find( "Fill Area/Fill" ).GetComponent<Image>().color = GameManager.instance.DataBase.enemyColor;
+                tfSliderCache.Find( "HP_Slider/Fill Area/Fill" ).GetComponent<Image>().color = GameManager.instance.DataBase.enemyColor;
             }
         }
 
