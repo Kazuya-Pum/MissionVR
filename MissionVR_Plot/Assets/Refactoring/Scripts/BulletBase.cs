@@ -13,7 +13,7 @@ namespace Refactoring
 
 
         #region 発射時に受け取る値
-        public int ownerId;
+        public PhotonView ownerView;
         public int damageValue;
         public DamageType damageType;
         public float range;
@@ -59,9 +59,9 @@ namespace Refactoring
 
             if ( !hit || hit.team != team )
             {
-                if ( ownerId > 0 && hit )
+                if ( ownerView && hit )
                 {
-                    PhotonView.Find( ownerId ).photonView.RPC( "Attack", PhotonTargets.MasterClient, damageValue, hit, damageType, ownerId );
+                    ownerView.RPC( "Attack", PhotonTargets.MasterClient, damageValue, hit, damageType );
                 }
                 Destroy( gameObject );
             }

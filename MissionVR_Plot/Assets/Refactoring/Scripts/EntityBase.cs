@@ -129,7 +129,7 @@ namespace Refactoring
             GameManager.instance.onSetPlayer += OnSetPlayer;
         }
 
-        public void OnSetPlayer()
+        private void OnSetPlayer()
         {
             playerCamera = PlayerController.instance.playerCamera;
             SetBarColor( PlayerController.instance.player.team );
@@ -194,7 +194,7 @@ namespace Refactoring
 
             if ( PhotonNetwork.isMasterClient )
             {
-                bulletBase.ownerId = photonView.viewID;
+                bulletBase.ownerView = photonView;
                 bulletBase.damageValue = physicalAttack;
                 bulletBase.damageType = DamageType.PHYSICAL;
             }

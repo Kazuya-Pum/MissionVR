@@ -127,13 +127,15 @@ namespace Refactoring
 
         private void InstantiatePlayer( Team team )
         {
-            PlayerController.instance.player = PhotonNetwork.Instantiate( "Player", spawnPoint[(int)team].position, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
+            Vector3 shiftedPosition = spawnPoint[(int)team].position;
+            shiftedPosition.x += Random.Range( -5, 10 );
+            shiftedPosition.z += Random.Range( -5, 10 );
+
+            PlayerController.instance.player = PhotonNetwork.Instantiate( "Player", shiftedPosition, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
             PlayerController.instance.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
             PlayerController.instance.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
 
             PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
-
-            EntityBase[] entities = FindObjectsOfType<EntityBase>();
 
             onSetPlayer();
         }
