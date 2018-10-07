@@ -130,12 +130,8 @@ namespace Refactoring
 
             PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
-            //if ( gameState == GameState.GAME )
-            //{
-            //    PlayerController.instance.playerState = PlayerState.PLAY;
-            //}
-
             EntityBase[] entities = FindObjectsOfType<EntityBase>();
+            
             foreach ( EntityBase entity in entities )
             {
                 entity.OnSetPlayer();
