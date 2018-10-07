@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +7,7 @@ namespace Refactoring
 {
     public enum PlayerState { WAIT, PLAY, SHOP }
 
-    public enum GameState { GAME, WAIT }
+    public enum GameState { WAIT, COUNT_DOWN, GAME }
 
     public class GameManager : Photon.MonoBehaviour
     {
@@ -18,6 +17,11 @@ namespace Refactoring
         [SerializeField] private float setRespawnTime;
         public WaitForSeconds respawnTime;
         public GameState gameState;
+
+        [SerializeField] private byte maxPlayers;
+
+        [SerializeField] private Text countDownText;
+        [SerializeField] private int countDownTime;
 
         public DataBaseFormat DataBase
         {
@@ -45,10 +49,26 @@ namespace Refactoring
             respawnTime = new WaitForSeconds( setRespawnTime );
         }
 
+        private void OnDestroy()
+        {
+            PhotonNetwork.Disconnect();
+        }
+
         void OnJoinedLobby()
         {
             Debug.Log( "joined lobby" );
-            PhotonNetwork.JoinOrCreateRoom( "Test", null, null );
+
+            PhotonNetwork.JoinRandomRoom();
+        }
+
+        void OnPhotonRandomJoinFailed()
+        {
+            RoomOptions roomOptions = new RoomOptions
+            {
+                MaxPlayers = maxPlayers
+            };
+
+            PhotonNetwork.CreateRoom( "TestRoom", roomOptions, null );
         }
 
         void OnJoinedRoom()
@@ -57,28 +77,69 @@ namespace Refactoring
 
 
             InstantiatePlayer( ( PhotonNetwork.room.PlayerCount % 2 == 0 ) ? Team.WHITE : Team.BLACK );
+
+            photonView.RPC( "CheckStart", PhotonTargets.MasterClient );
+
+        }
+
+        [PunRPC]
+        protected void CheckStart()
+        {
+            if ( ( PhotonNetwork.room.PlayerCount == maxPlayers || ( maxPlayers == 0 && PhotonNetwork.room.PlayerCount == 8 ) ) && gameState == GameState.WAIT )
+            {
+                photonView.RPC( "GameStart", PhotonTargets.AllViaServer );
+            }
+        }
+
+        [PunRPC]
+        protected void GameStart()
+        {
+            gameState = GameState.COUNT_DOWN;
+            StartCoroutine( "CountDown" );
+        }
+
+        private IEnumerator CountDown()
+        {
+            WaitForSeconds one = new WaitForSeconds( 1f );
+
+            for ( int i = countDownTime; i > 0; i-- )
+            {
+                countDownText.text = i.ToString();
+                yield return one;
+            }
+
+            if ( PhotonNetwork.isMasterClient )
+            {
+                photonView.RPC( "FetchGameState", PhotonTargets.AllBufferedViaServer );
+            }
+        }
+
+        [PunRPC]
+        protected void FetchGameState()
+        {
+            this.gameState = GameState.GAME;
+            PlayerController.instance.playerState = PlayerState.PLAY;
+            countDownText.transform.parent.gameObject.SetActive( false );
         }
 
         private void InstantiatePlayer( Team team )
         {
-            PlayerController.player = PhotonNetwork.Instantiate( "Player", spawnPoint[(int)team].position, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
-            PlayerController.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
-            PlayerController.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
+            PlayerController.instance.player = PhotonNetwork.Instantiate( "Player", spawnPoint[(int)team].position, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
+            PlayerController.instance.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
+            PlayerController.instance.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
 
-            PlayerController.playerCamera = PlayerController.player.head.Find( "Main Camera" ).transform;
+            PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
-            if ( gameState == GameState.GAME )
-            {
-                PlayerController.instance.playerState = PlayerState.PLAY;
-            }
+            //if ( gameState == GameState.GAME )
+            //{
+            //    PlayerController.instance.playerState = PlayerState.PLAY;
+            //}
 
             EntityBase[] entities = FindObjectsOfType<EntityBase>();
             foreach ( EntityBase entity in entities )
             {
                 entity.OnSetPlayer();
             }
-
-
         }
 
 

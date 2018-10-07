@@ -2332,7 +2332,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.4
-  far clip plane: 1000
+  far clip plane: 500
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -2505,9 +2505,9 @@ MonoBehaviour:
   trigger: 0
   head: {fileID: 4894235330120418}
   muzzle: {fileID: 4681409164933146}
+  objectGroup: {fileID: 0}
   moveSpeed: 1
   dashRate: 1.5
-  model: {fileID: 1623476032971692}
   myExp: 0
   myMoney: 0
   level: 0
@@ -2519,6 +2519,7 @@ MonoBehaviour:
     physicalDefense: 1
     magicAttack: 1
     magicDefense: 1
+  model: {fileID: 1623476032971692}
   modelRotate: {fileID: 4069446711155656}
 --- !u!114 &114580826626827854
 MonoBehaviour:

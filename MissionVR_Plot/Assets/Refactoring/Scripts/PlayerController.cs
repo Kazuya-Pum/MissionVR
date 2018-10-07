@@ -9,9 +9,9 @@ namespace Refactoring
     {
         public static PlayerController instance;
 
-        public static PlayerBase player;
+        public PlayerBase player;
 
-        public static Transform playerCamera;
+        public Transform playerCamera;
 
         public PlayerState playerState;
 
@@ -34,7 +34,6 @@ namespace Refactoring
 
         void Update()
         {
-            // TODO ゲームの状態も今後考慮する
             if ( playerState == PlayerState.PLAY && player && player.entityState == EntityState.ALIVE )
             {
                 GetKey();

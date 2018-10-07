@@ -53,8 +53,6 @@ namespace Refactoring
         /// </summary>
         [SerializeField] protected Transform muzzle;
 
-        [SerializeField] protected GameObject objectGroup;
-
         protected int Hp
         {
             get
@@ -114,14 +112,13 @@ namespace Refactoring
             tfCache = transform;
             tfSliderCache = hpSlider.transform.parent;
 
-            objectGroup = ( objectGroup == null ) ? gameObject : objectGroup;
         }
 
         protected virtual void Start()
         {
             gunInfo = GameManager.instance.DataBase.gunInfos[gunIndex];
 
-            if ( PlayerController.player )
+            if ( PlayerController.instance.player )
             {
                 OnSetPlayer();
             }
@@ -130,8 +127,8 @@ namespace Refactoring
 
         public void OnSetPlayer()
         {
-            playerCamera = PlayerController.playerCamera;
-            SetBarColor( PlayerController.player.team );
+            playerCamera = PlayerController.instance.playerCamera;
+            SetBarColor( PlayerController.instance.player.team );
         }
 
         protected virtual void Update()
@@ -232,7 +229,7 @@ namespace Refactoring
         [PunRPC]
         protected virtual void Death()
         {
-            PhotonNetwork.Destroy( objectGroup );
+            PhotonNetwork.Destroy( gameObject );
         }
 
         private void SetBarColor( Team playerTeam )

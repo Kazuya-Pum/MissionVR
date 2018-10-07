@@ -84,4 +84,7 @@ MonoBehaviour:
   - ToAliveState
   - ToDeathState
   - Shoot
+  - CheckStart
+  - GameStart
+  - FetchGameState
   DisableAutoOpenWizard: 1
