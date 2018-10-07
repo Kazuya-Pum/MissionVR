@@ -124,6 +124,10 @@ namespace Refactoring
             }
         }
 
+        void OnJoinedRoom()
+        {
+            GameManager.instance.onSetPlayer += OnSetPlayer;
+        }
 
         public void OnSetPlayer()
         {

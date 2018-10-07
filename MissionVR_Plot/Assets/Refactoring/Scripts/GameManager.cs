@@ -23,6 +23,9 @@ namespace Refactoring
         [SerializeField] private Text countDownText;
         [SerializeField] private int countDownTime;
 
+        public delegate void OnSetPlayer();
+        public OnSetPlayer onSetPlayer;
+
         public DataBaseFormat DataBase
         {
             get
@@ -131,11 +134,8 @@ namespace Refactoring
             PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
             EntityBase[] entities = FindObjectsOfType<EntityBase>();
-            
-            foreach ( EntityBase entity in entities )
-            {
-                entity.OnSetPlayer();
-            }
+
+            onSetPlayer();
         }
 
 
