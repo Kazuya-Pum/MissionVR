@@ -111,7 +111,6 @@ namespace Refactoring
 
             tfCache = transform;
             tfSliderCache = hpSlider.transform.parent;
-
         }
 
         protected virtual void Start()
@@ -155,17 +154,11 @@ namespace Refactoring
             team = remoteTeam;
         }
 
-        [PunRPC]
-        protected virtual void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL, int id = 0 )
+        public virtual void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL )
         {
-            if ( id == 0 )
-            {
-                id = photonView.viewID;
-            }
-
             if ( target.team != team )
             {
-                target.photonView.RPC( "Damaged", PhotonTargets.MasterClient, damageValue, damageType, id );
+                target.Damaged( damageValue, damageType, this );
             }
         }
 
@@ -194,7 +187,8 @@ namespace Refactoring
 
             if ( PhotonNetwork.isMasterClient )
             {
-                bulletBase.ownerView = photonView;
+
+                bulletBase.owner = this;
                 bulletBase.damageValue = physicalAttack;
                 bulletBase.damageType = DamageType.PHYSICAL;
             }
@@ -202,8 +196,7 @@ namespace Refactoring
             bulletBase.team = team;
         }
 
-        [PunRPC]
-        public void Damaged( int value, DamageType damageType, int id )
+        public void Damaged( int value, DamageType damageType, EntityBase killer )
         {
             switch ( damageType )
             {
@@ -221,16 +214,14 @@ namespace Refactoring
 
             if ( Hp <= 0 )
             {
-                EntityBase killer = PhotonView.Find( id ).GetComponent<EntityBase>();
                 if ( killer.entityType == EntityType.CHANPION )
                 {
-                    killer.photonView.RPC( "GetReward", PhotonTargets.MasterClient, sendingExp, sendingMoney );
+                    killer.GetComponent<PlayerBase>().GetReward( sendingExp, sendingMoney );
                 }
-                photonView.RPC( "Death", PhotonTargets.MasterClient );
+                Death();
             }
         }
 
-        [PunRPC]
         protected virtual void Death()
         {
             PhotonNetwork.Destroy( gameObject );

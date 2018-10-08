@@ -170,7 +170,6 @@ namespace Refactoring
         public GunInfo[] gunInfos;
 
         public GameObject[] entityInfos;
-
     }
 
     [System.Serializable]

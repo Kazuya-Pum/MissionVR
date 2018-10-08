@@ -65,7 +65,7 @@ namespace Refactoring
 
 
         [PunRPC]
-        protected void GetReward( int exp = 0, int money = 0 )
+        public void GetReward( int exp = 0, int money = 0 )
         {
             myExp += exp;
             myMoney += money;

@@ -13,7 +13,7 @@ namespace Refactoring
 
 
         #region 発射時に受け取る値
-        public PhotonView ownerView;
+        public EntityBase owner;
         public int damageValue;
         public DamageType damageType;
         public float range;
@@ -24,7 +24,7 @@ namespace Refactoring
         /// 銃弾のインスタンスが消えるまでの時間
         /// </summary>
         [SerializeField] private float ttl;
-        [SerializeField] private float speed;
+        [SerializeField] private float speed;   // TODO 弾速もgunInfoに登録する？
 
         private Vector3 prev;
         private Transform tfCache;
@@ -59,9 +59,9 @@ namespace Refactoring
 
             if ( !hit || hit.team != team )
             {
-                if ( ownerView && hit )
+                if ( PhotonNetwork.isMasterClient && hit )
                 {
-                    ownerView.RPC( "Attack", PhotonTargets.MasterClient, damageValue, hit, damageType );
+                    owner.Attack( damageValue, hit, damageType );
                 }
                 Destroy( gameObject );
             }

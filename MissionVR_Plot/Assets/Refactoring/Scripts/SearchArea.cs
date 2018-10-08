@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Refactoring
 {
-    public class SearchArea : MonoBehaviour
+    public class SearchArea : Photon.MonoBehaviour
     {
 
         public event System.Action<EntityBase> onFound = ( entity ) => { };
@@ -12,12 +12,16 @@ namespace Refactoring
 
         private void OnTriggerEnter( Collider other )
         {
-            
+            EntityBase entity = other.GetComponent<EntityBase>();
+
+            onFound( entity );
         }
 
         private void OnTriggerExit( Collider other )
         {
+            EntityBase entity = other.GetComponent<EntityBase>();
 
+            onLost( entity );
         }
     }
 }

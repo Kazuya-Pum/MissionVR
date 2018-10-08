@@ -429,7 +429,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 192f0361667b453418d13f1aa3340413, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  team: 1
+  team: 0
   entityType: 0
   entityState: 0
   maxHp: 50
@@ -449,7 +449,6 @@ MonoBehaviour:
   muzzle: {fileID: 0}
   moveSpeed: 0
   dashRate: 0
-  model: {fileID: 0}
 --- !u!114 &114848972261253428
 MonoBehaviour:
   m_ObjectHideFlags: 1
