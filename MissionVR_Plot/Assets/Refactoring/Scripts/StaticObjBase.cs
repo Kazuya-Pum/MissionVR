@@ -9,7 +9,6 @@ namespace Refactoring
 
         // TODO タワーやネクサス等の処理
 
-        [PunRPC]
         protected override void Death()
         {
 

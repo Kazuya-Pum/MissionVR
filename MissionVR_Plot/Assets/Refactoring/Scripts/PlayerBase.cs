@@ -63,8 +63,6 @@ namespace Refactoring
             modelRotate.localRotation = head.localRotation;
         }
 
-
-        [PunRPC]
         public void GetReward( int exp = 0, int money = 0 )
         {
             myExp += exp;
@@ -72,11 +70,10 @@ namespace Refactoring
 
             if ( myExp >= level * 100 + 50 )
             {
-                photonView.RPC( "LevelUp", PhotonTargets.MasterClient );
+                LevelUp();
             }
         }
 
-        [PunRPC]
         protected void LevelUp()
         {
             myExp -= level * 100;
@@ -95,8 +92,6 @@ namespace Refactoring
             }
         }
 
-
-        [PunRPC]
         protected override void Death()
         {
             photonView.RPC( "ToDeathState", PhotonTargets.All );
