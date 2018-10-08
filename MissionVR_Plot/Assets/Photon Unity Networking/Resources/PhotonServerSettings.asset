@@ -27,64 +27,49 @@ MonoBehaviour:
   NetworkLogging: 1
   RunInBackground: 1
   RpcList:
+  - AttackEnemy
+  - BulletsSynchronization
+  - CallIfPlayerKilled
+  - CallIfTowerDestroyed
   - Chat
+  - CheckStart
+  - Damage
+  - DamageMinion
+  - DestroyMinion
+  - DestroyMinionObject
   - DestroyRpc
+  - DestroyTowerObject
+  - FetchGameState
+  - FetchLocalParams
+  - FetchSetting
+  - FetchTeam
+  - GameStart
   - InstantiateRpc
+  - LevelUp
+  - LoadScene
+  - MinionDamage
+  - MinionKillMinion
+  - Move
   - PickupItemInit
   - PunPickup
   - PunPickupSimple
   - PunRespawn
-  - RequestForPickupItems
-  - RequestForPickupTimes
-  - CallIfPlayerKilled
-  - CallIfTowerDestroyed
-  - DestroyObject
-  - Damage
-  - DestroyMinionObject
-  - DestroyTowerObject
-  - DestroyNeutralCreep
-  - LevelUp
-  - AttackEnemy
   - RaceiveDamage
-  - SendDamage
-  - DestroyProjector
-  - MinionDamage
-  - DamageMinion
   - ReceiveSkillDamage
-  - SendSkillDamage
+  - Recieve_Money_NPCExp
   - RecieveChangedHP
   - RecieveExp
   - RecieveMoney
-  - RecieveExpFromNonPlayerObj
-  - SendExp
-  - SendMoney
-  - LoadScene
-  - BulletsSynchronization
-  - SpawnMinion
-  - DestroyMinion
-  - DestroyMinionNum
-  - Recieve_Money_NPCExp
-  - Send_Exp_Money
-  - DamageTower
-  - MinionKillMinion
-  - Damaged
-  - Attack
-  - Death
-  - SetUp
-  - GetReward
-  - Move
+  - RequestForPickupItems
+  - RequestForPickupTimes
   - Rotate
-  - FetchID
-  - Summon
+  - Send_Exp_Money
+  - SendDamage
+  - SendSkillDamage
   - SetDashFlag
-  - PullTheTrigger
-  - FetchTeam
-  - FetchLocalParams
-  - FetchSetting
+  - Shoot
+  - SpawnMinion
+  - Summon
   - ToAliveState
   - ToDeathState
-  - Shoot
-  - CheckStart
-  - GameStart
-  - FetchGameState
   DisableAutoOpenWizard: 1

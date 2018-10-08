@@ -63,6 +63,13 @@ namespace Refactoring
             modelRotate.localRotation = head.localRotation;
         }
 
+        /// <summary>
+        /// 報酬を受け取る関数。
+        /// エンティティーをキルした際に呼ばれる
+        /// <para>prev:Master->Master->next:Master</para>
+        /// </summary>
+        /// <param name="exp">獲得経験値</param>
+        /// <param name="money">獲得金額</param>
         public void GetReward( int exp = 0, int money = 0 )
         {
             myExp += exp;
@@ -74,6 +81,10 @@ namespace Refactoring
             }
         }
 
+        /// <summary>
+        /// レベルアップを処理する関数。各種ステータス成長
+        /// <para>prev:Master->Master->next:Master</para>
+        /// </summary>
         protected void LevelUp()
         {
             myExp -= level * 100;
@@ -99,6 +110,10 @@ namespace Refactoring
             StartCoroutine( "Respawn" );
         }
 
+        /// <summary>
+        /// 全クライアント上でこのプレイヤーを死亡状態に遷移する関数
+        /// <para>prev:Master->All</para>
+        /// </summary>
         [PunRPC]
         protected void ToDeathState()
         {
@@ -106,6 +121,11 @@ namespace Refactoring
             model.SetActive( false );
         }
 
+        /// <summary>
+        /// 一定時間でリスポーン処理をマスターから全クライアントに対して行う関数
+        /// <para>prev:Master->Master->next:All</para>
+        /// </summary>
+        /// <returns></returns>
         private IEnumerator Respawn()
         {
             yield return GameManager.instance.respawnTime;
@@ -113,6 +133,10 @@ namespace Refactoring
             photonView.RPC( "ToAliveState", PhotonTargets.AllViaServer );
         }
 
+        /// <summary>
+        /// 全クライアント上でこのプレイヤーを生存状態に遷移する関数
+        /// <para>prev:Master->All</para>
+        /// </summary>
         [PunRPC]
         protected void ToAliveState()
         {
@@ -125,6 +149,7 @@ namespace Refactoring
 
         /// <summary>
         /// HP、Manaの回復
+        /// <para>prev:Master->Master</para>
         /// </summary>
         /// <param name="cHp">HPの回復値</param>
         /// <param name="cMana">Manaの回復値（省略可）</param>
@@ -135,6 +160,10 @@ namespace Refactoring
         }
 
         float autoRecoverTime;
+        /// <summary>
+        /// 一定時間毎に自動回復を行う関数
+        /// <para>prev:Master->Master->next:Master</para>
+        /// </summary>
         protected void AutoRecover()
         {
             autoRecoverTime += Time.deltaTime;
@@ -147,7 +176,8 @@ namespace Refactoring
 
         /// <summary>
         /// マスタークライアントで処理した各プレイヤーの変数をそれぞれローカルに反映させる。
-        /// 更新処理部分で必要な変数のみ更新するようにするべき？
+        /// <para>prev:Master->Master以外</para>
+        /// <para>更新処理部分で必要な変数のみ更新するようにするべき？</para>
         /// </summary>
         /// <param name="maxHp"></param>
         /// <param name="hp"></param>

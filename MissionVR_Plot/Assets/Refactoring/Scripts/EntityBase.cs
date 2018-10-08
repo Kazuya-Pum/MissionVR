@@ -154,6 +154,13 @@ namespace Refactoring
             team = remoteTeam;
         }
 
+        /// <summary>
+        /// 攻撃を処理する関数
+        /// <para>prev:Master->Master->next:Master</para>
+        /// </summary>
+        /// <param name="damageValue">ダメージ値</param>
+        /// <param name="target">攻撃対象</param>
+        /// <param name="damageType">攻撃の種類</param>
         public virtual void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL )
         {
             if ( target.team != team )
@@ -163,6 +170,10 @@ namespace Refactoring
         }
 
         float interval;
+        /// <summary>
+        /// <para>prev:ローカル->ローカル->next:All</para>
+        /// </summary>
+        /// <param name="trigger"></param>
         protected void Shooting( bool trigger )
         {
             if ( interval >= gunInfo.fireRate )
@@ -196,6 +207,13 @@ namespace Refactoring
             bulletBase.team = team;
         }
 
+        /// <summary>
+        /// ダメージを受ける関数
+        /// <para>prev:Master->Master->Master</para>
+        /// </summary>
+        /// <param name="value">ダメージ値</param>
+        /// <param name="damageType">攻撃の種類</param>
+        /// <param name="killer">攻撃をしてきたエンティティー</param>
         public void Damaged( int value, DamageType damageType, EntityBase killer )
         {
             switch ( damageType )

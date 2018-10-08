@@ -6,7 +6,6 @@ namespace Refactoring
 {
     public class SearchArea : Photon.MonoBehaviour
     {
-
         public event System.Action<EntityBase> onFound = ( entity ) => { };
         public event System.Action<EntityBase> onLost = ( entity ) => { };
 
