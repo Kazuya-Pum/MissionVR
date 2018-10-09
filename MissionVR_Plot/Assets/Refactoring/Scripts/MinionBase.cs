@@ -26,7 +26,7 @@ namespace Refactoring
         protected override void Update()
         {
             base.Update();
-            Move( 0, 0 );
+            //Move( 0, 0 );
             //photonView.RPC( "Move", PhotonTargets.AllViaServer, 0f, 0f );
         }
 

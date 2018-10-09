@@ -28,6 +28,7 @@ namespace Refactoring
 
         private Vector3 prev;
         private Transform tfCache;
+        private Rigidbody rbCache;
 
         private void Awake()
         {
@@ -35,21 +36,24 @@ namespace Refactoring
             range = ( range <= 0 ) ? 50 : range;
 
             tfCache = transform;
+            rbCache = GetComponent<Rigidbody>();
         }
 
-        private void Start()
+        private void OnEnable()
         {
             prev = tfCache.position;
-            GetComponent<Rigidbody>().AddForce( transform.forward * 10 * speed, ForceMode.Impulse );
+            rbCache.AddForce( transform.forward * 10 * speed, ForceMode.Impulse );
         }
 
+        float leaveTime;
         private void Update()
         {
-            ttl -= Time.deltaTime;
+            leaveTime += Time.deltaTime;
 
-            if ( Vector3.Distance( prev, tfCache.position ) >= range || ttl <= 0 )
+            if ( Vector3.Distance( prev, tfCache.position ) >= range || leaveTime >= ttl )
             {
-                Destroy( gameObject );
+                leaveTime = 0;
+                StorBullet();
             }
         }
 
@@ -63,8 +67,15 @@ namespace Refactoring
                 {
                     owner.Attack( damageValue, hit, damageType );
                 }
-                Destroy( gameObject );
+                StorBullet();
             }
+        }
+
+        private void StorBullet()
+        {
+            GameManager.instance.bullets.Enqueue( this );
+            rbCache.velocity = Vector3.zero;
+            gameObject.SetActive( false );
         }
     }
 }

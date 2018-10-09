@@ -11,6 +11,8 @@ namespace Refactoring
         [SerializeField] protected float moveSpeed;
         [SerializeField] protected float dashRate;
         protected bool dashFlag = false;
+
+        [SerializeField] protected Transform modelRotate;
         #endregion
 
 

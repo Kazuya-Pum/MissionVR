@@ -194,11 +194,22 @@ namespace Refactoring
         [PunRPC]
         protected void Shoot( Quaternion direction )
         {
-            BulletBase bulletBase = Instantiate( gunInfo.bullet, muzzle.position, direction ).GetComponent<BulletBase>();
+            BulletBase bulletBase;
+
+            if ( GameManager.instance.bullets.Count > 0 )
+            {
+                bulletBase = GameManager.instance.bullets.Dequeue();
+                bulletBase.transform.position = muzzle.position;
+                bulletBase.transform.localRotation = direction;
+                bulletBase.gameObject.SetActive( true );
+            }
+            else
+            {
+                bulletBase = Instantiate( gunInfo.bullet, muzzle.position, direction ).GetComponent<BulletBase>();
+            }
 
             if ( PhotonNetwork.isMasterClient )
             {
-
                 bulletBase.owner = this;
                 bulletBase.damageValue = physicalAttack;
                 bulletBase.damageType = DamageType.PHYSICAL;

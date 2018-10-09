@@ -15,7 +15,8 @@ namespace Refactoring
         [SerializeField] private GrowthValues growthValues;
 
         [SerializeField] protected GameObject model;
-        [SerializeField] private Transform modelRotate;
+
+        protected Collider playerCollider;
 
         private float localSensitivity;
 
@@ -31,6 +32,8 @@ namespace Refactoring
             {
                 head.Find( "Main Camera" ).gameObject.SetActive( true );
             }
+
+            playerCollider = GetComponent<Collider>();
         }
 
         protected override void Update()
@@ -40,7 +43,7 @@ namespace Refactoring
             if ( PhotonNetwork.isMasterClient )
             {
                 AutoRecover();
-                photonView.RPC( "FetchLocalParams", PhotonTargets.Others, maxHp, Hp, maxMana, Mana, myExp, myMoney, level );
+                photonView.RPC( "FetchLocalParams", PhotonTargets.Others, maxHp, Hp, maxMana, Mana, myExp, myMoney, level, moveSpeed );
             }
         }
 
@@ -96,6 +99,7 @@ namespace Refactoring
             physicalDefense += growthValues.physicalDefense;
             magicAttack += growthValues.magicAttack;
             magicDifense += growthValues.magicDefense;
+            moveSpeed += growthValues.moovSpeed;
 
             if ( myExp >= level * 100 )
             {
@@ -119,6 +123,7 @@ namespace Refactoring
         {
             entityState = EntityState.DEATH;
             model.SetActive( false );
+            playerCollider.enabled = false;
         }
 
         /// <summary>
@@ -145,6 +150,7 @@ namespace Refactoring
 
             entityState = EntityState.ALIVE;
             model.SetActive( true );
+            playerCollider.enabled = true;
         }
 
         /// <summary>
@@ -187,7 +193,7 @@ namespace Refactoring
         /// <param name="myMoney"></param>
         /// <param name="level"></param>
         [PunRPC]
-        protected void FetchLocalParams( int maxHp, int hp, int maxMana, int mana, int myExp, int myMoney, int level )
+        protected void FetchLocalParams( int maxHp, int hp, int maxMana, int mana, int myExp, int myMoney, int level, float moveSpeed )
         {
             this.maxHp = maxHp;
             Hp = hp;
@@ -196,6 +202,7 @@ namespace Refactoring
             this.myExp = myExp;
             this.myMoney = myMoney;
             this.level = level;
+            this.moveSpeed = moveSpeed;
         }
     }
 
@@ -211,5 +218,6 @@ namespace Refactoring
         public int physicalDefense;
         public int magicAttack;
         public int magicDefense;
+        public int moovSpeed;
     }
 }

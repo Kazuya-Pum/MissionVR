@@ -34,6 +34,8 @@ namespace Refactoring
             }
         }
 
+        public Queue<BulletBase> bullets = new Queue<BulletBase>();
+
         void Awake()
         {
             if ( instance == null )

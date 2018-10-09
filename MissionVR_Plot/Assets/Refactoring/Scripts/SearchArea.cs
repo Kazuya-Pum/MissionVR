@@ -6,21 +6,30 @@ namespace Refactoring
 {
     public class SearchArea : Photon.MonoBehaviour
     {
-        public event System.Action<EntityBase> onFound = ( entity ) => { };
-        public event System.Action<EntityBase> onLost = ( entity ) => { };
+        AIBase aiBase;
+
+        private void Awake()
+        {
+            aiBase = transform.parent.GetComponent<AIBase>();
+        }
 
         private void OnTriggerEnter( Collider other )
         {
             EntityBase entity = other.GetComponent<EntityBase>();
-
-            onFound( entity );
+            if ( entity )
+            {
+                aiBase.OnFound( entity );
+            }
         }
 
         private void OnTriggerExit( Collider other )
         {
             EntityBase entity = other.GetComponent<EntityBase>();
 
-            onLost( entity );
+            if ( entity )
+            {
+                aiBase.OnLost( entity );
+            }
         }
     }
 }
