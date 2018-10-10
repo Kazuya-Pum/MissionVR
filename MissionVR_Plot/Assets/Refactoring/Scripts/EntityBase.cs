@@ -29,7 +29,7 @@ namespace Refactoring
         [SerializeField] protected int physicalAttack;
         [SerializeField] protected int physicalDefense;
         [SerializeField] protected int magicAttack;
-        [SerializeField] protected int magicDifense;
+        [SerializeField] protected int magicDefense;
         [SerializeField] protected int sendingExp;
         [SerializeField] protected int sendingMoney;
         #endregion
@@ -70,6 +70,8 @@ namespace Refactoring
                 {
                     hp = value;
                 }
+
+                hpSlider.value = hp;
             }
         }
 
@@ -98,6 +100,11 @@ namespace Refactoring
 
         protected virtual void Awake()
         {
+            tfCache = transform;
+            tfSliderCache = hpSlider.transform.parent;
+
+            hpSlider.maxValue = maxHp;
+
             Hp = maxHp;
             Mana = maxMana;
 
@@ -105,12 +112,8 @@ namespace Refactoring
             physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
             physicalDefense = ( physicalDefense <= 0 ) ? 1 : physicalDefense;
             magicAttack = ( magicAttack <= 0 ) ? 1 : magicAttack;
-            magicDifense = ( magicDifense <= 0 ) ? 1 : magicDifense;
+            magicDefense = ( magicDefense <= 0 ) ? 1 : magicDefense;
             #endregion
-
-
-            tfCache = transform;
-            tfSliderCache = hpSlider.transform.parent;
         }
 
         protected virtual void Start()
@@ -137,8 +140,6 @@ namespace Refactoring
         protected virtual void Update()
         {
             tfSliderCache.LookAt( playerCamera );
-            hpSlider.maxValue = maxHp;
-            hpSlider.value = Hp;
 
             Shooting( trigger );
 
@@ -233,7 +234,7 @@ namespace Refactoring
                     value *= value / physicalDefense;
                     break;
                 case DamageType.MAGIC:
-                    value *= value / magicDifense;
+                    value *= value / magicDefense;
                     break;
                 case DamageType.THROUGH:
                     break;

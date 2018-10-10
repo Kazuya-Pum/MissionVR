@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 namespace Refactoring
 {
@@ -17,6 +17,17 @@ namespace Refactoring
 
         // TODO 設定ファイル等に移設
         public float sensitivity;
+
+        [SerializeField] private Slider hpSlider;
+        [SerializeField] private Slider manaSlider;
+        [SerializeField] private Text moneyText;
+        [SerializeField] private Text levelText;
+        [SerializeField] private Image expValue;
+        [SerializeField] private Image statusPhysicalAttack;
+        [SerializeField] private Image statusPhysicalDiffence;
+        [SerializeField] private Image statusMagicDiffence;
+        [SerializeField] private Image statusSpeed;
+
 
         private void Awake()
         {
@@ -80,6 +91,21 @@ namespace Refactoring
             {
                 player.trigger = false;
             }
+        }
+
+        public void OnStatusChanged()
+        {
+            PlayerStatus status = player.GetStatus();
+
+            hpSlider.maxValue = status.maxHp;
+            manaSlider.maxValue = status.maxMana;
+            moneyText.text = status.myMoney.ToString();
+            levelText.text = status.level.ToString();
+            expValue.fillAmount = status.myExp / status.level / 100;
+            statusPhysicalAttack.fillAmount = status.physicalAttack * 0.1f;
+            statusPhysicalDiffence.fillAmount = status.physicalDefense * 0.1f;
+            statusMagicDiffence.fillAmount = status.magicDefense * 0.1f;
+            statusSpeed.fillAmount = status.moovSpeed * 0.1f;
         }
     }
 }

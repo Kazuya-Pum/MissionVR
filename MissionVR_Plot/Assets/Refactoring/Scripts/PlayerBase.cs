@@ -25,6 +25,7 @@ namespace Refactoring
             base.Awake();
 
             autoRecoverSpam = ( autoRecoverSpam <= 0 ) ? 1f : autoRecoverSpam;
+            level = 1;
 
             entityType = EntityType.CHANPION;
 
@@ -78,7 +79,7 @@ namespace Refactoring
             myExp += exp;
             myMoney += money;
 
-            if ( myExp >= level * 100 + 50 )
+            if ( myExp >= level * 100 )
             {
                 LevelUp();
             }
@@ -95,11 +96,18 @@ namespace Refactoring
 
             maxHp += growthValues.hp;
             maxMana += growthValues.mana;
-            physicalAttack += growthValues.phycalAttack;
+            physicalAttack += growthValues.physicalAttack;
             physicalDefense += growthValues.physicalDefense;
             magicAttack += growthValues.magicAttack;
-            magicDifense += growthValues.magicDefense;
+            magicDefense += growthValues.magicDefense;
             moveSpeed += growthValues.moovSpeed;
+
+            hpSlider.maxValue = maxHp;
+
+            if ( photonView.isMine )
+            {
+                PlayerController.instance.OnStatusChanged();
+            }
 
             if ( myExp >= level * 100 )
             {
@@ -204,6 +212,25 @@ namespace Refactoring
             this.level = level;
             this.moveSpeed = moveSpeed;
         }
+
+        public PlayerStatus GetStatus()
+        {
+            PlayerStatus status = new PlayerStatus
+            {
+                maxHp = maxHp,
+                maxMana = maxMana,
+                physicalAttack = physicalAttack,
+                physicalDefense = physicalDefense,
+                magicAttack = magicAttack,
+                magicDefense = magicDefense,
+                moovSpeed = moveSpeed,
+                level = level,
+                myMoney = myMoney,
+                myExp = myExp
+            };
+
+            return status;
+        }
     }
 
     /// <summary>
@@ -214,10 +241,27 @@ namespace Refactoring
     {
         public int hp;
         public int mana;
-        public int phycalAttack;
+        public int physicalAttack;
         public int physicalDefense;
         public int magicAttack;
         public int magicDefense;
-        public int moovSpeed;
+        public float moovSpeed;
+    }
+
+    [System.Serializable]
+    public class PlayerStatus
+    {
+        public int maxHp;
+        public int hp;
+        public int maxMana;
+        public int mana;
+        public int physicalAttack;
+        public int physicalDefense;
+        public int magicAttack;
+        public int magicDefense;
+        public float moovSpeed;
+        public int level;
+        public int myMoney;
+        public int myExp;
     }
 }
