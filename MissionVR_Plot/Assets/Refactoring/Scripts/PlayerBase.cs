@@ -14,8 +14,6 @@ namespace Refactoring
 
         [SerializeField] private GrowthValues growthValues;
 
-        [SerializeField] protected GameObject model;
-
         protected Collider playerCollider;
 
         private float localSensitivity;
@@ -79,6 +77,11 @@ namespace Refactoring
             myExp += exp;
             myMoney += money;
 
+            if ( photonView.isMine )
+            {
+                PlayerController.instance.OnGetReward();
+            }
+
             if ( myExp >= level * 100 )
             {
                 LevelUp();
@@ -100,7 +103,7 @@ namespace Refactoring
             physicalDefense += growthValues.physicalDefense;
             magicAttack += growthValues.magicAttack;
             magicDefense += growthValues.magicDefense;
-            moveSpeed += growthValues.moovSpeed;
+            moveSpeed += growthValues.moveSpeed;
 
             hpSlider.maxValue = maxHp;
 
@@ -130,7 +133,6 @@ namespace Refactoring
         protected void ToDeathState()
         {
             entityState = EntityState.DEATH;
-            model.SetActive( false );
             playerCollider.enabled = false;
         }
 
@@ -155,9 +157,10 @@ namespace Refactoring
         {
             Hp = maxHp;
             tfCache.position = GameManager.instance.spawnPoint[(int)team].position;
+            head.localEulerAngles = Vector3.zero;
+            modelRotate.localRotation = head.localRotation;
 
             entityState = EntityState.ALIVE;
-            model.SetActive( true );
             playerCollider.enabled = true;
         }
 
@@ -213,23 +216,84 @@ namespace Refactoring
             this.moveSpeed = moveSpeed;
         }
 
-        public PlayerStatus GetStatus()
+        public int MaxHp
         {
-            PlayerStatus status = new PlayerStatus
+            get
             {
-                maxHp = maxHp,
-                maxMana = maxMana,
-                physicalAttack = physicalAttack,
-                physicalDefense = physicalDefense,
-                magicAttack = magicAttack,
-                magicDefense = magicDefense,
-                moovSpeed = moveSpeed,
-                level = level,
-                myMoney = myMoney,
-                myExp = myExp
-            };
+                return maxHp;
+            }
+        }
 
-            return status;
+        public int MaxMana
+        {
+            get
+            {
+                return maxMana;
+            }
+        }
+
+        public int PhysicalAttack
+        {
+            get
+            {
+                return physicalAttack;
+            }
+        }
+
+        public int PhysicalDefense
+        {
+            get
+            {
+                return physicalDefense;
+            }
+        }
+
+        public int MagicAttack
+        {
+            get
+            {
+                return magicAttack;
+            }
+        }
+
+        public int MagicDefense
+        {
+            get
+            {
+                return magicDefense;
+            }
+        }
+
+        public float MoveSpeed
+        {
+            get
+            {
+                return moveSpeed;
+            }
+        }
+
+        public int Level
+        {
+            get
+            {
+                return level;
+            }
+        }
+
+        public int MyMoney
+        {
+            get
+            {
+                return myMoney;
+            }
+        }
+
+        public int MyExp
+        {
+            get
+            {
+                return myExp;
+            }
         }
     }
 
@@ -245,23 +309,6 @@ namespace Refactoring
         public int physicalDefense;
         public int magicAttack;
         public int magicDefense;
-        public float moovSpeed;
-    }
-
-    [System.Serializable]
-    public class PlayerStatus
-    {
-        public int maxHp;
-        public int hp;
-        public int maxMana;
-        public int mana;
-        public int physicalAttack;
-        public int physicalDefense;
-        public int magicAttack;
-        public int magicDefense;
-        public float moovSpeed;
-        public int level;
-        public int myMoney;
-        public int myExp;
+        public float moveSpeed;
     }
 }

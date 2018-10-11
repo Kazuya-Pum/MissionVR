@@ -53,7 +53,7 @@ namespace Refactoring
         /// </summary>
         [SerializeField] protected Transform muzzle;
 
-        protected int Hp
+        public int Hp
         {
             get
             {
@@ -75,7 +75,7 @@ namespace Refactoring
             }
         }
 
-        protected int Mana
+        public int Mana
         {
             get
             {
@@ -124,11 +124,10 @@ namespace Refactoring
             {
                 OnSetPlayer();
             }
-        }
-
-        void OnJoinedRoom()
-        {
-            GameManager.instance.onSetPlayer += OnSetPlayer;
+            else
+            {
+                GameManager.instance.onSetPlayer += OnSetPlayer;
+            }
         }
 
         private void OnSetPlayer()
@@ -191,7 +190,6 @@ namespace Refactoring
             }
         }
 
-        // TODO オブジェクトプール
         [PunRPC]
         protected void Shoot( Quaternion direction )
         {

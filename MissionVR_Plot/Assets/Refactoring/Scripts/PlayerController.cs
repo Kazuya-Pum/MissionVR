@@ -18,8 +18,8 @@ namespace Refactoring
         // TODO 設定ファイル等に移設
         public float sensitivity;
 
-        [SerializeField] private Slider hpSlider;
-        [SerializeField] private Slider manaSlider;
+        [SerializeField] private Image hpBar;
+        [SerializeField] private Image manaBar;
         [SerializeField] private Text moneyText;
         [SerializeField] private Text levelText;
         [SerializeField] private Image expValue;
@@ -43,11 +43,23 @@ namespace Refactoring
             sensitivity = ( sensitivity <= 0 ) ? 100f : sensitivity;
         }
 
+        private void Start()
+        {
+            GameManager.instance.onSetPlayer += OnSetPlayer;
+        }
+
+        private void OnSetPlayer()
+        {
+            OnStatusChanged();
+        }
+
         void Update()
         {
             if ( playerState == PlayerState.PLAY && player && player.entityState == EntityState.ALIVE )
             {
                 GetKey();
+                hpBar.fillAmount = (float)player.Hp / player.MaxHp;
+                manaBar.fillAmount = (float)player.Mana / player.MaxMana;
             }
         }
 
@@ -95,17 +107,21 @@ namespace Refactoring
 
         public void OnStatusChanged()
         {
-            PlayerStatus status = player.GetStatus();
+            hpBar.fillAmount = (float)player.Hp / player.MaxHp;
+            manaBar.fillAmount = (float)player.Mana / player.MaxMana;
+            moneyText.text = player.MyMoney.ToString();
+            levelText.text = ( "Lv." + player.Level );
+            expValue.fillAmount = (float)player.MyExp / player.Level / 100;
+            statusPhysicalAttack.fillAmount = player.PhysicalAttack * 0.1f;
+            statusPhysicalDiffence.fillAmount = player.PhysicalDefense * 0.1f;
+            statusMagicDiffence.fillAmount = player.MagicDefense * 0.1f;
+            statusSpeed.fillAmount = player.MoveSpeed * 0.1f;
+        }
 
-            hpSlider.maxValue = status.maxHp;
-            manaSlider.maxValue = status.maxMana;
-            moneyText.text = status.myMoney.ToString();
-            levelText.text = status.level.ToString();
-            expValue.fillAmount = status.myExp / status.level / 100;
-            statusPhysicalAttack.fillAmount = status.physicalAttack * 0.1f;
-            statusPhysicalDiffence.fillAmount = status.physicalDefense * 0.1f;
-            statusMagicDiffence.fillAmount = status.magicDefense * 0.1f;
-            statusSpeed.fillAmount = status.moovSpeed * 0.1f;
+        public void OnGetReward()
+        {
+            moneyText.text = player.MyMoney.ToString();
+            expValue.fillAmount = (float)player.MyExp / player.Level / 100;
         }
     }
 }

@@ -2498,7 +2498,7 @@ MonoBehaviour:
   physicalAttack: 2
   physicalDefense: 1
   magicAttack: 1
-  magicDifense: 1
+  magicDefense: 0
   sendingExp: 1
   sendingMoney: 1
   hpSlider: {fileID: 114655593713292728}
@@ -2516,11 +2516,13 @@ MonoBehaviour:
   growthValues:
     hp: 1
     mana: 1
-    phycalAttack: 1
+    physicalAttack: 0
     physicalDefense: 1
     magicAttack: 1
     magicDefense: 1
+    moveSpeed: 0
   model: {fileID: 1623476032971692}
+  animator: {fileID: 95084836677277886}
 --- !u!114 &114580826626827854
 MonoBehaviour:
   m_ObjectHideFlags: 1

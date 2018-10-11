@@ -27,14 +27,14 @@ namespace Refactoring
     public class AIBase : Photon.MonoBehaviour
     {
         EntityBase entityBase;
-        SearchArea searchArea;
+        //SearchArea searchArea;
         public AI_STATE aiState;
         public List<EntityBase> entities;
 
         private void Awake()
         {
             entityBase = GetComponent<EntityBase>();
-            searchArea = transform.Find( "SearchArea" ).GetComponent<SearchArea>();
+            //searchArea = transform.Find( "SearchArea" ).GetComponent<SearchArea>();
         }
 
         public void OnFound( EntityBase target )
