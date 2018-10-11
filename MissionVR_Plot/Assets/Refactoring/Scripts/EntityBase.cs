@@ -36,8 +36,8 @@ namespace Refactoring
 
         protected Transform tfCache;
 
-        [SerializeField] protected Slider hpSlider;
-        protected Transform tfSliderCache;
+        [SerializeField] protected Image hpBar;
+        protected Transform tfBarCache;
         protected Transform playerCamera;
 
         [SerializeField] private int gunIndex;
@@ -71,7 +71,7 @@ namespace Refactoring
                     hp = value;
                 }
 
-                hpSlider.value = hp;
+                hpBar.fillAmount = (float)hp / maxHp;
             }
         }
 
@@ -101,9 +101,7 @@ namespace Refactoring
         protected virtual void Awake()
         {
             tfCache = transform;
-            tfSliderCache = hpSlider.transform.parent;
-
-            hpSlider.maxValue = maxHp;
+            tfBarCache = hpBar.transform.parent;
 
             Hp = maxHp;
             Mana = maxMana;
@@ -138,7 +136,7 @@ namespace Refactoring
 
         protected virtual void Update()
         {
-            tfSliderCache.LookAt( playerCamera );
+            tfBarCache.LookAt( playerCamera );
 
             Shooting( trigger );
 
@@ -257,13 +255,14 @@ namespace Refactoring
 
         private void SetBarColor( Team playerTeam )
         {
+
             if ( playerTeam == team )
             {
-                tfSliderCache.Find( "HP_Slider/Fill Area/Fill" ).GetComponent<Image>().color = GameManager.instance.DataBase.allyColor;
+                hpBar.color = GameManager.instance.DataBase.allyColor;
             }
             else
             {
-                tfSliderCache.Find( "HP_Slider/Fill Area/Fill" ).GetComponent<Image>().color = GameManager.instance.DataBase.enemyColor;
+                hpBar.color = GameManager.instance.DataBase.enemyColor;
             }
         }
 

@@ -105,7 +105,7 @@ namespace Refactoring
             magicDefense += growthValues.magicDefense;
             moveSpeed += growthValues.moveSpeed;
 
-            hpSlider.maxValue = maxHp;
+            hpBar.fillAmount = (float)Hp / maxHp;
 
             if ( photonView.isMine )
             {
