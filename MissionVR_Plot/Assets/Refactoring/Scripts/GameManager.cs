@@ -5,20 +5,26 @@ using UnityEngine.UI;
 
 namespace Refactoring
 {
+    // TODO GameStateとの統合を検討
     public enum PlayerState { WAIT, PLAY, SHOP }
 
     public enum GameState { WAIT, COUNT_DOWN, GAME }
 
+    public enum AnounceType { LEVEL, PlAYER_DEATH, DESTROY }
+
     public class GameManager : Photon.MonoBehaviour
     {
         public static GameManager instance;
+
+        [SerializeField] private byte maxPlayers;
+
         [SerializeField] private DataBaseFormat dataBase;
+
         public Transform[] spawnPoint;
         [SerializeField] private float setRespawnTime;
         public WaitForSeconds respawnTime;
-        public GameState gameState;
 
-        [SerializeField] private byte maxPlayers;
+        public GameState gameState;
 
         [SerializeField] private Text countDownText;
         [SerializeField] private int countDownTime;
@@ -36,6 +42,11 @@ namespace Refactoring
 
         public Queue<BulletBase> bullets = new Queue<BulletBase>();
 
+        [SerializeField] private Text anounceText;
+        [SerializeField] private float setAnounceSpeed;
+        private WaitForSeconds anounceSpeed;
+        private Queue<string> anounceTask = new Queue<string>();
+
         void Awake()
         {
             if ( instance == null )
@@ -52,6 +63,7 @@ namespace Refactoring
             PhotonNetwork.ConnectUsingSettings( "v1.0" );
 
             respawnTime = new WaitForSeconds( setRespawnTime );
+            anounceSpeed = new WaitForSeconds( setAnounceSpeed );
         }
 
         private void OnDestroy()
@@ -115,6 +127,7 @@ namespace Refactoring
 
             if ( PhotonNetwork.isMasterClient )
             {
+                // TODO Masterがゲームから抜けるとバッファが破棄されるため要対策
                 photonView.RPC( "FetchGameState", PhotonTargets.AllBufferedViaServer );
             }
         }
@@ -122,9 +135,12 @@ namespace Refactoring
         [PunRPC]
         protected void FetchGameState()
         {
-            this.gameState = GameState.GAME;
-            PlayerController.instance.playerState = PlayerState.PLAY;
+            gameState = GameState.GAME;
             countDownText.transform.parent.gameObject.SetActive( false );
+            if ( PlayerController.instance.player )
+            {
+                PlayerController.instance.playerState = PlayerState.PLAY;
+            }
         }
 
         private void InstantiatePlayer( Team team )
@@ -139,9 +155,13 @@ namespace Refactoring
 
             PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
+            if ( gameState == GameState.GAME )
+            {
+                PlayerController.instance.playerState = PlayerState.PLAY;
+            }
+
             onSetPlayer();
         }
-
 
         [PunRPC]
         protected void Summon( int index, Team team )
@@ -160,6 +180,44 @@ namespace Refactoring
             int index = 0;
             Team team = ( white ) ? Team.WHITE : Team.BLACK;
             photonView.RPC( "Summon", PhotonTargets.MasterClient, index, team );
+        }
+
+        [PunRPC]
+        public void SetAnounce( AnounceType type, Team team = Team.WHITE )
+        {
+            string message;
+            switch ( type )
+            {
+                case AnounceType.LEVEL:
+                    message = "レベルが上がりました";
+                    break;
+                case AnounceType.PlAYER_DEATH:
+                    message = ( team == PlayerController.instance.player.team ) ? "味方が倒されました" : "敵を倒しました";
+                    break;
+                case AnounceType.DESTROY:
+                    message = ( team == PlayerController.instance.player.team ) ? "味方のタワーが破壊されました" : "敵のタワーを破壊しました";
+                    break;
+                default:
+                    message = "error";
+                    break;
+            }
+
+            anounceTask.Enqueue( message );
+
+            if ( anounceText.text == "" )
+            {
+                StartCoroutine( "OnAnounce" );
+            }
+        }
+
+        private IEnumerator OnAnounce()
+        {
+            while ( anounceTask.Count > 0 )
+            {
+                anounceText.text = anounceTask.Dequeue();
+                yield return anounceSpeed;
+            }
+            anounceText.text = null;
         }
     }
 
