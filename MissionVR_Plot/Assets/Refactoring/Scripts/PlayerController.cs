@@ -15,6 +15,8 @@ namespace Refactoring
 
         public PlayerState playerState;
 
+        public Transform tfMiniMapCamera;
+
         // TODO 設定ファイル等に移設
         public float sensitivity;
 
@@ -59,7 +61,10 @@ namespace Refactoring
             {
                 GetKey();
                 OnChange_HP_MANA();
+
+                tfMiniMapCamera.position = new Vector3( player.tfCache.position.x, tfMiniMapCamera.position.y, player.tfCache.position.z );
             }
+
         }
 
         // TODO InputManagerからキーを設定し、そちらを使用

@@ -35,7 +35,7 @@ namespace Refactoring
         [SerializeField] protected int sendingMoney;
         #endregion
 
-        protected Transform tfCache;
+        [HideInInspector] public Transform tfCache;
 
         [SerializeField] protected Image hpBar;
         protected Transform tfBarCache;
