@@ -41,6 +41,8 @@ namespace Refactoring
         protected Transform tfBarCache;
         protected Transform playerCamera;
 
+        [SerializeField] protected Image miniMapPoint;
+
         [SerializeField] private int gunIndex;
         protected GunInfo gunInfo;
         [HideInInspector] public bool trigger;
@@ -262,7 +264,16 @@ namespace Refactoring
 
         private void SetBarColor( Team playerTeam )
         {
-            hpBar.color = ( playerTeam == team ) ? GameManager.instance.DataBase.allyColor : GameManager.instance.DataBase.enemyColor;
+            if( playerTeam == team )
+            {
+                hpBar.color = GameManager.instance.DataBase.allyColor;
+                miniMapPoint.color = GameManager.instance.DataBase.allyColor;
+            }
+            else
+            {
+                hpBar.color = GameManager.instance.DataBase.enemyColor;
+                miniMapPoint.color = GameManager.instance.DataBase.enemyColor;
+            }
         }
 
         Quaternion networkHeadRotation;

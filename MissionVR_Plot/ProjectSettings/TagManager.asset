@@ -18,6 +18,7 @@ TagManager:
   - StageObject
   - firstButton
   - Controller
+  - Target
   layers:
   - Default
   - TransparentFX
@@ -29,7 +30,7 @@ TagManager:
   - 
   - Entity
   - Search
-  - 
+  - MiniMap
   - 
   - 
   - 
