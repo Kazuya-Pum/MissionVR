@@ -11,6 +11,7 @@ namespace Refactoring
 
     public enum EntityType { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
 
+    // 状態異常をここに追加するか別でenum作るかは要検討
     public enum EntityState { ALIVE, DEATH }
 
     public class EntityBase : Photon.MonoBehaviour, IPunObservable
@@ -53,7 +54,7 @@ namespace Refactoring
         /// </summary>
         [SerializeField] protected Transform muzzle;
 
-        public int Hp
+        public virtual int Hp
         {
             get
             {
@@ -75,7 +76,7 @@ namespace Refactoring
             }
         }
 
-        public int Mana
+        public virtual int Mana
         {
             get
             {
@@ -103,9 +104,6 @@ namespace Refactoring
             tfCache = transform;
             tfBarCache = hpBar.transform.parent;
 
-            Hp = maxHp;
-            Mana = maxMana;
-
             #region 値チェック
             physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
             physicalDefense = ( physicalDefense <= 0 ) ? 1 : physicalDefense;
@@ -116,6 +114,9 @@ namespace Refactoring
 
         protected virtual void Start()
         {
+            Hp = maxHp;
+            Mana = maxMana;
+
             gunInfo = GameManager.instance.DataBase.gunInfos[gunIndex];
 
             if ( PlayerController.instance.player )
@@ -163,7 +164,7 @@ namespace Refactoring
         {
             if ( target.team != team )
             {
-                target.Damaged( damageValue, damageType, this );
+                target.photonView.RPC( "Damaged", PhotonTargets.All, damageValue, damageType, photonView.viewID );
             }
         }
 
@@ -217,12 +218,13 @@ namespace Refactoring
 
         /// <summary>
         /// ダメージを受ける関数
-        /// <para>prev:Master->Master->Master</para>
+        /// <para>prev:Master->All->All(DeathのみMaster)</para>
         /// </summary>
         /// <param name="value">ダメージ値</param>
         /// <param name="damageType">攻撃の種類</param>
         /// <param name="killer">攻撃をしてきたエンティティー</param>
-        public void Damaged( int value, DamageType damageType, EntityBase killer )
+        [PunRPC]
+        public void Damaged( int value, DamageType damageType, int killerId )
         {
             switch ( damageType )
             {
@@ -240,11 +242,16 @@ namespace Refactoring
 
             if ( Hp <= 0 )
             {
+                EntityBase killer = PhotonView.Find( killerId ).GetComponent<EntityBase>();
                 if ( killer.entityType == EntityType.CHANPION )
                 {
-                    killer.GetComponent<PlayerBase>().GetReward( sendingExp, sendingMoney );
+                    killer.GetComponent<PlayerBase>().GetReward( sendingExp, sendingExp );
                 }
-                Death();
+
+                if ( PhotonNetwork.isMasterClient )
+                {
+                    Death();
+                }
             }
         }
 

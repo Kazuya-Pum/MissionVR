@@ -42,7 +42,6 @@ namespace Refactoring
             if ( PhotonNetwork.isMasterClient )
             {
                 AutoRecover();
-                photonView.RPC( "FetchLocalParams", PhotonTargets.Others, maxHp, Hp, maxMana, Mana, myExp, myMoney, level, moveSpeed );
             }
         }
 
@@ -68,7 +67,7 @@ namespace Refactoring
         /// <summary>
         /// 報酬を受け取る関数。
         /// エンティティーをキルした際に呼ばれる
-        /// <para>prev:Master->Master->next:Master</para>
+        /// <para>prev:All->All->next:All</para>
         /// </summary>
         /// <param name="exp">獲得経験値</param>
         /// <param name="money">獲得金額</param>
@@ -85,12 +84,17 @@ namespace Refactoring
             if ( myExp >= level * 100 )
             {
                 LevelUp();
+
+                if ( photonView.isMine )
+                {
+                    GameManager.instance.SetAnounce( AnounceType.LEVEL );
+                }
             }
         }
 
         /// <summary>
         /// レベルアップを処理する関数。各種ステータス成長
-        /// <para>prev:Master->Master->next:Master</para>
+        /// <para>prev:All->All->next:All</para>
         /// </summary>
         protected void LevelUp()
         {
@@ -107,14 +111,14 @@ namespace Refactoring
 
             hpBar.fillAmount = (float)Hp / maxHp;
 
-            if ( photonView.isMine )
-            {
-                PlayerController.instance.OnStatusChanged();
-            }
-
             if ( myExp >= level * 100 )
             {
                 LevelUp();
+            }
+
+            if ( photonView.isMine )
+            {
+                PlayerController.instance.OnStatusChanged();
             }
         }
 
@@ -132,6 +136,7 @@ namespace Refactoring
         [PunRPC]
         protected void ToDeathState()
         {
+            GameManager.instance.SetAnounce( AnounceType.PlAYER_DEATH, team );
             entityState = EntityState.DEATH;
             playerCollider.enabled = false;
         }
@@ -157,6 +162,7 @@ namespace Refactoring
         {
             Hp = maxHp;
             tfCache.position = GameManager.instance.spawnPoint[(int)team].position;
+            tfCache.localRotation = GameManager.instance.spawnPoint[(int)team].localRotation;
             head.localEulerAngles = Vector3.zero;
             modelRotate.localRotation = head.localRotation;
 
@@ -166,10 +172,11 @@ namespace Refactoring
 
         /// <summary>
         /// HP、Manaの回復
-        /// <para>prev:Master->Master</para>
+        /// <para>prev:Master->All</para>
         /// </summary>
         /// <param name="cHp">HPの回復値</param>
         /// <param name="cMana">Manaの回復値（省略可）</param>
+        [PunRPC]
         protected void Recover( int cHp, int cMana = 0 )
         {
             Hp += cHp;
@@ -184,9 +191,9 @@ namespace Refactoring
         protected void AutoRecover()
         {
             autoRecoverTime += Time.deltaTime;
-            if ( autoRecoverTime >= autoRecoverSpam )
+            if ( autoRecoverTime >= autoRecoverSpam && entityState != EntityState.DEATH )
             {
-                Recover( 1, 1 );
+                photonView.RPC( "Recover", PhotonTargets.All, 1, 1 );
                 autoRecoverTime -= autoRecoverSpam;
             }
         }
@@ -214,6 +221,11 @@ namespace Refactoring
             this.myMoney = myMoney;
             this.level = level;
             this.moveSpeed = moveSpeed;
+
+            if ( photonView.isMine )
+            {
+                PlayerController.instance.OnStatusChanged();
+            }
         }
 
         public int MaxHp
@@ -224,11 +236,47 @@ namespace Refactoring
             }
         }
 
+        public override int Hp
+        {
+            get
+            {
+                return base.Hp;
+            }
+
+            set
+            {
+                base.Hp = value;
+
+                if ( photonView.isMine )
+                {
+                    PlayerController.instance.OnChange_HP_MANA();
+                }
+            }
+        }
+
         public int MaxMana
         {
             get
             {
                 return maxMana;
+            }
+        }
+
+        public override int Mana
+        {
+            get
+            {
+                return base.Mana;
+            }
+
+            set
+            {
+                base.Mana = value;
+
+                if ( photonView.isMine )
+                {
+                    PlayerController.instance.OnChange_HP_MANA();
+                }
             }
         }
 
@@ -297,6 +345,7 @@ namespace Refactoring
         }
     }
 
+    // TODO スクリプタブルオブジェクトにする
     /// <summary>
     /// レベルアップ時のステータス上昇値
     /// </summary>

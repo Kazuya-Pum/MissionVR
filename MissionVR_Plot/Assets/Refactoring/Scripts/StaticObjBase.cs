@@ -11,8 +11,7 @@ namespace Refactoring
 
         protected override void Death()
         {
-
-            
+            GameManager.instance.photonView.RPC( "SetAnounce", PhotonTargets.All, AnounceType.DESTROY, team );
             base.Death();
         }
     }

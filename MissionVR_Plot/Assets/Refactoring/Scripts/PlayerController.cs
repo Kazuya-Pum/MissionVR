@@ -58,8 +58,7 @@ namespace Refactoring
             if ( playerState == PlayerState.PLAY && player && player.entityState == EntityState.ALIVE )
             {
                 GetKey();
-                hpBar.fillAmount = (float)player.Hp / player.MaxHp;
-                manaBar.fillAmount = (float)player.Mana / player.MaxMana;
+                OnChange_HP_MANA();
             }
         }
 
@@ -107,15 +106,21 @@ namespace Refactoring
 
         public void OnStatusChanged()
         {
-            hpBar.fillAmount = (float)player.Hp / player.MaxHp;
-            manaBar.fillAmount = (float)player.Mana / player.MaxMana;
-            moneyText.text = player.MyMoney.ToString();
+            OnChange_HP_MANA();
+            OnGetReward();
+
             levelText.text = ( "Lv." + player.Level );
-            expValue.fillAmount = (float)player.MyExp / player.Level / 100;
             statusPhysicalAttack.fillAmount = player.PhysicalAttack * 0.1f;
             statusPhysicalDiffence.fillAmount = player.PhysicalDefense * 0.1f;
             statusMagicDiffence.fillAmount = player.MagicDefense * 0.1f;
             statusSpeed.fillAmount = player.MoveSpeed * 0.1f;
+        }
+
+        // TODO 動きを滑らかにしたい
+        public void OnChange_HP_MANA()
+        {
+            hpBar.fillAmount = (float)player.Hp / player.MaxHp;
+            manaBar.fillAmount = (float)player.Mana / player.MaxMana;
         }
 
         public void OnGetReward()

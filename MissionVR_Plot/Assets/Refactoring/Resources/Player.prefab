@@ -2502,8 +2502,8 @@ MonoBehaviour:
   physicalDefense: 1
   magicAttack: 1
   magicDefense: 0
-  sendingExp: 1
-  sendingMoney: 1
+  sendingExp: 50
+  sendingMoney: 100
   hpBar: {fileID: 114219053862694424}
   gunIndex: 0
   trigger: 0

@@ -72,4 +72,7 @@ MonoBehaviour:
   - Summon
   - ToAliveState
   - ToDeathState
+  - Damaged
+  - Recover
+  - SetAnounce
   DisableAutoOpenWizard: 1

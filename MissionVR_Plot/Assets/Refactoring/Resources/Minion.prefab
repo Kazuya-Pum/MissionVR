@@ -190,7 +190,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4330743947201076}
   - component: {fileID: 33055685740540222}
-  - component: {fileID: 136339075074910174}
   - component: {fileID: 23170938948387052}
   m_Layer: 8
   m_Name: Body
@@ -698,19 +697,6 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 20
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!136 &136339075074910174
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1684988896895740}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!136 &136661829861598684
 CapsuleCollider:
