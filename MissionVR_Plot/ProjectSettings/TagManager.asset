@@ -17,6 +17,7 @@ TagManager:
   - FPSController
   - StageObject
   - firstButton
+  - Controller
   layers:
   - Default
   - TransparentFX
@@ -26,8 +27,8 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
+  - Entity
+  - Search
   - 
   - 
   - 

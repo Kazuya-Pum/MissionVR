@@ -5,18 +5,21 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Menu.unity
     guid: b5bcd5edf1cf07c4c84e74ef53c3ffae
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/test_lol.unity
     guid: 7d9693ce764d9974387eb4bf1ab6b16e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Result.unity
     guid: 75533a8961042e44993aea3258261f67
-  - enabled: 1
+  - enabled: 0
     path: Assets/Shop/res/ShopScene.unity
     guid: cbe3b35c43565a442a44ac9272ef2500
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ShopTest.unity
     guid: 2dba3280b30390246a44d38b70cb8eaa
+  - enabled: 1
+    path: Assets/Refactoring/Scenes/TestAI.unity
+    guid: e004b525a416e0a429d6fcec9626a3fe
