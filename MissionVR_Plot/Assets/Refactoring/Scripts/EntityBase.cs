@@ -262,15 +262,7 @@ namespace Refactoring
 
         private void SetBarColor( Team playerTeam )
         {
-
-            if ( playerTeam == team )
-            {
-                hpBar.color = GameManager.instance.DataBase.allyColor;
-            }
-            else
-            {
-                hpBar.color = GameManager.instance.DataBase.enemyColor;
-            }
+            hpBar.color = ( playerTeam == team ) ? GameManager.instance.DataBase.allyColor : GameManager.instance.DataBase.enemyColor;
         }
 
         Quaternion networkHeadRotation;
