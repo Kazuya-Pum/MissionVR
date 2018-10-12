@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace Refactoring
 {
     // TODO GameStateとの統合を検討
-    public enum PlayerState { WAIT, PLAY, BIGMAP, SHOP }
+    public enum PlayerState : byte { WAIT, PLAY, BIGMAP, SHOP }
 
     public class PlayerController : Photon.MonoBehaviour
     {
@@ -20,6 +20,7 @@ namespace Refactoring
 
         public Camera miniMapCamera;
         private Transform tfMiniMapCamera;
+        private float miniMapPosY;
         [SerializeField] private RawImage miniMapImage;
 
         // TODO 設定ファイル等に移設
@@ -50,6 +51,7 @@ namespace Refactoring
             sensitivity = ( sensitivity <= 0 ) ? 100f : sensitivity;
 
             tfMiniMapCamera = miniMapCamera.transform;
+            miniMapPosY = tfMiniMapCamera.position.y;
         }
 
         private void Start()
@@ -71,7 +73,7 @@ namespace Refactoring
 
                 if ( playerState != PlayerState.BIGMAP )
                 {
-                    tfMiniMapCamera.position = new Vector3( player.tfCache.position.x, tfMiniMapCamera.position.y, player.tfCache.position.z );
+                    tfMiniMapCamera.position = new Vector3( player.tfCache.position.x, miniMapPosY, player.tfCache.position.z );
                 }
             }
 
@@ -127,6 +129,8 @@ namespace Refactoring
                     miniMapCamera.orthographicSize = 300;
                     miniMapImage.rectTransform.anchoredPosition = new Vector3( -400, -250, 0 );
                     miniMapImage.rectTransform.sizeDelta = new Vector2( 450, 450 );
+
+                    tfMiniMapCamera.position = new Vector3( 0, miniMapPosY, 0 );
                 }
                 else if ( playerState == PlayerState.BIGMAP )
                 {
