@@ -155,21 +155,6 @@ namespace Refactoring
             team = remoteTeam;
         }
 
-        /// <summary>
-        /// 攻撃を処理する関数
-        /// <para>prev:Master->Master->next:Master</para>
-        /// </summary>
-        /// <param name="damageValue">ダメージ値</param>
-        /// <param name="target">攻撃対象</param>
-        /// <param name="damageType">攻撃の種類</param>
-        public virtual void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL )
-        {
-            if ( target.team != team )
-            {
-                target.photonView.RPC( "Damaged", PhotonTargets.All, damageValue, damageType, photonView.viewID );
-            }
-        }
-
         float interval;
         /// <summary>
         /// <para>prev:ローカル->ローカル->next:All</para>
@@ -219,6 +204,21 @@ namespace Refactoring
         }
 
         /// <summary>
+        /// 攻撃を処理する関数
+        /// <para>prev:Master->Master->next:Master</para>
+        /// </summary>
+        /// <param name="damageValue">ダメージ値</param>
+        /// <param name="target">攻撃対象</param>
+        /// <param name="damageType">攻撃の種類</param>
+        public virtual void Attack( int damageValue, EntityBase target, DamageType damageType = DamageType.PHYSICAL )
+        {
+            if ( target.team != team )
+            {
+                target.photonView.RPC( "Damaged", PhotonTargets.All, (float)damageValue, damageType, photonView.viewID );
+            }
+        }
+
+        /// <summary>
         /// ダメージを受ける関数
         /// <para>prev:Master->All->All(DeathのみMaster)</para>
         /// </summary>
@@ -226,7 +226,7 @@ namespace Refactoring
         /// <param name="damageType">攻撃の種類</param>
         /// <param name="killer">攻撃をしてきたエンティティー</param>
         [PunRPC]
-        public void Damaged( int value, DamageType damageType, int killerId )
+        public void Damaged( float value, DamageType damageType, int killerId )
         {
             switch ( damageType )
             {
@@ -239,8 +239,9 @@ namespace Refactoring
                 case DamageType.THROUGH:
                     break;
             }
+            Debug.Log( value );
 
-            Hp -= value;
+            Hp -= Mathf.CeilToInt( value );
 
             if ( Hp <= 0 )
             {
@@ -264,7 +265,7 @@ namespace Refactoring
 
         private void SetBarColor( Team playerTeam )
         {
-            if( playerTeam == team )
+            if ( playerTeam == team )
             {
                 hpBar.color = GameManager.instance.DataBase.allyColor;
                 miniMapPoint.color = GameManager.instance.DataBase.allyColor;
