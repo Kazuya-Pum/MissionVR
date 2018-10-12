@@ -5,9 +5,6 @@ using UnityEngine.UI;
 
 namespace Refactoring
 {
-    // TODO GameStateとの統合を検討
-    public enum PlayerState { WAIT, PLAY, SHOP }
-
     public enum GameState { WAIT, COUNT_DOWN, GAME }
 
     public enum AnounceType { LEVEL, PlAYER_DEATH, DESTROY }
