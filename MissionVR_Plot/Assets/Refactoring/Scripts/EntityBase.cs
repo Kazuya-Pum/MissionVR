@@ -5,14 +5,14 @@ using UnityEngine.UI;
 
 namespace Refactoring
 {
-    public enum DamageType { PHYSICAL, MAGIC, THROUGH }
+    public enum DamageType : byte { PHYSICAL, MAGIC, THROUGH }
 
-    public enum Team { WHITE, BLACK }
+    public enum Team : byte { WHITE, BLACK }
 
-    public enum EntityType { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
+    public enum EntityType : byte { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
 
     // 状態異常をここに追加するか別でenum作るかは要検討
-    public enum EntityState { ALIVE, DEATH }
+    public enum EntityState : byte { ALIVE, DEATH }
 
     public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {

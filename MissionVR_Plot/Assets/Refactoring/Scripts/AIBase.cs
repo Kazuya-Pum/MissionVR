@@ -7,7 +7,7 @@ namespace Refactoring
     /// <summary>
     /// AIのステート
     /// </summary>
-    public enum AI_STATE
+    public enum AI_STATE : byte
     {
         /// <summary>
         /// 敵を発見しておらず、移動しているステート
