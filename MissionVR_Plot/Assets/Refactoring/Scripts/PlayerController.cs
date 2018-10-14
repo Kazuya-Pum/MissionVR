@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace Refactoring
 {
+    // TODO GameStateとの統合を検討
+    public enum PlayerState : byte { WAIT, PLAY, BIGMAP, SHOP }
+
     public class PlayerController : Photon.MonoBehaviour
     {
         public static PlayerController instance;
@@ -14,6 +17,11 @@ namespace Refactoring
         public Transform playerCamera;
 
         public PlayerState playerState;
+
+        public Camera miniMapCamera;
+        private Transform tfMiniMapCamera;
+        private float miniMapPosY;
+        [SerializeField] private RawImage miniMapImage;
 
         // TODO 設定ファイル等に移設
         public float sensitivity;
@@ -41,6 +49,9 @@ namespace Refactoring
             }
 
             sensitivity = ( sensitivity <= 0 ) ? 100f : sensitivity;
+
+            tfMiniMapCamera = miniMapCamera.transform;
+            miniMapPosY = tfMiniMapCamera.position.y;
         }
 
         private void Start()
@@ -55,11 +66,17 @@ namespace Refactoring
 
         void Update()
         {
-            if ( playerState == PlayerState.PLAY && player && player.entityState == EntityState.ALIVE )
+            if ( ( playerState == PlayerState.PLAY || playerState == PlayerState.BIGMAP ) && player && player.entityState == EntityState.ALIVE )
             {
                 GetKey();
                 OnChange_HP_MANA();
+
+                if ( playerState != PlayerState.BIGMAP )
+                {
+                    tfMiniMapCamera.position = new Vector3( player.tfCache.position.x, miniMapPosY, player.tfCache.position.z );
+                }
             }
+
         }
 
         // TODO InputManagerからキーを設定し、そちらを使用
@@ -101,6 +118,28 @@ namespace Refactoring
             else if ( Input.GetKeyUp( KeyCode.Mouse0 ) )
             {
                 player.trigger = false;
+            }
+
+            if ( Input.GetKeyDown( KeyCode.M ) )
+            {
+                if ( playerState == PlayerState.PLAY )
+                {
+                    playerState = PlayerState.BIGMAP;
+
+                    miniMapCamera.orthographicSize = 300;
+                    miniMapImage.rectTransform.anchoredPosition = new Vector3( -400, -250, 0 );
+                    miniMapImage.rectTransform.sizeDelta = new Vector2( 450, 450 );
+
+                    tfMiniMapCamera.position = new Vector3( 0, miniMapPosY, 0 );
+                }
+                else if ( playerState == PlayerState.BIGMAP )
+                {
+                    playerState = PlayerState.PLAY;
+
+                    miniMapCamera.orthographicSize = 50;
+                    miniMapImage.rectTransform.anchoredPosition = new Vector3( -60, -60, 0 );
+                    miniMapImage.rectTransform.sizeDelta = new Vector2( 100, 100 );
+                }
             }
         }
 
