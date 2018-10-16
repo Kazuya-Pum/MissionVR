@@ -54,7 +54,7 @@ namespace Refactoring
         /// <summary>
         /// 銃撃時の銃弾の生成位置
         /// </summary>
-        [SerializeField] protected Transform muzzle;
+        [SerializeField] public Transform muzzle;
 
         public virtual int Hp
         {
@@ -141,9 +141,11 @@ namespace Refactoring
         {
             tfBarCache.LookAt( playerCamera );
 
-            Shooting( trigger );
-
-            if ( !photonView.isMine )
+            if ( photonView.isMine )
+            {
+                Shooting( trigger );
+            }
+            else
             {
                 UpdateRotation();
             }
@@ -239,7 +241,6 @@ namespace Refactoring
                 case DamageType.THROUGH:
                     break;
             }
-            Debug.Log( value );
 
             Hp -= Mathf.CeilToInt( value );
 
@@ -275,6 +276,22 @@ namespace Refactoring
                 hpBar.color = GameManager.instance.DataBase.enemyColor;
                 miniMapPoint.color = GameManager.instance.DataBase.enemyColor;
             }
+        }
+
+        [PunRPC]
+        protected virtual void Rotate( float x = 0, float y = 0 )
+        {
+            tfCache.localEulerAngles = new Vector3( 0, tfCache.localEulerAngles.y + x, 0 );
+            head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );   // TODO 角度の上限作成
+        }
+
+        [PunRPC]
+        protected virtual void RotateToTarget( Vector3 to )
+        {
+            Vector3 diff = Quaternion.LookRotation( to - head.position ).eulerAngles;
+
+            head.localEulerAngles = new Vector3( diff.x, 0, 0 );
+            tfCache.localEulerAngles = new Vector3( 0, diff.y, 0 );
         }
 
         Quaternion networkHeadRotation;

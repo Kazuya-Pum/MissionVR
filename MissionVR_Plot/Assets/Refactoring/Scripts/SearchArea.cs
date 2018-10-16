@@ -6,19 +6,19 @@ namespace Refactoring
 {
     public class SearchArea : Photon.MonoBehaviour
     {
-        AIBase aiBase;
+        private AIBase aiBase;
 
         private void Awake()
         {
             aiBase = transform.parent.GetComponent<AIBase>();
         }
 
-        private void OnTriggerEnter( Collider other )
+        private void OnTriggerStay( Collider other )
         {
             EntityBase entity = other.GetComponent<EntityBase>();
             if ( entity )
             {
-                aiBase.OnFound( entity );
+                aiBase.OnCheck( entity );
             }
         }
 

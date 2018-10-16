@@ -136,7 +136,7 @@ namespace Refactoring
             countDownText.transform.parent.gameObject.SetActive( false );
             if ( PlayerController.instance.player )
             {
-                PlayerController.instance.playerState = PlayerState.PLAY;
+                PlayerController.instance.PlayerState = PlayerState.PLAY;
             }
         }
 
@@ -154,7 +154,7 @@ namespace Refactoring
 
             if ( gameState == GameState.GAME )
             {
-                PlayerController.instance.playerState = PlayerState.PLAY;
+                PlayerController.instance.PlayerState = PlayerState.PLAY;
             }
 
             onSetPlayer();

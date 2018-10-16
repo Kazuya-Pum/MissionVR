@@ -12,7 +12,7 @@ namespace Refactoring
         protected override void Start()
         {
             base.Start();
-            GetComponent<NavMeshAgent>().destination = goal.position;
+            //GetComponent<NavMeshAgent>().destination = goal.position;
         }
     }
 }

@@ -8,6 +8,11 @@ namespace Refactoring
     {
 
         // TODO タワーやネクサス等の処理
+        [PunRPC]
+        protected override void RotateToTarget( Vector3 to )
+        {
+            head.LookAt( to );
+        }
 
         protected override void Death()
         {
