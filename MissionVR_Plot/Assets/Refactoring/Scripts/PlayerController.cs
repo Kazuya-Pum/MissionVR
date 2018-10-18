@@ -67,6 +67,8 @@ namespace Refactoring
 
             tfMiniMapCamera = miniMapCamera.transform;
             miniMapPosY = tfMiniMapCamera.position.y;
+
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Start()
@@ -154,7 +156,7 @@ namespace Refactoring
                 {
                     PlayerState = PlayerState.BIGMAP;
 
-                    miniMapCamera.orthographicSize = 300;
+                    miniMapCamera.orthographicSize = 180;
                     miniMapImage.rectTransform.anchoredPosition = new Vector3( -400, -250, 0 );
                     miniMapImage.rectTransform.sizeDelta = new Vector2( 450, 450 );
 

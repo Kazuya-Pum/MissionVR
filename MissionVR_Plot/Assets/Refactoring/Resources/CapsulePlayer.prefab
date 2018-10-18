@@ -821,7 +821,7 @@ GameObject:
   - component: {fileID: 136666931134387396}
   - component: {fileID: 208177733174651586}
   m_Layer: 8
-  m_Name: Player
+  m_Name: CapsulePlayer
   m_TagString: Champion
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2628,16 +2628,16 @@ MonoBehaviour:
   team: 1
   entityType: 0
   entityState: 0
-  maxHp: 50
+  maxHp: 100
   hp: 0
-  maxMana: 1
+  maxMana: 100
   mana: 0
   physicalAttack: 2
   physicalDefense: 1
   magicAttack: 1
   magicDefense: 0
-  sendingExp: 50
-  sendingMoney: 100
+  sendingExp: 100
+  sendingMoney: 300
   tfCache: {fileID: 0}
   hpBar: {fileID: 114613902946880660}
   miniMapPoint: {fileID: 114405156475956960}
@@ -2645,7 +2645,7 @@ MonoBehaviour:
   trigger: 0
   head: {fileID: 4065150390632684}
   muzzle: {fileID: 4070207782521870}
-  moveSpeed: 1
+  moveSpeed: 2.5
   dashRate: 1.5
   modelRotate: {fileID: 4993254237391770}
   myExp: 0
