@@ -42,10 +42,23 @@ namespace Refactoring
         }
 
         [PunRPC]
-        protected virtual void Rotate( float x = 0, float y = 0 )
+        protected override void Rotate( float x = 0, float y = 0 )
         {
-            tfCache.localEulerAngles = new Vector3( 0, tfCache.localEulerAngles.y + x, 0 );
-            head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );   // TODO 角度の上限作成
+            base.Rotate( x, y );
+            modelRotate.localRotation = head.localRotation;
+        }
+
+        [PunRPC]
+        protected override void RotateToTarget(Vector3 to )
+        {
+            base.RotateToTarget( to );
+            modelRotate.localRotation = head.localRotation;
+        }
+
+        protected override void UpdateRotation()
+        {
+            base.UpdateRotation();
+            modelRotate.localRotation = head.localRotation;
         }
     }
 }

@@ -24,9 +24,9 @@ namespace Refactoring
         // クラス作ってもいいかも
         #region Status
         [SerializeField] protected int maxHp;
-        [SerializeField] private int hp;
+        private int hp;
         [SerializeField] protected int maxMana;
-        [SerializeField] private int mana;
+        private int mana;
         [SerializeField] protected int physicalAttack;
         [SerializeField] protected int physicalDefense;
         [SerializeField] protected int magicAttack;
@@ -37,11 +37,11 @@ namespace Refactoring
 
         [HideInInspector] public Transform tfCache;
 
-        [SerializeField] protected Image hpBar;
+        protected Image hpBar;
         protected Transform tfBarCache;
         protected Transform playerCamera;
 
-        [SerializeField] protected Image miniMapPoint;
+        protected Image miniMapPoint;
 
         [SerializeField] private int gunIndex;
         protected GunInfo gunInfo;
@@ -50,11 +50,11 @@ namespace Refactoring
         /// <summary>
         /// 視点を取得するゲームオブジェクト
         /// </summary>
-        [SerializeField] public Transform head;
+        [HideInInspector] public Transform head;
         /// <summary>
         /// 銃撃時の銃弾の生成位置
         /// </summary>
-        [SerializeField] protected Transform muzzle;
+        [HideInInspector] public Transform muzzle;
 
         public virtual int Hp
         {
@@ -104,7 +104,12 @@ namespace Refactoring
         protected virtual void Awake()
         {
             tfCache = transform;
-            tfBarCache = hpBar.transform.parent;
+
+            tfBarCache = tfCache.Find( "Visual/Bar" );
+            hpBar = tfBarCache.Find( "HP/HP_Bar" ).GetComponent<Image>();
+            miniMapPoint = tfCache.Find( "Visual/MiniMap/MiniMapPoint" ).GetComponent<Image>();
+            head = tfCache.Find( "Head" );
+            muzzle = head.Find( "Muzzle" );
 
             #region 値チェック
             physicalAttack = ( physicalAttack <= 0 ) ? 1 : physicalAttack;
@@ -141,9 +146,11 @@ namespace Refactoring
         {
             tfBarCache.LookAt( playerCamera );
 
-            Shooting( trigger );
-
-            if ( !photonView.isMine )
+            if ( photonView.isMine )
+            {
+                Shooting( trigger );
+            }
+            else
             {
                 UpdateRotation();
             }
@@ -239,7 +246,6 @@ namespace Refactoring
                 case DamageType.THROUGH:
                     break;
             }
-            Debug.Log( value );
 
             Hp -= Mathf.CeilToInt( value );
 
@@ -275,6 +281,22 @@ namespace Refactoring
                 hpBar.color = GameManager.instance.DataBase.enemyColor;
                 miniMapPoint.color = GameManager.instance.DataBase.enemyColor;
             }
+        }
+
+        [PunRPC]
+        protected virtual void Rotate( float x = 0, float y = 0 )
+        {
+            tfCache.localEulerAngles = new Vector3( 0, tfCache.localEulerAngles.y + x, 0 );
+            head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );   // TODO 角度の上限作成
+        }
+
+        [PunRPC]
+        protected virtual void RotateToTarget( Vector3 to )
+        {
+            Vector3 diff = Quaternion.LookRotation( to - head.position ).eulerAngles;
+
+            head.localEulerAngles = new Vector3( diff.x, 0, 0 );
+            tfCache.localEulerAngles = new Vector3( 0, diff.y, 0 );
         }
 
         Quaternion networkHeadRotation;

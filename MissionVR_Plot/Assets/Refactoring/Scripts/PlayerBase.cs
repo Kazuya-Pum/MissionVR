@@ -55,13 +55,6 @@ namespace Refactoring
         protected override void Rotate( float x = 0, float y = 0 )
         {
             base.Rotate( x * localSensitivity, y * localSensitivity );
-            modelRotate.localRotation = head.localRotation;
-        }
-
-        protected override void UpdateRotation()
-        {
-            base.UpdateRotation();
-            modelRotate.localRotation = head.localRotation;
         }
 
         /// <summary>
@@ -139,6 +132,11 @@ namespace Refactoring
             GameManager.instance.SetAnounce( AnounceType.PlAYER_DEATH, team );
             entityState = EntityState.DEATH;
             playerCollider.enabled = false;
+
+            if ( photonView.isMine )
+            {
+                PlayerController.instance.OnCheck();
+            }
         }
 
         /// <summary>
@@ -168,6 +166,11 @@ namespace Refactoring
 
             entityState = EntityState.ALIVE;
             playerCollider.enabled = true;
+
+            if ( photonView.isMine )
+            {
+                PlayerController.instance.OnCheck();
+            }
         }
 
         /// <summary>

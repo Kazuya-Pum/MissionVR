@@ -16,7 +16,9 @@ namespace Refactoring
 
         public Transform playerCamera;
 
-        public PlayerState playerState;
+        private PlayerState playerState;
+
+        private bool enable = false;
 
         public Camera miniMapCamera;
         private Transform tfMiniMapCamera;
@@ -36,6 +38,19 @@ namespace Refactoring
         [SerializeField] private Image statusMagicDiffence;
         [SerializeField] private Image statusSpeed;
 
+        public PlayerState PlayerState
+        {
+            get
+            {
+                return playerState;
+            }
+
+            set
+            {
+                playerState =  value ;
+                OnCheck();
+            }
+        }
 
         private void Awake()
         {
@@ -52,6 +67,8 @@ namespace Refactoring
 
             tfMiniMapCamera = miniMapCamera.transform;
             miniMapPosY = tfMiniMapCamera.position.y;
+
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Start()
@@ -62,16 +79,29 @@ namespace Refactoring
         private void OnSetPlayer()
         {
             OnStatusChanged();
+            OnCheck();
+        }
+
+        public void OnCheck()
+        {
+            if( ( PlayerState == PlayerState.PLAY || PlayerState == PlayerState.BIGMAP ) && player && player.entityState == EntityState.ALIVE )
+            {
+                enable = true;
+            }
+            else
+            {
+                enable = false;
+            }
         }
 
         void Update()
         {
-            if ( ( playerState == PlayerState.PLAY || playerState == PlayerState.BIGMAP ) && player && player.entityState == EntityState.ALIVE )
+            if ( enable )
             {
                 GetKey();
                 OnChange_HP_MANA();
 
-                if ( playerState != PlayerState.BIGMAP )
+                if ( PlayerState != PlayerState.BIGMAP )
                 {
                     tfMiniMapCamera.position = new Vector3( player.tfCache.position.x, miniMapPosY, player.tfCache.position.z );
                 }
@@ -122,19 +152,19 @@ namespace Refactoring
 
             if ( Input.GetKeyDown( KeyCode.M ) )
             {
-                if ( playerState == PlayerState.PLAY )
+                if ( PlayerState == PlayerState.PLAY )
                 {
-                    playerState = PlayerState.BIGMAP;
+                    PlayerState = PlayerState.BIGMAP;
 
-                    miniMapCamera.orthographicSize = 300;
+                    miniMapCamera.orthographicSize = 180;
                     miniMapImage.rectTransform.anchoredPosition = new Vector3( -400, -250, 0 );
                     miniMapImage.rectTransform.sizeDelta = new Vector2( 450, 450 );
 
                     tfMiniMapCamera.position = new Vector3( 0, miniMapPosY, 0 );
                 }
-                else if ( playerState == PlayerState.BIGMAP )
+                else if ( PlayerState == PlayerState.BIGMAP )
                 {
-                    playerState = PlayerState.PLAY;
+                    PlayerState = PlayerState.PLAY;
 
                     miniMapCamera.orthographicSize = 50;
                     miniMapImage.rectTransform.anchoredPosition = new Vector3( -60, -60, 0 );

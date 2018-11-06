@@ -75,4 +75,5 @@ MonoBehaviour:
   - Damaged
   - Recover
   - SetAnounce
+  - RotateToTarget
   DisableAutoOpenWizard: 1

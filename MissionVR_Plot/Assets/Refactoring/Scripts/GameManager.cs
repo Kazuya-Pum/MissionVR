@@ -17,7 +17,7 @@ namespace Refactoring
 
         [SerializeField] private DataBaseFormat dataBase;
 
-        public Transform[] spawnPoint;
+        [HideInInspector] public Transform[] spawnPoint;
         [SerializeField] private float setRespawnTime;
         public WaitForSeconds respawnTime;
 
@@ -61,6 +61,12 @@ namespace Refactoring
 
             respawnTime = new WaitForSeconds( setRespawnTime );
             anounceSpeed = new WaitForSeconds( setAnounceSpeed );
+        }
+
+        private void Start()
+        {
+            spawnPoint[0] = GameObject.Find( "WhitePlayerSpawnPoint" ).transform;
+            spawnPoint[1] = GameObject.Find( "BlackPlayerSpawnPoint" ).transform;
         }
 
         private void OnDestroy()
@@ -136,7 +142,7 @@ namespace Refactoring
             countDownText.transform.parent.gameObject.SetActive( false );
             if ( PlayerController.instance.player )
             {
-                PlayerController.instance.playerState = PlayerState.PLAY;
+                PlayerController.instance.PlayerState = PlayerState.PLAY;
             }
         }
 
@@ -146,7 +152,7 @@ namespace Refactoring
             shiftedPosition.x += Random.Range( -5, 10 );
             shiftedPosition.z += Random.Range( -5, 10 );
 
-            PlayerController.instance.player = PhotonNetwork.Instantiate( "Player", shiftedPosition, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
+            PlayerController.instance.player = PhotonNetwork.Instantiate( "CapsulePlayer", shiftedPosition, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
             PlayerController.instance.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
             PlayerController.instance.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
 
@@ -154,7 +160,7 @@ namespace Refactoring
 
             if ( gameState == GameState.GAME )
             {
-                PlayerController.instance.playerState = PlayerState.PLAY;
+                PlayerController.instance.PlayerState = PlayerState.PLAY;
             }
 
             onSetPlayer();
