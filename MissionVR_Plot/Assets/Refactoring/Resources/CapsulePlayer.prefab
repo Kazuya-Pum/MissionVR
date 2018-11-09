@@ -819,7 +819,6 @@ GameObject:
   - component: {fileID: 114332550514424076}
   - component: {fileID: 114023931553206988}
   - component: {fileID: 136666931134387396}
-  - component: {fileID: 208177733174651586}
   m_Layer: 8
   m_Name: CapsulePlayer
   m_TagString: Champion
@@ -2629,9 +2628,7 @@ MonoBehaviour:
   entityType: 0
   entityState: 0
   maxHp: 100
-  hp: 0
   maxMana: 100
-  mana: 0
   physicalAttack: 2
   physicalDefense: 1
   magicAttack: 1
@@ -2639,8 +2636,6 @@ MonoBehaviour:
   sendingExp: 100
   sendingMoney: 300
   tfCache: {fileID: 0}
-  hpBar: {fileID: 114613902946880660}
-  miniMapPoint: {fileID: 114405156475956960}
   gunIndex: 0
   trigger: 0
   head: {fileID: 4065150390632684}
@@ -3459,21 +3454,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.013163034, y: 0.0060584703, z: -0.029805435}
     m_Extent: {x: 0.011624884, y: 0.026302695, z: 0.03484713}
   m_DirtyAABB: 0
---- !u!208 &208177733174651586
-NavMeshObstacle:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1610347546321374}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 1.7, y: 4.3, z: 1.7}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 4.3, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!222 &222173962712560740
 CanvasRenderer:
   m_ObjectHideFlags: 1

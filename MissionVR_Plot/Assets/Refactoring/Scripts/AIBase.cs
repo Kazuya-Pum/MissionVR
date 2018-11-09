@@ -27,19 +27,19 @@ namespace Refactoring
     public class AIBase : Photon.MonoBehaviour
     {
         private EntityBase entityBase;
-        private EntityBase tmpTarget;
+        protected EntityBase tmpTarget;
         [SerializeField] private float attackRange;
         public AI_STATE aiState;
         public List<EntityBase> entities = new List<EntityBase>();
         private int entityLayer;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             entityBase = GetComponent<EntityBase>();
             entityLayer = LayerMask.NameToLayer( "Entity" );
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if ( PhotonNetwork.isMasterClient && GameManager.instance.gameState == GameState.GAME && aiState != AI_STATE.MOVE )
             {
@@ -62,7 +62,7 @@ namespace Refactoring
 
                     if ( Ray( tmpTarget ) )
                     {
-                        aiState = AI_STATE.DISCOVER;
+                        ChangeState( AI_STATE.DISCOVER );
                         entityBase.trigger = true;
                     }
                     else
@@ -73,7 +73,7 @@ namespace Refactoring
                             tmpTarget = entities[0];
                         }
 
-                        aiState = AI_STATE.WARNING;
+                        ChangeState( AI_STATE.WARNING );
                         entityBase.trigger = false;
                     }
 
@@ -81,10 +81,26 @@ namespace Refactoring
                 }
                 else
                 {
-                    aiState = AI_STATE.MOVE;
+                    ChangeState( AI_STATE.MOVE );
                     entityBase.trigger = false;
                 }
             }
+        }
+
+        protected void ChangeState( AI_STATE to )
+        {
+            if ( aiState == to )
+            {
+                return;
+            }
+
+            photonView.RPC( "RpcChangeState", PhotonTargets.All, to );
+        }
+
+        [PunRPC]
+        protected virtual void RpcChangeState( AI_STATE to )
+        {
+            aiState = to;
         }
 
         public void OnCheck( EntityBase target )
@@ -92,7 +108,10 @@ namespace Refactoring
             if ( target.team != entityBase.team && !entities.Contains( target ) )
             {
                 entities.Add( target );
-                aiState = AI_STATE.WARNING;
+                if ( aiState == AI_STATE.MOVE )
+                {
+                    ChangeState( AI_STATE.WARNING );
+                }
             }
         }
 
@@ -124,7 +143,7 @@ namespace Refactoring
 
             if ( entities.Count == 0 )
             {
-                aiState = AI_STATE.MOVE;
+                ChangeState( AI_STATE.MOVE );
                 entityBase.trigger = false;
             }
         }

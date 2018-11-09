@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace Refactoring
 {
@@ -221,6 +222,19 @@ namespace Refactoring
                 yield return anounceSpeed;
             }
             anounceText.text = null;
+        }
+
+        [PunRPC]
+        protected void ToResult( Team loser )
+        {
+            if ( PlayerController.instance.player.team == loser )
+            {
+
+            }
+            else
+            {
+                SceneManager.LoadSceneAsync( "Result" );
+            }
         }
     }
 

@@ -175,7 +175,7 @@ GameObject:
   - component: {fileID: 114661470477002560}
   - component: {fileID: 114626146279566862}
   - component: {fileID: 195924759149879036}
-  - component: {fileID: 114140809851256542}
+  - component: {fileID: 114315580939483820}
   m_Layer: 8
   m_Name: Minion
   m_TagString: Minion
@@ -500,20 +500,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &114140809851256542
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1868228213638302}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4737da07e7c7be34bb2ef8df58e50edf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackRange: 15
-  aiState: 0
-  entities: []
 --- !u!114 &114240253102266718
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -569,6 +555,21 @@ MonoBehaviour:
   instantiationId: -1
   currentMasterID: -1
   isRuntimeInstantiated: 0
+--- !u!114 &114315580939483820
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1868228213638302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4a3b14b5f2a1a649982b62957b483e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 15
+  aiState: 0
+  entities: []
+  lanePoints: []
 --- !u!114 &114395218978689428
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -584,9 +585,7 @@ MonoBehaviour:
   entityType: 1
   entityState: 0
   maxHp: 50
-  hp: 0
   maxMana: 0
-  mana: 0
   physicalAttack: 0
   physicalDefense: 0
   magicAttack: 0
@@ -594,8 +593,6 @@ MonoBehaviour:
   sendingExp: 10
   sendingMoney: 10
   tfCache: {fileID: 0}
-  hpBar: {fileID: 114472696748001414}
-  miniMapPoint: {fileID: 114240253102266718}
   gunIndex: 0
   trigger: 0
   head: {fileID: 4522529819121590}

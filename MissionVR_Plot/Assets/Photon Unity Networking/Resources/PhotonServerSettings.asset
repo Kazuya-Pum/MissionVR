@@ -76,4 +76,6 @@ MonoBehaviour:
   - Recover
   - SetAnounce
   - RotateToTarget
+  - RpcChangeState
+  - ToResult
   DisableAutoOpenWizard: 1

@@ -7,12 +7,6 @@ namespace Refactoring
 {
     public class MinionMelee : MinionBase
     {
-        public Transform goal;
 
-        protected override void Start()
-        {
-            base.Start();
-            //GetComponent<NavMeshAgent>().destination = goal.position;
-        }
     }
 }
