@@ -237,7 +237,7 @@ public class Chara : Photon.MonoBehaviour ,IPlayer{
 #endif
 
             IP = this.gameObject.GetComponent<Chara>();
-            gameState = GameState.idle;
+            //gameState = GameState.idle;
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             canvasUI.enabled = true;
@@ -363,18 +363,18 @@ public class Chara : Photon.MonoBehaviour ,IPlayer{
          */
         //            for (int count = 0; count < level - networkManager.subLocalVariables[playerID - 1].Level; count++)
         //            {
-        networkManager.subLocalVariables[playerID - 1].MaxHp = MaxHP;
-                //hpMax = playerLocalVariables.MaxHp;
-                //hpBar_OnHead.maxValue = hpMax;
-                //hpBar.maxValue = hpMax;
-                networkManager.subLocalVariables[playerID - 1].PhysicalOffence = PhysicalOffence;
-                networkManager.subLocalVariables[playerID - 1].PhysicalDefence = PhysicalDefence;
-                networkManager.subLocalVariables[playerID - 1].MagicalOffence = MagicalOffence;
-                networkManager.subLocalVariables[playerID - 1].MagicalDefence = MagicalDefence;
-                networkManager.subLocalVariables[playerID - 1].MoveSpeed = MoveSpeed;
-                networkManager.subLocalVariables[playerID - 1].Level = level;
-//            }
-//        }
+//        networkManager.subLocalVariables[playerID - 1].MaxHp = MaxHP;
+//                //hpMax = playerLocalVariables.MaxHp;
+//                //hpBar_OnHead.maxValue = hpMax;
+//                //hpBar.maxValue = hpMax;
+//                networkManager.subLocalVariables[playerID - 1].PhysicalOffence = PhysicalOffence;
+//                networkManager.subLocalVariables[playerID - 1].PhysicalDefence = PhysicalDefence;
+//                networkManager.subLocalVariables[playerID - 1].MagicalOffence = MagicalOffence;
+//                networkManager.subLocalVariables[playerID - 1].MagicalDefence = MagicalDefence;
+//                networkManager.subLocalVariables[playerID - 1].MoveSpeed = MoveSpeed;
+//                networkManager.subLocalVariables[playerID - 1].Level = level;
+////            }
+////        }
     }
 
     void Update()
@@ -386,91 +386,91 @@ public class Chara : Photon.MonoBehaviour ,IPlayer{
             
  //           sliderHpPlayer = hpPlayer;
 
-            if (gameState == GameState.idle && networkManager.isStart)
-            {
-                gameStartTimer += Time.deltaTime;
-                if (gameStartTimer >= 1)
-                {
-                    gameStartTimer = 0;
-                    startCount--;
-                }
-                startTimer.GetComponent<Image>().fillAmount = gameStartTimer;
-                startTimer.transform.GetChild(0).GetComponent<Text>().text = "" + startCount;
-                if (startCount < 0)
-                {
-                    gameState = GameState.Game;
-                    startTimer.gameObject.SetActive(false);
-                    rigidbody.constraints = RigidbodyConstraints.None;
-                    rigidbody.constraints = RigidbodyConstraints.FreezePositionY
-                        | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-                }
-            }
+            //if (gameState == GameState.idle && networkManager.isStart)
+            //{
+            //    gameStartTimer += Time.deltaTime;
+            //    if (gameStartTimer >= 1)
+            //    {
+            //        gameStartTimer = 0;
+            //        startCount--;
+            //    }
+            //    startTimer.GetComponent<Image>().fillAmount = gameStartTimer;
+            //    startTimer.transform.GetChild(0).GetComponent<Text>().text = "" + startCount;
+            //    if (startCount < 0)
+            //    {
+            //        gameState = GameState.Game;
+            //        startTimer.gameObject.SetActive(false);
+            //        rigidbody.constraints = RigidbodyConstraints.None;
+            //        rigidbody.constraints = RigidbodyConstraints.FreezePositionY
+            //            | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            //    }
+            //}
 
-            if (gameState == GameState.Game)
-            {
-                if (playerLocalVariables.Mana < playerLocalVariables.ManaMax)
-                {
-                    manaDeclien_StartTime += Time.deltaTime;
-                    if (manaDeclien_StartTime >= manaAutoRecoveryinterval)
-                    {
-                        playerLocalVariables.Mana += playerLocalVariables.AutomaticManaRecovery;
-                        manaDeclien_StartTime = 0;
-                    }
-                }
+            //if (gameState == GameState.Game)
+            //{
+            //    if (playerLocalVariables.Mana < playerLocalVariables.ManaMax)
+            //    {
+            //        manaDeclien_StartTime += Time.deltaTime;
+            //        if (manaDeclien_StartTime >= manaAutoRecoveryinterval)
+            //        {
+            //            playerLocalVariables.Mana += playerLocalVariables.AutomaticManaRecovery;
+            //            manaDeclien_StartTime = 0;
+            //        }
+            //    }
 
-                if (playerLocalVariables.Hp < playerLocalVariables.MaxHp)
-                {
-                    hpDeclien_StartTime += Time.deltaTime;
-                    if (hpDeclien_StartTime >= hpAutoRecoveryinterval)
-                    {
-                        playerLocalVariables.Hp += playerLocalVariables.AutomaticHpRecovery;
+            //    if (playerLocalVariables.Hp < playerLocalVariables.MaxHp)
+            //    {
+            //        hpDeclien_StartTime += Time.deltaTime;
+            //        if (hpDeclien_StartTime >= hpAutoRecoveryinterval)
+            //        {
+            //            playerLocalVariables.Hp += playerLocalVariables.AutomaticHpRecovery;
 
-                        networkManager.photonView.RPC("RecieveChangedHP", PhotonTargets.MasterClient, gameObject.GetPhotonView().ownerId, playerLocalVariables.Hp);
+            //            networkManager.photonView.RPC("RecieveChangedHP", PhotonTargets.MasterClient, gameObject.GetPhotonView().ownerId, playerLocalVariables.Hp);
 
-                        hpDeclien_StartTime = 0;
-                    }
-                }
+            //            hpDeclien_StartTime = 0;
+            //        }
+            //    }
 
-                if (isStun)//スタンは一定時間攻撃・移動・スキル全部使用不可能
-                {
-                    timeStun -= Time.deltaTime;
-                    if (timeStun <= 0)
-                    {
-                        isStun = false;timeStun = 10f;
-                    }
-                }
-                else
-                {
-                    ControlBasely();
-                }
+            //    if (isStun)//スタンは一定時間攻撃・移動・スキル全部使用不可能
+            //    {
+            //        timeStun -= Time.deltaTime;
+            //        if (timeStun <= 0)
+            //        {
+            //            isStun = false;timeStun = 10f;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        ControlBasely();
+            //    }
 
-                if (isFired)
-                {
-                    timeFire -= Time.deltaTime;
-                    isFiredDamageTime -= Time.deltaTime;
-                    if (isFiredDamageTime <= 0)
-                    {
-                        playerLocalVariables.Hp -= 2;
-                        isFiredDamageTime = 1;
-                    }
-                    if (timeFire <= 0)
-                    {
-                        isFired = false;
-                        timeFire = 10f;
-                    }
+            //    if (isFired)
+            //    {
+            //        timeFire -= Time.deltaTime;
+            //        isFiredDamageTime -= Time.deltaTime;
+            //        if (isFiredDamageTime <= 0)
+            //        {
+            //            playerLocalVariables.Hp -= 2;
+            //            isFiredDamageTime = 1;
+            //        }
+            //        if (timeFire <= 0)
+            //        {
+            //            isFired = false;
+            //            timeFire = 10f;
+            //        }
 
-                }
+            //    }
 
-                //２秒ごとにマナが１回復する
-                if (playerLocalVariables.Mana < playerLocalVariables.ManaMax) manaRecoverCount += Time.deltaTime;
+            //    //２秒ごとにマナが１回復する
+            //    if (playerLocalVariables.Mana < playerLocalVariables.ManaMax) manaRecoverCount += Time.deltaTime;
 
-                if (manaRecoverCount >= 2 && playerLocalVariables.Mana < playerLocalVariables.ManaMax)
-                {
-                    manaRecoverCount = 0;
-                    playerLocalVariables.Mana++;
+            //    if (manaRecoverCount >= 2 && playerLocalVariables.Mana < playerLocalVariables.ManaMax)
+            //    {
+            //        manaRecoverCount = 0;
+            //        playerLocalVariables.Mana++;
 
-                }
-            }
+            //    }
+            //}
         }
     }
 
