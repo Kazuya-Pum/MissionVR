@@ -89,12 +89,10 @@ namespace Refactoring
 
         protected void ChangeState( AI_STATE to )
         {
-            if ( aiState == to )
+            if ( aiState != to && GameManager.instance.gameState == GameState.GAME )
             {
-                return;
+                photonView.RPC( "RpcChangeState", PhotonTargets.All, to );
             }
-
-            photonView.RPC( "RpcChangeState", PhotonTargets.All, to );
         }
 
         [PunRPC]
