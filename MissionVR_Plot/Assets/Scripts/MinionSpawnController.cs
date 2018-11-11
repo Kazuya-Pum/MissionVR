@@ -12,6 +12,9 @@ public class MinionSpawnController : Photon.MonoBehaviour
     private WaitForSeconds spawnInterval;
     private WaitForSeconds waveInterval;
 
+    [SerializeField] private Transform[] rootTopPoints;
+    [SerializeField] private Transform[] rootBotPoints;
+
     private void Awake()
     {
         spawnInterval = new WaitForSeconds( spawnIntervalTime );
@@ -36,12 +39,46 @@ public class MinionSpawnController : Photon.MonoBehaviour
         int spawnCount = 0;
         while ( true )
         {
+            int teamNum = 0;
             foreach ( Transform teamPoint in spawnPoints )
             {
+                int pos = 0;
                 foreach ( Transform point in teamPoint )
                 {
-                    MinionAI minionAI = GameManager.instance.Summon( 0, point, (Team)System.Enum.Parse( typeof( Team ), teamPoint.name ) ).GetComponent<MinionAI>();
+                    MinionAI minionAI = GameManager.instance.Summon( 0, point, (Team)teamNum ).GetComponent<MinionAI>();
+                    minionAI.minionLane = (MinionLane)pos;
+                    if ( pos == (int)MinionLane.TOP )
+                    {
+                        foreach ( Transform item in rootTopPoints )
+                        {
+                            if ( teamNum == (int)Team.WHITE )
+                            {
+                                minionAI.lanePoints.Add( item );
+                            }
+                            else
+                            {
+                                minionAI.lanePoints.Insert( 0, item );
+                            }
+                        }
+                    }
+                    else if ( pos == (int)MinionLane.BOT )
+                    {
+                        foreach ( Transform item in rootBotPoints )
+                        {
+                            if ( teamNum == (int)Team.WHITE )
+                            {
+                                minionAI.lanePoints.Add( item );
+                            }
+                            else
+                            {
+                                minionAI.lanePoints.Insert( 0, item );
+                            }
+                        }
+                    }
+                    minionAI.lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
+                    pos++;
                 }
+                teamNum++;
             }
 
             spawnCount++;
@@ -56,4 +93,10 @@ public class MinionSpawnController : Photon.MonoBehaviour
             }
         }
     }
+}
+
+[System.Serializable]
+public class RootPoint
+{
+    public Transform[] point;
 }
