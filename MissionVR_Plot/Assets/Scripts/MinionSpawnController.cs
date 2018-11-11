@@ -3,131 +3,100 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class MinionSpawnController : Photon.MonoBehaviour {
+public class MinionSpawnController : Photon.MonoBehaviour
+{
+    [SerializeField] private Transform spawnPoints;
+    [SerializeField] private float spawnIntervalTime;
+    [SerializeField] private float waveIntervalTime;
+    [SerializeField] private int waveSpawnLimit;
+    private WaitForSeconds spawnInterval;
+    private WaitForSeconds waveInterval;
 
-    #region Variables
-    //private string[] Minion = new string[3]{"MeleeMinion","MiddleMinion","RangedMinion"};//出すミニオン
+    [SerializeField] private Transform[] rootTopPoints;
+    [SerializeField] private Transform[] rootBotPoints;
 
-    [SerializeField]
-    private GameObject[] Minion;
-
-    [SerializeField]//ミニオンがスポーンする位置の空オブジェクト
-    private GameObject[] Minion_SpawnPointObject_White;
-
-    [SerializeField]//ミニオンがスポーンする位置の空オブジェクト
-    private GameObject[] Minion_SpawnPointObject_Black;
-
-    [SerializeField]
-    private Transform[] Projector;//プロジェクター
-
-    [SerializeField]
-    private int spawnNum;//1レーンの1ウェーブでスポーンするミニオンの数
-
-    [SerializeField]
-    private float spawnInterval;//ミニオン'ウェーブ'のスポーン間隔
-
-    [SerializeField]
-    private float spawnContinuityInterval;//ミニオン'単体'が出る間隔
-    
-    // 0:Red 1:Blue
-    [SerializeField]
-    private Material[] minionMat;
-
-    private bool inNetworkFlag = false;
-
-    // NavMeshAgentに設定するmask
-    private int topMask = 1 << 3, midMask = 1 << 4, botMask = 1 << 5;
-
-    #endregion
-
-    // Use this for initialization
-    void Start () {
-        //スポーンのコルーチン開始
-//        StartCoroutine(Spawn());
+    private void Awake()
+    {
+        spawnInterval = new WaitForSeconds( spawnIntervalTime );
+        waveInterval = new WaitForSeconds( waveIntervalTime );
     }
 
-    private void Update()
+    private void Start()
     {
-        NetworkManager networkManager = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-        if (networkManager.isStart)
+        GameManager.instance.onGameStart += OnGameStart;
+    }
+
+    public void OnGameStart()
+    {
+        if ( PhotonNetwork.isMasterClient )
         {
-            if (!inNetworkFlag)
-            {
-                if (!PhotonNetwork.isMasterClient) return;
-                if (GameObject.FindGameObjectWithTag("Player").GetComponent<Chara>().GetGameState != GameState.Game) return;
-                StartCoroutine(Spawn());
-                inNetworkFlag = !inNetworkFlag;
-            }
+            StartCoroutine( "MinionSpawning" );
         }
     }
 
-    //スポーンする処理
-    IEnumerator Spawn()
+    private IEnumerator MinionSpawning()
     {
-        int count = 1;
-        for (;;)
+        int spawnCount = 0;
+        while ( true )
         {
-            // どちらのチームか
-            for (int n = 0; n < 2; n++)
+            int teamNum = 0;
+            foreach ( Transform teamPoint in spawnPoints )
             {
-                // どのレーンか
-                for (int m = 0; m < 3; m++)
+                int pos = 0;
+                foreach ( Transform point in teamPoint )
                 {
-                    int minionViewID = PhotonNetwork.AllocateViewID();
-                    photonView.RPC( "SpawnMinion", PhotonTargets.AllBuffered, (TeamColor)n, (Lane)m, count, minionViewID);
+                    MinionAI minionAI = GameManager.instance.Summon( 0, point, (Team)teamNum ).GetComponent<MinionAI>();
+                    minionAI.minionLane = (MinionLane)pos;
+                    if ( pos == (int)MinionLane.TOP )
+                    {
+                        foreach ( Transform item in rootTopPoints )
+                        {
+                            if ( teamNum == (int)Team.WHITE )
+                            {
+                                minionAI.lanePoints.Add( item );
+                            }
+                            else
+                            {
+                                minionAI.lanePoints.Insert( 0, item );
+                            }
+                        }
+                    }
+                    else if ( pos == (int)MinionLane.BOT )
+                    {
+                        foreach ( Transform item in rootBotPoints )
+                        {
+                            if ( teamNum == (int)Team.WHITE )
+                            {
+                                minionAI.lanePoints.Add( item );
+                            }
+                            else
+                            {
+                                minionAI.lanePoints.Insert( 0, item );
+                            }
+                        }
+                    }
+                    minionAI.lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
+                    pos++;
                 }
+                teamNum++;
             }
-            if(count < spawnNum)//ミニオン単体の湧き感覚
+
+            spawnCount++;
+            if ( spawnCount < waveSpawnLimit )
             {
-                yield return new WaitForSeconds(this.spawnContinuityInterval);
-                count += 1;
+                yield return spawnInterval;
             }
-            else//1ウェーブの湧き感覚
+            else
             {
-                count = 1;
-                yield return new WaitForSeconds(this.spawnInterval);
+                spawnCount = 0;
+                yield return waveInterval;
             }
         }
     }
+}
 
-    //ミニオンをInstantiateするメソッド
-    //引数は(このミニオンのチーム,このミニオンのレーン,一つのウェーブの数)
-    [PunRPC]
-    void SpawnMinion(TeamColor team, Lane lane,int count, int minionViewID)
-    {
-        int playSide = (int)team;
-        int playLane = (int)lane;
-        GameObject obj;
-
-        // minionを生成する＆とりあえず色を変える
-        switch (playSide)
-        {
-            case 0:
-                obj = Instantiate( Minion[count - 1], this.Minion_SpawnPointObject_White[playLane].transform.position, Quaternion.identity);
-                obj.GetComponent<PhotonView>().viewID = minionViewID;
-                break;
-
-            case 1:
-                obj = Instantiate( Minion[count - 1], this.Minion_SpawnPointObject_Black[playLane].transform.position, Quaternion.identity);
-                obj.GetComponent<PhotonView>().viewID = minionViewID;
-                break;
-
-            default:
-                return;
-        }
-
-        obj.GetComponent<Renderer>().material = minionMat[playSide];
-
-        // minionのagentmask
-        LocalVariables teamAndLane = obj.GetComponent<LocalVariables>();
-        teamAndLane.team = team;
-        teamAndLane.lane = lane;
-
-    }
-
-    //コルーチン終了Method
-    void StopCoroutine()
-    {
-        StopCoroutine(Spawn());
-    }
+[System.Serializable]
+public class RootPoint
+{
+    public Transform[] point;
 }

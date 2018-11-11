@@ -6,10 +6,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public enum GameState
-{
-    idle, Game, Result,Dead
-}
+//public enum OldGameState
+//{
+//    idle, Game, Result,Dead
+//}
 
 public class NetworkManager : Photon.MonoBehaviour
 {
@@ -46,7 +46,7 @@ public class NetworkManager : Photon.MonoBehaviour
     [SerializeField]
     GameObject[] BlackTower;
 //    Chara chara;
-    public SubLocalVariables[] subLocalVariables = new SubLocalVariables[10];
+    //public SubLocalVariables[] subLocalVariables = new SubLocalVariables[10];
     [SerializeField]
     private int expRange = 40;
     [SerializeField]
@@ -67,8 +67,8 @@ public class NetworkManager : Photon.MonoBehaviour
     {
         if (PhotonNetwork.isMasterClient)
         {
-            int damage = (int)subLocalVariables[playerID - 1].PhysicalOffence;
-            photonView.RPC("RaceiveDamage", PhotonTargets.All, playerID, otherPlayerID,damage,otherPhotonViewID);
+            //int damage = (int)subLocalVariables[playerID - 1].PhysicalOffence;
+            //photonView.RPC("RaceiveDamage", PhotonTargets.All, playerID, otherPlayerID,damage,otherPhotonViewID);
         }
     }
 
@@ -77,8 +77,8 @@ public class NetworkManager : Photon.MonoBehaviour
     {
         if (PhotonNetwork.isMasterClient)
         {
-            int damage = (int)skillDmage - (int)subLocalVariables[playerID - 1].MagicalDefence;
-            photonView.RPC("ReceiveSkillDamage", PhotonTargets.All, playerID, otherPlayerID, damage, otherPhotonViewID);
+            //int damage = (int)skillDmage - (int)subLocalVariables[playerID - 1].MagicalDefence;
+            //photonView.RPC("ReceiveSkillDamage", PhotonTargets.All, playerID, otherPlayerID, damage, otherPhotonViewID);
         }
     }
 
@@ -206,7 +206,7 @@ public class NetworkManager : Photon.MonoBehaviour
                 if (player.GetComponent<LocalVariables>().Hp <= 0 && !respawned)
                 {
                     respawned = true;
-                    chara.gameState = GameState.Dead;
+                    //chara.gameState = GameState.Dead;
                     //ここでデス数を＋１したい
                     chara.IsShooted = false;
                 }
@@ -250,26 +250,26 @@ public class NetworkManager : Photon.MonoBehaviour
 
     private void SaveInfo()
     {
-        for (int index = 0; index < subLocalVariables.Length; index++)
-        {
-            //獲得金額保存
-            PlayerPrefs.SetInt("Money" + index, subLocalVariables[index].money);
-            //キル数保存
-            PlayerPrefs.SetInt("KillCount" + index, subLocalVariables[index].killCount);
-            //デス数保存
-            PlayerPrefs.SetInt("DeathCount" + index, subLocalVariables[index].deathCount);
+        //for (int index = 0; index < subLocalVariables.Length; index++)
+        //{
+        //    //獲得金額保存
+        //    PlayerPrefs.SetInt("Money" + index, subLocalVariables[index].money);
+        //    //キル数保存
+        //    PlayerPrefs.SetInt("KillCount" + index, subLocalVariables[index].killCount);
+        //    //デス数保存
+        //    PlayerPrefs.SetInt("DeathCount" + index, subLocalVariables[index].deathCount);
 
             
-        }
+        //}
         //勝敗を決める必要があったので、暫定で総キル数の多い方を勝者にしました
         int killCountWhite = 1;
         int killCountBlack = 0;
-        for (int index = 0; index < subLocalVariables.Length; index++)
-        {
-            if (subLocalVariables[index].team == TeamColor.White) killCountWhite += subLocalVariables[index].killCount;
-            else
-                killCountBlack += subLocalVariables[index].killCount;
-        }
+        //for (int index = 0; index < subLocalVariables.Length; index++)
+        //{
+        //    if (subLocalVariables[index].team == TeamColor.White) killCountWhite += subLocalVariables[index].killCount;
+        //    else
+        //        killCountBlack += subLocalVariables[index].killCount;
+        //}
 
         //チームに応じて勝敗を分けて保存
         if (teamColorPlayerSave == TeamColor.White)
@@ -307,7 +307,7 @@ public class NetworkManager : Photon.MonoBehaviour
     {
         if (PhotonNetwork.isMasterClient)
         {
-            this.subLocalVariables[changedPlayerID - 1].Hp = changedHP;
+            //this.subLocalVariables[changedPlayerID - 1].Hp = changedHP;
         }
     }
 
@@ -353,11 +353,11 @@ public class NetworkManager : Photon.MonoBehaviour
 
     void JoinTeam(string team)
     {
-        subLocalVariables = new SubLocalVariables[10];
-        for (int n = 0; n < subLocalVariables.Length; n++)
-        {
-            subLocalVariables[n] = new SubLocalVariables();
-        }
+        //subLocalVariables = new SubLocalVariables[10];
+        //for (int n = 0; n < subLocalVariables.Length; n++)
+        //{
+        //    subLocalVariables[n] = new SubLocalVariables();
+        //}
 
 
         Debug.Log(team);
@@ -445,7 +445,7 @@ public class NetworkManager : Photon.MonoBehaviour
 
         photonView.RPC("RecieveChangedHP", PhotonTargets.MasterClient, player.gameObject.GetPhotonView().ownerId, playerLocalVariables.Hp);
 
-        chara.gameState = GameState.Game;
+        //chara.gameState = GameState.Game;
 
         switch (teamColorPlayerSave)
         {
