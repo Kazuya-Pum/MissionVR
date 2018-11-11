@@ -1422,7 +1422,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoints: {fileID: 1470408965}
-  spawnIntervalTime: 2
+  spawnIntervalTime: 5
 --- !u!1 &834027351
 GameObject:
   m_ObjectHideFlags: 0

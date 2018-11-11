@@ -7,11 +7,15 @@ public class MinionSpawnController : Photon.MonoBehaviour
 {
     [SerializeField] private Transform spawnPoints;
     [SerializeField] private float spawnIntervalTime;
+    [SerializeField] private float waveIntervalTime;
+    [SerializeField] private int waveSpawnLimit;
     private WaitForSeconds spawnInterval;
+    private WaitForSeconds waveInterval;
 
     private void Awake()
     {
         spawnInterval = new WaitForSeconds( spawnIntervalTime );
+        waveInterval = new WaitForSeconds( waveIntervalTime );
     }
 
     private void Start()
@@ -29,6 +33,7 @@ public class MinionSpawnController : Photon.MonoBehaviour
 
     private IEnumerator MinionSpawning()
     {
+        int spawnCount = 0;
         while ( true )
         {
             foreach ( Transform teamPoint in spawnPoints )
@@ -38,7 +43,17 @@ public class MinionSpawnController : Photon.MonoBehaviour
                     MinionAI minionAI = GameManager.instance.Summon( 0, point, (Team)System.Enum.Parse( typeof( Team ), teamPoint.name ) ).GetComponent<MinionAI>();
                 }
             }
-            yield return spawnInterval;
+
+            spawnCount++;
+            if ( spawnCount < waveSpawnLimit )
+            {
+                yield return spawnInterval;
+            }
+            else
+            {
+                spawnCount = 0;
+                yield return waveInterval;
+            }
         }
     }
 }
