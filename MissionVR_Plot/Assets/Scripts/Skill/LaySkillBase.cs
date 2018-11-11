@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace MOBAEngine.Skills{
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "skills/LaySkillBase")]
     public class LaySkillBase : SkillBase
     {
         [SerializeField]
