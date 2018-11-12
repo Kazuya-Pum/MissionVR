@@ -93,10 +93,10 @@ public class PlayerController : Photon.MonoBehaviour
 
     void Update()
     {
+        OnChange_HP_MANA();
         if ( enable )
         {
             GetKey();
-            OnChange_HP_MANA();
 
             if ( PlayerState != PlayerState.BIGMAP )
             {
@@ -172,7 +172,6 @@ public class PlayerController : Photon.MonoBehaviour
 
     public void OnStatusChanged()
     {
-        OnChange_HP_MANA();
         OnGetReward();
 
         levelText.text = ( "Lv." + player.Level );
@@ -182,11 +181,19 @@ public class PlayerController : Photon.MonoBehaviour
         statusSpeed.fillAmount = player.MoveSpeed * 0.1f;
     }
 
-    // TODO 動きを滑らかにしたい
     public void OnChange_HP_MANA()
     {
-        hpBar.fillAmount = (float)player.Hp / player.MaxHp;
-        manaBar.fillAmount = (float)player.Mana / player.MaxMana;
+        float hp = (float)player.Hp / player.MaxHp;
+        float mana = (float)player.Mana / player.MaxMana;
+
+        if ( !Mathf.Approximately( hpBar.fillAmount, hp ) )
+        {
+            hpBar.fillAmount = Mathf.Lerp( hpBar.fillAmount, hp, 0.25f );
+        }
+        if ( !Mathf.Approximately( manaBar.fillAmount, mana ) )
+        {
+            manaBar.fillAmount = Mathf.Lerp( manaBar.fillAmount, mana, 0.25f );
+        }
     }
 
     public void OnGetReward()
