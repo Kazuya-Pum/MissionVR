@@ -47,7 +47,7 @@ public class MobBase : EntityBase
     }
 
     [PunRPC]
-    protected override void RotateToTarget( Vector3 to )
+    public override void RotateToTarget( Vector3 to )
     {
         base.RotateToTarget( to );
         modelRotate.localRotation = head.localRotation;

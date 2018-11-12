@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 /// <summary>
 /// AIのステート
@@ -24,11 +25,11 @@ public enum AI_STATE : byte
 [RequireComponent( typeof( EntityBase ) )]
 public class AIBase : Photon.MonoBehaviour
 {
-    private EntityBase entityBase;
+    protected EntityBase entityBase;
     protected EntityBase tmpTarget;
     [SerializeField] private float attackRange;
     public AI_STATE aiState;
-    public List<EntityBase> entities = new List<EntityBase>();
+    public HashSet<EntityBase> entities = new HashSet<EntityBase>();
     private int entityLayer;
 
     protected virtual void Awake()
@@ -41,22 +42,13 @@ public class AIBase : Photon.MonoBehaviour
     {
         if ( PhotonNetwork.isMasterClient && GameManager.instance.gameState == GameState.GAME && aiState != AI_STATE.MOVE )
         {
-            if ( entities.Count != 0 )
+            entities.RemoveWhere( ( EntityBase e ) => e == null );
+            if ( entities.Any() )
             {
-                if ( entities.Remove( tmpTarget ) && tmpTarget != null )
+                if ( tmpTarget == null || !entities.Contains( tmpTarget ) )
                 {
-                    entities.Insert( 0, tmpTarget );
+                    tmpTarget = entities.FirstOrDefault();
                 }
-                else if ( entities.Count != 0 )
-                {
-                    tmpTarget = entities[0];
-                }
-                else
-                {
-                    return;
-                }
-
-                entityBase.photonView.RPC( "RotateToTarget", PhotonTargets.AllViaServer, tmpTarget.head.position );
 
                 if ( Ray( tmpTarget ) )
                 {
@@ -66,9 +58,9 @@ public class AIBase : Photon.MonoBehaviour
                 else
                 {
                     entities.Remove( tmpTarget );
-                    if ( entities.Count != 0 )
+                    if ( entities.Any() )
                     {
-                        tmpTarget = entities[0];
+                        tmpTarget = entities.FirstOrDefault();
                     }
 
                     ChangeState( AI_STATE.WARNING );
@@ -82,6 +74,11 @@ public class AIBase : Photon.MonoBehaviour
                 ChangeState( AI_STATE.MOVE );
                 entityBase.trigger = false;
             }
+        }
+
+        if ( aiState == AI_STATE.DISCOVER )
+        {
+            entityBase.RotateToTarget( tmpTarget.head.position );
         }
     }
 
@@ -101,7 +98,7 @@ public class AIBase : Photon.MonoBehaviour
 
     public void OnCheck( EntityBase target )
     {
-        if ( target.team != entityBase.team && !entities.Contains( target ) )
+        if ( target.team != entityBase.team )
         {
             entities.Add( target );
             if ( aiState == AI_STATE.MOVE )
@@ -137,7 +134,7 @@ public class AIBase : Photon.MonoBehaviour
     {
         entities.Remove( target );
 
-        if ( entities.Count == 0 )
+        if ( entities.Any() )
         {
             ChangeState( AI_STATE.MOVE );
             entityBase.trigger = false;

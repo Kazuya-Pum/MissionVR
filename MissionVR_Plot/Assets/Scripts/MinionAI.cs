@@ -24,18 +24,18 @@ public class MinionAI : AIBase
     {
         int teamNum = (int)GetComponent<EntityBase>().team;
 
-        //switch ( minionLane )
-        //{
-        //    case MinionLane.TOP:
-        //        lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
-        //        break;
-        //    case MinionLane.MID:
-        //        lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
-        //        break;
-        //    case MinionLane.BOT:
-        //        lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
-        //        break;
-        //}
+        switch ( minionLane )
+        {
+            case MinionLane.TOP:
+                break;
+            case MinionLane.MID:
+                break;
+            case MinionLane.BOT:
+                break;
+        }
+
+        //lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
+
         agent.destination = lanePoints[destPoint].position;
     }
 
@@ -65,7 +65,7 @@ public class MinionAI : AIBase
                 case AI_STATE.WARNING:
                     if ( tmpTarget )
                     {
-                        agent.destination = tmpTarget.transform.position;
+                        agent.destination = tmpTarget.tfCache.position;
                     }
                     agent.isStopped = false;
                     break;

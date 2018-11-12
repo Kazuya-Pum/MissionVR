@@ -9,7 +9,7 @@ public enum Team : byte { WHITE, BLACK }
 
 public enum EntityType : byte { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
 
-// 状態異常をここに追加するか別でenum作るかは要検討
+// TODO 状態異常をここに追加するか別でenum作るかは要検討
 public enum EntityState : byte { ALIVE, DEATH }
 
 public class EntityBase : Photon.MonoBehaviour, IPunObservable
@@ -289,7 +289,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     }
 
     [PunRPC]
-    protected virtual void RotateToTarget( Vector3 to )
+    public virtual void RotateToTarget( Vector3 to )
     {
         Vector3 diff = Quaternion.LookRotation( to - head.position ).eulerAngles;
 

@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class MinionSpawnController : Photon.MonoBehaviour
 {
+    public static MinionSpawnController instance;
+
     [SerializeField] private Transform spawnPoints;
     [SerializeField] private float spawnIntervalTime;
     [SerializeField] private float waveIntervalTime;
@@ -17,6 +19,15 @@ public class MinionSpawnController : Photon.MonoBehaviour
 
     private void Awake()
     {
+        if ( instance == null )
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy( gameObject );
+        }
+
         spawnInterval = new WaitForSeconds( spawnIntervalTime );
         waveInterval = new WaitForSeconds( waveIntervalTime );
     }
@@ -39,19 +50,32 @@ public class MinionSpawnController : Photon.MonoBehaviour
         int spawnCount = 0;
         while ( true )
         {
-            int teamNum = 0;
+            Team team = 0;
             foreach ( Transform teamPoint in spawnPoints )
             {
+                switch ( teamPoint.name )
+                {
+                    case "WHITE":
+                        team = Team.WHITE;
+                        break;
+                    case "BLACK":
+                        team = Team.BLACK;
+                        break;
+                    default:
+                        Debug.LogWarning( "spawnPointsに指定したオブジェクトの名前が不正です。\n" );
+                        break;
+                }
+
                 int pos = 0;
                 foreach ( Transform point in teamPoint )
                 {
-                    MinionAI minionAI = GameManager.instance.Summon( 0, point, (Team)teamNum ).GetComponent<MinionAI>();
+                    MinionAI minionAI = GameManager.instance.Summon( 0, point, team ).GetComponent<MinionAI>();
                     minionAI.minionLane = (MinionLane)pos;
                     if ( pos == (int)MinionLane.TOP )
                     {
                         foreach ( Transform item in rootTopPoints )
                         {
-                            if ( teamNum == (int)Team.WHITE )
+                            if ( team == Team.WHITE )
                             {
                                 minionAI.lanePoints.Add( item );
                             }
@@ -65,7 +89,7 @@ public class MinionSpawnController : Photon.MonoBehaviour
                     {
                         foreach ( Transform item in rootBotPoints )
                         {
-                            if ( teamNum == (int)Team.WHITE )
+                            if ( team == Team.WHITE )
                             {
                                 minionAI.lanePoints.Add( item );
                             }
@@ -75,10 +99,9 @@ public class MinionSpawnController : Photon.MonoBehaviour
                             }
                         }
                     }
-                    minionAI.lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
+                    minionAI.lanePoints.Add( GameManager.instance.projectorPos[(int)team] );
                     pos++;
                 }
-                teamNum++;
             }
 
             spawnCount++;
