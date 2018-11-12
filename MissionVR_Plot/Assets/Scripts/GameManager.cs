@@ -8,7 +8,7 @@ public enum GameState { WAIT, COUNT_DOWN, GAME }
 
 public enum AnounceType { LEVEL, PlAYER_DEATH, DESTROY }
 
-public class GameManager : Photon.MonoBehaviour
+public class GameManager : Photon.MonoBehaviour, IPunObservable
 {
     public static GameManager instance;
 
@@ -134,8 +134,7 @@ public class GameManager : Photon.MonoBehaviour
 
         if ( PhotonNetwork.isMasterClient )
         {
-            // TODO Masterがゲームから抜けるとバッファが破棄されるため要対策
-            photonView.RPC( "FetchGameState", PhotonTargets.AllBufferedViaServer );
+            photonView.RPC( "FetchGameState", PhotonTargets.AllViaServer );
             onGameStart();
         }
     }
@@ -165,6 +164,7 @@ public class GameManager : Photon.MonoBehaviour
 
         if ( gameState == GameState.GAME )
         {
+            countDownText.transform.parent.gameObject.SetActive( false );
             PlayerController.instance.PlayerState = PlayerState.PLAY;
         }
 
@@ -243,6 +243,18 @@ public class GameManager : Photon.MonoBehaviour
         else
         {
             SceneManager.LoadSceneAsync( "Result" );
+        }
+    }
+
+    public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    {
+        if ( stream.isWriting )
+        {
+            stream.SendNext( gameState );
+        }
+        else
+        {
+            gameState = (GameState)stream.ReceiveNext();
         }
     }
 }

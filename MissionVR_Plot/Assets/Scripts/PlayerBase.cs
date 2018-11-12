@@ -129,6 +129,7 @@ public class PlayerBase : MobBase
         GameManager.instance.SetAnounce( AnounceType.PlAYER_DEATH, team );
         entityState = EntityState.DEATH;
         playerCollider.enabled = false;
+        trigger = false;
 
         if ( photonView.isMine )
         {
@@ -246,11 +247,6 @@ public class PlayerBase : MobBase
         set
         {
             base.Hp = value;
-
-            if ( photonView.isMine )
-            {
-                PlayerController.instance.OnChange_HP_MANA();
-            }
         }
     }
 
@@ -272,11 +268,6 @@ public class PlayerBase : MobBase
         set
         {
             base.Mana = value;
-
-            if ( photonView.isMine )
-            {
-                PlayerController.instance.OnChange_HP_MANA();
-            }
         }
     }
 
