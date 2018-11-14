@@ -370,12 +370,12 @@ MonoBehaviour:
   group: 0
   OwnerShipWasTransfered: 0
   prefixBackup: -1
-  synchronization: 0
+  synchronization: 3
   onSerializeTransformOption: 3
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 0
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 114800797855910978}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
@@ -459,7 +459,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRange: 30
   aiState: 0
-  entities: []
 --- !u!114 &114514142888571382
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -524,6 +523,7 @@ MonoBehaviour:
   trigger: 0
   head: {fileID: 4220875449237208}
   muzzle: {fileID: 4048888684404892}
+  index: 0
 --- !u!114 &114856326901615008
 MonoBehaviour:
   m_ObjectHideFlags: 1

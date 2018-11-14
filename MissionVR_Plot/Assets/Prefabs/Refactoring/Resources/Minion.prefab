@@ -527,6 +527,7 @@ MonoBehaviour:
   trigger: 0
   head: {fileID: 0}
   muzzle: {fileID: 0}
+  index: 0
   moveSpeed: 2
   dashRate: 0
   modelRotate: {fileID: 4628989694203550}
@@ -579,7 +580,7 @@ MonoBehaviour:
   ObservedComponents:
   - {fileID: 114661470477002560}
   - {fileID: 114626146279566862}
-  - {fileID: 0}
+  - {fileID: 114132884823044474}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
@@ -598,7 +599,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRange: 15
   aiState: 0
-  entities: []
   lanePoints: []
   destPoint: 0
   minionLane: 0

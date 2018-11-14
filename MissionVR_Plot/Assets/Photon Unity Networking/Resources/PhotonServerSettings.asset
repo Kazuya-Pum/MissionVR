@@ -78,4 +78,6 @@ MonoBehaviour:
   - RotateToTarget
   - RpcChangeState
   - ToResult
+  - SetValue
+  - ToActiveSetting
   DisableAutoOpenWizard: 1
