@@ -157,8 +157,11 @@ public class PlayerBase : MobBase
     protected void ToAliveState()
     {
         Hp = maxHp;
-        tfCache.position = GameManager.instance.spawnPoint[(int)team].position;
-        tfCache.localRotation = GameManager.instance.spawnPoint[(int)team].localRotation;
+
+        Transform spawnPoint = GameManager.instance.GetSpawnPoint( team );
+
+        tfCache.position = spawnPoint.position;
+        tfCache.localRotation = spawnPoint.localRotation;
         head.localEulerAngles = Vector3.zero;
         modelRotate.localRotation = head.localRotation;
 

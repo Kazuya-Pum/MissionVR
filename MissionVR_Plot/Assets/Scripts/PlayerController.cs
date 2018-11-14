@@ -93,9 +93,9 @@ public class PlayerController : Photon.MonoBehaviour
 
     void Update()
     {
-        OnChange_HP_MANA();
         if ( enable )
         {
+            OnChange_HP_MANA();
             GetKey();
 
             if ( PlayerState != PlayerState.BIGMAP )

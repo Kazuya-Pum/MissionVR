@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public enum DamageType : byte { PHYSICAL, MAGIC, THROUGH }
 
@@ -41,7 +42,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     protected Image miniMapPoint;
 
-    [SerializeField] private int gunIndex;
+    public int gunIndex;
     protected GunInfo gunInfo;
     [HideInInspector] public bool trigger;
 
@@ -53,6 +54,8 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     /// 銃撃時の銃弾の生成位置
     /// </summary>
     [HideInInspector] public Transform muzzle;
+
+    [HideInInspector] public int index;
 
     public virtual int Hp
     {
@@ -119,6 +122,11 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     protected virtual void Start()
     {
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         Hp = maxHp;
         Mana = maxMana;
 
@@ -132,6 +140,16 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         {
             GameManager.instance.onSetPlayer += OnSetPlayer;
         }
+    }
+
+    [PunRPC]
+    protected void ToActiveSetting( Vector3 position, Quaternion rotation, Team team )
+    {
+        gameObject.SetActive( true );
+        tfCache.position = position;
+        tfCache.rotation = rotation;
+        this.team = team;
+        Initialize();
     }
 
     private void OnSetPlayer()
@@ -152,12 +170,6 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         {
             UpdateRotation();
         }
-    }
-
-    [PunRPC]
-    protected void FetchTeam( Team remoteTeam )
-    {
-        team = remoteTeam;
     }
 
     float interval;
@@ -186,7 +198,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {
         BulletBase bulletBase;
 
-        if ( GameManager.instance.bullets.Count > 0 )
+        if ( GameManager.instance.bullets.Any() )
         {
             bulletBase = GameManager.instance.bullets.Dequeue();
             bulletBase.transform.position = muzzle.position;
@@ -219,7 +231,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {
         if ( target.team != team )
         {
-            target.photonView.RPC( "Damaged", PhotonTargets.All, (float)damageValue, damageType, photonView.viewID );
+            target.photonView.RPC( "Damaged", PhotonTargets.AllViaServer, (float)damageValue, damageType, photonView.viewID );
         }
     }
 
@@ -255,16 +267,17 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
                 killer.GetComponent<PlayerBase>().GetReward( sendingExp, sendingExp );
             }
 
-            if ( PhotonNetwork.isMasterClient )
-            {
-                Death();
-            }
+            Death();
         }
     }
 
     protected virtual void Death()
     {
-        PhotonNetwork.Destroy( gameObject );
+        if ( PhotonNetwork.isMasterClient )
+        {
+            GameManager.instance.minions[index].Enqueue( this );
+        }
+        gameObject.SetActive( false );
     }
 
     private void SetBarColor( Team playerTeam )
@@ -312,6 +325,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
                 stream.SendNext( maxHp );
                 stream.SendNext( Hp );
             }
+            stream.SendNext( team );
             stream.SendNext( head.localRotation );
             networkHeadRotation = head.localRotation;
         }
@@ -322,6 +336,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
                 maxHp = (int)stream.ReceiveNext();
                 Hp = (int)stream.ReceiveNext();
             }
+            team = (Team)stream.ReceiveNext();
             networkHeadRotation = (Quaternion)stream.ReceiveNext();
         }
     }
