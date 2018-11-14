@@ -14,8 +14,10 @@ public class MinionSpawnController : Photon.MonoBehaviour
     private WaitForSeconds spawnInterval;
     private WaitForSeconds waveInterval;
 
-    [SerializeField] private Transform[] rootTopPoints;
-    [SerializeField] private Transform[] rootBotPoints;
+    public Transform[] rootTopPoints;
+    public Transform[] rootBotPoints;
+    public Transform whileProjector;
+    public Transform blackProjector;
 
     private void Awake()
     {
@@ -70,36 +72,8 @@ public class MinionSpawnController : Photon.MonoBehaviour
                 foreach ( Transform point in teamPoint )
                 {
                     MinionAI minionAI = GameManager.instance.Summon( 0, point, team ).GetComponent<MinionAI>();
-                    minionAI.minionLane = (MinionLane)pos;
-                    if ( pos == (int)MinionLane.TOP )
-                    {
-                        foreach ( Transform item in rootTopPoints )
-                        {
-                            if ( team == Team.WHITE )
-                            {
-                                minionAI.lanePoints.Add( item );
-                            }
-                            else
-                            {
-                                minionAI.lanePoints.Insert( 0, item );
-                            }
-                        }
-                    }
-                    else if ( pos == (int)MinionLane.BOT )
-                    {
-                        foreach ( Transform item in rootBotPoints )
-                        {
-                            if ( team == Team.WHITE )
-                            {
-                                minionAI.lanePoints.Add( item );
-                            }
-                            else
-                            {
-                                minionAI.lanePoints.Insert( 0, item );
-                            }
-                        }
-                    }
-                    minionAI.lanePoints.Add( GameManager.instance.projectorPos[(int)team] );
+                    minionAI.photonView.RPC( "SetValue", PhotonTargets.All, (MinionLane)pos, point.position, team );
+
                     pos++;
                 }
             }

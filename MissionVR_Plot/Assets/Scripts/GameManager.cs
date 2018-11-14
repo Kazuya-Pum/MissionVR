@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public enum GameState { WAIT, COUNT_DOWN, GAME }
 
@@ -16,7 +17,8 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
 
     [SerializeField] private DataBaseFormat dataBase;
 
-    [HideInInspector] public Transform[] spawnPoint;
+    public Transform whiteSpawnPoint;
+    public Transform blackSpawnPoint;
     [SerializeField] private float setRespawnTime;
     public WaitForSeconds respawnTime;
 
@@ -40,13 +42,12 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
     }
 
     public Queue<BulletBase> bullets = new Queue<BulletBase>();
+    public Queue<EntityBase>[] minions;
 
     [SerializeField] private Text anounceText;
     [SerializeField] private float setAnounceSpeed;
     private WaitForSeconds anounceSpeed;
     private Queue<string> anounceTask = new Queue<string>();
-
-    public Transform[] projectorPos;
 
     void Awake()
     {
@@ -65,12 +66,12 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
 
         respawnTime = new WaitForSeconds( setRespawnTime );
         anounceSpeed = new WaitForSeconds( setAnounceSpeed );
-    }
 
-    private void Start()
-    {
-        spawnPoint[0] = GameObject.Find( "WhitePlayerSpawnPoint" ).transform;
-        spawnPoint[1] = GameObject.Find( "BlackPlayerSpawnPoint" ).transform;
+        minions = new Queue<EntityBase>[DataBase.entityInfos.Length];
+        for ( int i = 0; i < minions.Length; i++ )
+        {
+            minions[i] = new Queue<EntityBase>();
+        }
     }
 
     private void OnDestroy()
@@ -152,12 +153,13 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
 
     private void InstantiatePlayer( Team team )
     {
-        Vector3 shiftedPosition = spawnPoint[(int)team].position;
+        Transform spawnPoint = GetSpawnPoint( team );
+
+        Vector3 shiftedPosition = spawnPoint.position;
         shiftedPosition.x += Random.Range( -5, 10 );
         shiftedPosition.z += Random.Range( -5, 10 );
 
-        PlayerController.instance.player = PhotonNetwork.Instantiate( "CapsulePlayer", shiftedPosition, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
-        PlayerController.instance.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
+        PlayerController.instance.player = PhotonNetwork.Instantiate( "CapsulePlayer", shiftedPosition, spawnPoint.rotation, 0 ).GetComponent<PlayerBase>();
         PlayerController.instance.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
 
         PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
@@ -169,6 +171,21 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
         }
 
         onSetPlayer();
+    }
+
+    public Transform GetSpawnPoint( Team team )
+    {
+        Transform spawnPoint;
+        if ( team == Team.WHITE )
+        {
+            spawnPoint = this.whiteSpawnPoint;
+        }
+        else
+        {
+            spawnPoint = this.blackSpawnPoint;
+        }
+
+        return spawnPoint;
     }
 
     /// <summary>
@@ -184,8 +201,18 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
         if ( PhotonNetwork.isMasterClient )
         {
             EntityBase entity;
-            entity = PhotonNetwork.InstantiateSceneObject( DataBase.entityInfos[index].name, point.position, point.rotation, 0, null ).GetComponent<EntityBase>();
-            entity.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
+            if ( minions[index].Any() )
+            {
+                entity = minions[index].Dequeue();
+                entity.photonView.RPC( "ToActiveSetting", PhotonTargets.All, point.position, point.rotation, team );
+            }
+            else
+            {
+                entity = PhotonNetwork.InstantiateSceneObject( DataBase.entityInfos[index].name, point.position, point.rotation, 0, null ).GetComponent<EntityBase>();
+                entity.team = team;
+            }
+
+            entity.index = index;
             return entity;
         }
         else

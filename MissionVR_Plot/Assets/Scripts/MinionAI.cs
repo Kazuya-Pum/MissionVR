@@ -6,11 +6,11 @@ using UnityEngine.AI;
 public enum MinionLane : byte { TOP, MID, BOT }
 
 [RequireComponent( typeof( NavMeshAgent ) )]
-public class MinionAI : AIBase
+public class MinionAI : AIBase, IPunObservable
 {
-    public List<Transform> lanePoints;
-    private NavMeshAgent agent;
-    [SerializeField] private int destPoint = 0;
+    public List<Vector3> lanePoints;
+    public NavMeshAgent agent;
+    public int destPoint = 0;
     public MinionLane minionLane;
 
     protected override void Awake()
@@ -20,23 +20,56 @@ public class MinionAI : AIBase
         agent = GetComponent<NavMeshAgent>();
     }
 
-    void Start()
+    [PunRPC]
+    protected void SetValue( MinionLane lane, Vector3 point, Team team )
     {
-        int teamNum = (int)GetComponent<EntityBase>().team;
+        minionLane = lane;
+        lanePoints.Clear();
 
         switch ( minionLane )
         {
             case MinionLane.TOP:
+                foreach ( Transform item in MinionSpawnController.instance.rootTopPoints )
+                {
+                    if ( team == Team.WHITE )
+                    {
+                        lanePoints.Add( item.position );
+                    }
+                    else
+                    {
+                        lanePoints.Insert( 0, item.position );
+                    }
+                }
                 break;
             case MinionLane.MID:
                 break;
             case MinionLane.BOT:
+                foreach ( Transform item in MinionSpawnController.instance.rootBotPoints )
+                {
+                    if ( team == Team.WHITE )
+                    {
+                        lanePoints.Add( item.position );
+                    }
+                    else
+                    {
+                        lanePoints.Insert( 0, item.position );
+                    }
+                }
                 break;
         }
 
-        //lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
+        if ( team == Team.WHITE )
+        {
+            lanePoints.Add( MinionSpawnController.instance.blackProjector.position );
+        }
+        else
+        {
+            lanePoints.Add( MinionSpawnController.instance.whileProjector.position );
+        }
 
-        agent.destination = lanePoints[destPoint].position;
+        agent.Warp( point );
+        agent.destination = lanePoints[0];
+        destPoint = 0;
     }
 
     protected override void Update()
@@ -59,7 +92,7 @@ public class MinionAI : AIBase
             switch ( to )
             {
                 case AI_STATE.MOVE:
-                    agent.destination = lanePoints[destPoint].position;
+                    agent.destination = lanePoints[destPoint];
                     agent.isStopped = false;
                     break;
                 case AI_STATE.WARNING:
@@ -87,6 +120,20 @@ public class MinionAI : AIBase
         destPoint++;
 
         // エージェントが現在設定された目標地点に行くように設定
-        agent.destination = lanePoints[destPoint].position;
+        agent.destination = lanePoints[destPoint];
+    }
+
+    public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    {
+        if ( stream.isWriting )
+        {
+            stream.SendNext( minionLane );
+            stream.SendNext( agent.destination );
+        }
+        else
+        {
+            minionLane = (MinionLane)stream.ReceiveNext();
+            agent.destination = (Vector3)stream.ReceiveNext();
+        }
     }
 }
