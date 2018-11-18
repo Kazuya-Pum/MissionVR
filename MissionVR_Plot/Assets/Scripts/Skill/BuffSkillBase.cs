@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MOBAEngine.Skills
 {
-    [CreateAssetMenu]
+    [CreateAssetMenu(menuName = "skills/BuffSkillBase")]
     public class BuffSkillBase : SkillBase
     {
         [SerializeField]
