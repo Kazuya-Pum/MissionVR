@@ -42,7 +42,7 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
     }
 
     public Queue<BulletBase> bullets = new Queue<BulletBase>();
-    public Queue<EntityBase>[] minions;
+    public HashSet<EntityBase>[] minions;
 
     [SerializeField] private Text anounceText;
     [SerializeField] private float setAnounceSpeed;
@@ -67,10 +67,10 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
         respawnTime = new WaitForSeconds( setRespawnTime );
         anounceSpeed = new WaitForSeconds( setAnounceSpeed );
 
-        minions = new Queue<EntityBase>[DataBase.entityInfos.Length];
+        minions = new HashSet<EntityBase>[DataBase.entityInfos.Length];
         for ( int i = 0; i < minions.Length; i++ )
         {
-            minions[i] = new Queue<EntityBase>();
+            minions[i] = new HashSet<EntityBase>();
         }
     }
 
@@ -160,7 +160,8 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
         shiftedPosition.z += Random.Range( -5, 10 );
 
         PlayerController.instance.player = PhotonNetwork.Instantiate( "CapsulePlayer", shiftedPosition, spawnPoint.rotation, 0 ).GetComponent<PlayerBase>();
-        PlayerController.instance.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
+        PlayerController.instance.player.localSensitivity = PlayerController.instance.sensitivity;
+        PlayerController.instance.player.team = team;
 
         PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
@@ -203,15 +204,15 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
             EntityBase entity;
             if ( minions[index].Any() )
             {
-                entity = minions[index].Dequeue();
-                entity.photonView.RPC( "ToActiveSetting", PhotonTargets.All, point.position, point.rotation, team );
+                entity = minions[index].First();
+                minions[index].Remove( entity );
             }
             else
             {
                 entity = PhotonNetwork.InstantiateSceneObject( DataBase.entityInfos[index].name, point.position, point.rotation, 0, null ).GetComponent<EntityBase>();
-                entity.team = team;
             }
 
+            entity.photonView.RPC( "ToActiveSetting", PhotonTargets.All, team, point.position, point.rotation );
             entity.index = index;
             return entity;
         }

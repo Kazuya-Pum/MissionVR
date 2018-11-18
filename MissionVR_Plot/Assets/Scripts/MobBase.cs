@@ -28,19 +28,18 @@ public class MobBase : EntityBase
     {
         base.Update();
 
-        rbCache.velocity = Vector3.Lerp( rbCache.velocity, Vector3.zero, 0.6f );
+        //rbCache.velocity = Vector3.Lerp( rbCache.velocity, Vector3.zero, 0.6f );
     }
 
     [PunRPC]
-    protected virtual void Move( float x, float z )
+    protected virtual void Move( Vector3 vector )
     {
         if ( dashFlag )
         {
-            x *= dashRate;
-            z *= dashRate;
+            vector *= dashRate;
         }
 
-        rbCache.AddForce( Vector3.Normalize( tfCache.forward * z + tfCache.right * x ) * moveSpeed, ForceMode.VelocityChange );
+        rbCache.AddForce( vector * moveSpeed, ForceMode.VelocityChange );
     }
 
     [PunRPC]

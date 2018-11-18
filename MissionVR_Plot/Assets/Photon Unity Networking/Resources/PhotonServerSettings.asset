@@ -34,15 +34,14 @@ MonoBehaviour:
   - Chat
   - CheckStart
   - Damage
+  - Damaged
   - DamageMinion
   - DestroyMinion
-  - DestroyMinionObject
   - DestroyRpc
   - DestroyTowerObject
   - FetchGameState
   - FetchLocalParams
   - FetchSetting
-  - FetchTeam
   - GameStart
   - InstantiateRpc
   - LevelUp
@@ -60,24 +59,22 @@ MonoBehaviour:
   - RecieveChangedHP
   - RecieveExp
   - RecieveMoney
+  - Recover
   - RequestForPickupItems
   - RequestForPickupTimes
   - Rotate
+  - RotateToTarget
+  - RpcChangeState
   - Send_Exp_Money
   - SendDamage
   - SendSkillDamage
+  - SetAnounce
   - SetDashFlag
+  - SetValue
   - Shoot
-  - SpawnMinion
   - Summon
+  - ToActiveSetting
   - ToAliveState
   - ToDeathState
-  - Damaged
-  - Recover
-  - SetAnounce
-  - RotateToTarget
-  - RpcChangeState
   - ToResult
-  - SetValue
-  - ToActiveSetting
   DisableAutoOpenWizard: 1

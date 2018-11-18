@@ -42,7 +42,7 @@ public class AIBase : Photon.MonoBehaviour
     {
         if ( PhotonNetwork.isMasterClient && GameManager.instance.gameState == GameState.GAME && aiState != AI_STATE.MOVE )
         {
-            entities.RemoveWhere( ( EntityBase e ) => e == null );
+            entities.RemoveWhere( ( EntityBase e ) => e == null || e.entityState == EntityState.DEATH );
             if ( entities.Any() )
             {
                 if ( tmpTarget == null || !entities.Contains( tmpTarget ) )
@@ -53,11 +53,13 @@ public class AIBase : Photon.MonoBehaviour
                 if ( Ray( tmpTarget ) )
                 {
                     ChangeState( AI_STATE.DISCOVER );
+                    entityBase.RotateToTarget( tmpTarget.head.position );
                     entityBase.trigger = true;
                 }
                 else
                 {
                     entities.Remove( tmpTarget );
+                    entities.Add( tmpTarget );
                     if ( entities.Any() )
                     {
                         tmpTarget = entities.FirstOrDefault();
@@ -66,8 +68,6 @@ public class AIBase : Photon.MonoBehaviour
                     ChangeState( AI_STATE.WARNING );
                     entityBase.trigger = false;
                 }
-
-                entities.Clear();
             }
             else
             {
@@ -75,18 +75,13 @@ public class AIBase : Photon.MonoBehaviour
                 entityBase.trigger = false;
             }
         }
-
-        if ( aiState == AI_STATE.DISCOVER )
-        {
-            entityBase.RotateToTarget( tmpTarget.head.position );
-        }
     }
 
     protected void ChangeState( AI_STATE to )
     {
-        if ( aiState != to && GameManager.instance.gameState == GameState.GAME )
+        if ( aiState != to && GameManager.instance.gameState == GameState.GAME && PhotonNetwork.isMasterClient )
         {
-            photonView.RPC( "RpcChangeState", PhotonTargets.All, to );
+            photonView.RPC( "RpcChangeState", PhotonTargets.AllViaServer, to );
         }
     }
 
@@ -134,7 +129,7 @@ public class AIBase : Photon.MonoBehaviour
     {
         entities.Remove( target );
 
-        if ( entities.Any() )
+        if ( !entities.Any() )
         {
             ChangeState( AI_STATE.MOVE );
             entityBase.trigger = false;

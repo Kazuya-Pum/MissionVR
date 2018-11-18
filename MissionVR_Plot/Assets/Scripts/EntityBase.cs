@@ -130,6 +130,8 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         Hp = maxHp;
         Mana = maxMana;
 
+        entityState = EntityState.ALIVE;
+
         gunInfo = GameManager.instance.DataBase.gunInfos[gunIndex];
 
         if ( PlayerController.instance.player )
@@ -143,13 +145,13 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     }
 
     [PunRPC]
-    protected void ToActiveSetting( Vector3 position, Quaternion rotation, Team team )
+    protected void ToActiveSetting( Team team, Vector3 position, Quaternion rotation )
     {
         gameObject.SetActive( true );
-        tfCache.position = position;
-        tfCache.rotation = rotation;
         this.team = team;
         Initialize();
+        tfCache.position = position;
+        tfCache.rotation = rotation;
     }
 
     private void OnSetPlayer()
@@ -267,17 +269,28 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
                 killer.GetComponent<PlayerBase>().GetReward( sendingExp, sendingExp );
             }
 
-            Death();
+            if ( PhotonNetwork.isMasterClient )
+            {
+                Death();
+            }
         }
     }
 
     protected virtual void Death()
     {
+        photonView.RPC( "ToDeathState", PhotonTargets.All );
+    }
+
+    [PunRPC]
+    protected virtual void ToDeathState()
+    {
         if ( PhotonNetwork.isMasterClient )
         {
-            GameManager.instance.minions[index].Enqueue( this );
+            GameManager.instance.minions[index].Add( this );
         }
+        trigger = false;
         gameObject.SetActive( false );
+        entityState = EntityState.DEATH;
     }
 
     private void SetBarColor( Team playerTeam )

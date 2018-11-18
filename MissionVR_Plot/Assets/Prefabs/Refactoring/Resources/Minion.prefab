@@ -581,6 +581,7 @@ MonoBehaviour:
   - {fileID: 114661470477002560}
   - {fileID: 114626146279566862}
   - {fileID: 114132884823044474}
+  - {fileID: 114315580939483820}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
@@ -600,6 +601,7 @@ MonoBehaviour:
   attackRange: 15
   aiState: 0
   lanePoints: []
+  agent: {fileID: 0}
   destPoint: 0
   minionLane: 0
 --- !u!114 &114425024233847348

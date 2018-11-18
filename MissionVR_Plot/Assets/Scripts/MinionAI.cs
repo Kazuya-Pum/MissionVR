@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Linq;
 
 public enum MinionLane : byte { TOP, MID, BOT }
 
@@ -66,7 +67,8 @@ public class MinionAI : AIBase, IPunObservable
         {
             lanePoints.Add( MinionSpawnController.instance.whileProjector.position );
         }
-
+        entities.Clear();
+        aiState = AI_STATE.MOVE;
         agent.Warp( point );
         agent.destination = lanePoints[0];
         destPoint = 0;
@@ -87,7 +89,7 @@ public class MinionAI : AIBase, IPunObservable
     {
         base.RpcChangeState( to );
 
-        if ( GameManager.instance.gameState == GameState.GAME )
+        if ( GameManager.instance.gameState == GameState.GAME && gameObject.activeInHierarchy )
         {
             switch ( to )
             {
@@ -111,16 +113,21 @@ public class MinionAI : AIBase, IPunObservable
 
     void GotoNextPoint()
     {
-        // 地点がなにも設定されていないときに返す
-        if ( lanePoints.Count == 0 || destPoint >= lanePoints.Count - 1 )
+        if ( PhotonNetwork.isMasterClient && lanePoints.Any() && destPoint < lanePoints.Count - 1 )
         {
-            return;
+            destPoint++;
+
+            photonView.RPC( "SetDestination", PhotonTargets.AllViaServer, lanePoints[destPoint] );
         }
+    }
 
-        destPoint++;
-
-        // エージェントが現在設定された目標地点に行くように設定
-        agent.destination = lanePoints[destPoint];
+    [PunRPC]
+    protected void SetDestination( Vector3 target )
+    {
+        if ( gameObject.activeInHierarchy )
+        {
+            agent.SetDestination( target );
+        }
     }
 
     public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
@@ -128,12 +135,14 @@ public class MinionAI : AIBase, IPunObservable
         if ( stream.isWriting )
         {
             stream.SendNext( minionLane );
-            stream.SendNext( agent.destination );
+            //stream.SendNext( agent.destination );
+            //stream.SendNext( agent.isStopped );
         }
         else
         {
             minionLane = (MinionLane)stream.ReceiveNext();
-            agent.destination = (Vector3)stream.ReceiveNext();
+            //agent.destination = (Vector3)stream.ReceiveNext();
+            //agent.isStopped = (bool)stream.ReceiveNext();
         }
     }
 }

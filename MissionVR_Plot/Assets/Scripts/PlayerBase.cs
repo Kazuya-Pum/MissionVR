@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase : MobBase
+public class PlayerBase : MobBase, IPunObservable
 {
     [SerializeField] private int myExp;
     [SerializeField] private int myMoney;
@@ -13,7 +13,7 @@ public class PlayerBase : MobBase
 
     protected Collider playerCollider;
 
-    private float localSensitivity;
+    public float localSensitivity;
 
     protected override void Awake()
     {
@@ -124,7 +124,7 @@ public class PlayerBase : MobBase
     /// <para>prev:Master->All</para>
     /// </summary>
     [PunRPC]
-    protected void ToDeathState()
+    protected override void ToDeathState()
     {
         GameManager.instance.SetAnounce( AnounceType.PlAYER_DEATH, team );
         entityState = EntityState.DEATH;
@@ -335,6 +335,20 @@ public class PlayerBase : MobBase
         get
         {
             return myExp;
+        }
+    }
+
+    public override void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    {
+        base.OnPhotonSerializeView( stream, info );
+
+        if ( stream.isWriting )
+        {
+            stream.SendNext( localSensitivity );
+        }
+        else
+        {
+            localSensitivity = (float)stream.ReceiveNext();
         }
     }
 }
