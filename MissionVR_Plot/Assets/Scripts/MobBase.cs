@@ -13,6 +13,7 @@ public class MobBase : EntityBase
     [SerializeField] protected Transform modelRotate;
 
     private Rigidbody rbCache;
+    private Vector3 vector;
     #endregion
 
 
@@ -24,11 +25,12 @@ public class MobBase : EntityBase
         rbCache = GetComponent<Rigidbody>();
     }
 
-    protected override void Update()
+    protected void FixedUpdate()
     {
-        base.Update();
-
-        //rbCache.velocity = Vector3.Lerp( rbCache.velocity, Vector3.zero, 0.6f );
+        if ( vector.magnitude > 0 || rbCache.velocity.magnitude > 0 )
+        {
+            rbCache.AddForce( vector * moveSpeed - rbCache.velocity, ForceMode.VelocityChange );
+        }
     }
 
     [PunRPC]
@@ -38,8 +40,7 @@ public class MobBase : EntityBase
         {
             vector *= dashRate;
         }
-
-        rbCache.AddForce( vector * moveSpeed, ForceMode.VelocityChange );
+        this.vector = vector;
     }
 
     [PunRPC]

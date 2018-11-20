@@ -17,6 +17,8 @@ public class PlayerController : Photon.MonoBehaviour
 
     private bool enable = false;
 
+    private Vector3 vector;
+
     public Camera miniMapCamera;
     private Transform tfMiniMapCamera;
     private float miniMapPosY;
@@ -118,7 +120,12 @@ public class PlayerController : Photon.MonoBehaviour
 
         if ( x != 0 || z != 0 )
         {
-            player.photonView.RPC( "Move", PhotonTargets.AllViaServer, Vector3.Normalize( player.tfCache.forward * z + player.tfCache.right * x ) );
+            vector = Vector3.Normalize( player.tfCache.forward * z + player.tfCache.right * x );
+            player.photonView.RPC( "Move", PhotonTargets.AllViaServer, vector );
+        }
+        else if ( vector.magnitude > 0 )
+        {
+            player.photonView.RPC( "Move", PhotonTargets.AllViaServer, Vector3.zero );
         }
 
         float mouse_x = Input.GetAxis( "Mouse X" ) * Time.deltaTime;
