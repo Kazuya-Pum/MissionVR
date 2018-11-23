@@ -89,7 +89,7 @@ public class MinionAI : AIBase, IPunObservable
     {
         base.RpcChangeState( to );
 
-        if ( GameManager.instance.gameState == GameState.GAME && gameObject.activeInHierarchy )
+        if ( GameManager.instance.GameState == GameState.GAME && gameObject.activeInHierarchy )
         {
             switch ( to )
             {
@@ -130,19 +130,28 @@ public class MinionAI : AIBase, IPunObservable
         }
     }
 
+    Vector3 networkDistination;
+    bool networkIsStopped;
+
     public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
     {
         if ( stream.isWriting )
         {
             stream.SendNext( minionLane );
-            //stream.SendNext( agent.destination );
-            //stream.SendNext( agent.isStopped );
+            stream.SendNext( agent.destination );
+            stream.SendNext( agent.isStopped );
         }
         else
         {
             minionLane = (MinionLane)stream.ReceiveNext();
-            //agent.destination = (Vector3)stream.ReceiveNext();
-            //agent.isStopped = (bool)stream.ReceiveNext();
+
+            networkDistination = (Vector3)stream.ReceiveNext();
+            networkIsStopped = (bool)stream.ReceiveNext();
+            if ( agent.isActiveAndEnabled )
+            {
+                agent.destination = networkDistination;
+                agent.isStopped = networkIsStopped;
+            }
         }
     }
 }

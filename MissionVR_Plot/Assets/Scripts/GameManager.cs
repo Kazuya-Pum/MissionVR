@@ -22,7 +22,7 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
     [SerializeField] private float setRespawnTime;
     public WaitForSeconds respawnTime;
 
-    public GameState gameState;
+    private GameState gameState;
 
     [SerializeField] private Text countDownText;
     [SerializeField] private int countDownTime;
@@ -38,6 +38,23 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
         get
         {
             return dataBase;
+        }
+    }
+
+    public GameState GameState
+    {
+        get
+        {
+            return gameState;
+        }
+
+        set
+        {
+            gameState =  value ;
+            if(value == GameState.GAME )
+            {
+                ToStart();
+            }
         }
     }
 
@@ -110,7 +127,7 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
     [PunRPC]
     protected void CheckStart()
     {
-        if ( ( PhotonNetwork.room.PlayerCount == maxPlayers || ( maxPlayers == 0 && PhotonNetwork.room.PlayerCount == 8 ) ) && gameState == GameState.WAIT )
+        if ( ( PhotonNetwork.room.PlayerCount == maxPlayers || ( maxPlayers == 0 && PhotonNetwork.room.PlayerCount == 8 ) ) && GameState == GameState.WAIT )
         {
             photonView.RPC( "GameStart", PhotonTargets.AllViaServer );
         }
@@ -119,7 +136,7 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
     [PunRPC]
     protected void GameStart()
     {
-        gameState = GameState.COUNT_DOWN;
+        GameState = GameState.COUNT_DOWN;
         StartCoroutine( "CountDown" );
     }
 
@@ -143,7 +160,11 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
     [PunRPC]
     protected void FetchGameState()
     {
-        gameState = GameState.GAME;
+        GameState = GameState.GAME;
+    }
+
+    private void ToStart()
+    {
         countDownText.transform.parent.gameObject.SetActive( false );
         if ( PlayerController.instance.player )
         {
@@ -165,10 +186,9 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
 
         PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
-        if ( gameState == GameState.GAME )
+        if ( GameState == GameState.GAME )
         {
-            countDownText.transform.parent.gameObject.SetActive( false );
-            PlayerController.instance.PlayerState = PlayerState.PLAY;
+            ToStart();
         }
 
         onSetPlayer();
@@ -278,11 +298,11 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
     {
         if ( stream.isWriting )
         {
-            stream.SendNext( gameState );
+            stream.SendNext( GameState );
         }
         else
         {
-            gameState = (GameState)stream.ReceiveNext();
+            GameState = (GameState)stream.ReceiveNext();
         }
     }
 }

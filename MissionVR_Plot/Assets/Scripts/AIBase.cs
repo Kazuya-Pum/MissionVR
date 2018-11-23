@@ -40,7 +40,7 @@ public class AIBase : Photon.MonoBehaviour
 
     protected virtual void Update()
     {
-        if ( PhotonNetwork.isMasterClient && GameManager.instance.gameState == GameState.GAME && aiState != AI_STATE.MOVE )
+        if ( PhotonNetwork.isMasterClient && GameManager.instance.GameState == GameState.GAME )
         {
             entities.RemoveWhere( ( EntityBase e ) => e == null || e.entityState == EntityState.DEATH );
             if ( entities.Any() )
@@ -79,7 +79,7 @@ public class AIBase : Photon.MonoBehaviour
 
     protected void ChangeState( AI_STATE to )
     {
-        if ( aiState != to && GameManager.instance.gameState == GameState.GAME && PhotonNetwork.isMasterClient )
+        if ( aiState != to && GameManager.instance.GameState == GameState.GAME && PhotonNetwork.isMasterClient )
         {
             photonView.RPC( "RpcChangeState", PhotonTargets.AllViaServer, to );
         }

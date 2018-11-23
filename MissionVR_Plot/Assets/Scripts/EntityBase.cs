@@ -307,11 +307,17 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         }
     }
 
+    Vector3 rotateX;
+    Vector3 rotateY;
+
     [PunRPC]
     protected virtual void Rotate( float x = 0, float y = 0 )
     {
-        tfCache.localEulerAngles = new Vector3( 0, tfCache.localEulerAngles.y + x, 0 );
-        head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );   // TODO 角度の上限作成
+        rotateX.x = head.localEulerAngles.x - y;
+        rotateY.y = tfCache.localEulerAngles.y + x;
+
+        tfCache.localEulerAngles = rotateY;
+        head.localEulerAngles = rotateX;  // TODO 角度の上限作成
     }
 
     [PunRPC]
@@ -319,8 +325,11 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {
         Vector3 diff = Quaternion.LookRotation( to - head.position ).eulerAngles;
 
-        head.localEulerAngles = new Vector3( diff.x, 0, 0 );
-        tfCache.localEulerAngles = new Vector3( 0, diff.y, 0 );
+        rotateX.x = diff.x;
+        rotateY.y = diff.y;
+
+        tfCache.localEulerAngles = rotateY;
+        head.localEulerAngles = rotateX;
     }
 
     Quaternion networkHeadRotation;

@@ -2641,7 +2641,7 @@ MonoBehaviour:
   head: {fileID: 4065150390632684}
   muzzle: {fileID: 4070207782521870}
   index: 0
-  moveSpeed: 10
+  moveSpeed: 8
   dashRate: 1.5
   modelRotate: {fileID: 4993254237391770}
   myExp: 0

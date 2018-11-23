@@ -20,15 +20,6 @@ public class SearchArea : Photon.MonoBehaviour
         }
     }
 
-    //private void OnTriggerStay( Collider other )
-    //{
-    //    EntityBase entity = other.GetComponent<EntityBase>();
-    //    if ( entity )
-    //    {
-    //        aiBase.OnCheck( entity );
-    //    }
-    //}
-
     private void OnTriggerExit( Collider other )
     {
         EntityBase entity = other.GetComponent<EntityBase>();
