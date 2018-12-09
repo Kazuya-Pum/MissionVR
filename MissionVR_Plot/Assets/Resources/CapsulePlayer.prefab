@@ -201,6 +201,7 @@ GameObject:
   - component: {fileID: 4536897170450668}
   - component: {fileID: 20844572366539576}
   - component: {fileID: 124398239533890926}
+  - component: {fileID: 114373741197823156}
   m_Layer: 0
   m_Name: CameraHip
   m_TagString: Untagged
@@ -4799,6 +4800,18 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114373741197823156
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1037467608746362}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  profile: {fileID: 11400000, guid: d2f89a7bbabfdd54a9a36bb8a7ab7478, type: 2}
 --- !u!114 &114379726970623534
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6247,6 +6260,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e9a57d4d710f3c4d82d90f67cda5b46, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shopManager: {fileID: 0}
   skills:
   - {fileID: 114479978142424850}
   - {fileID: 114052078956771174}
@@ -6314,16 +6328,15 @@ MonoBehaviour:
   id: 0
   championID: 0
   havingItemID: 
-  manaToUseSkill: []
   initMana: 0
   initMoveSpeed: 0
   manaRecoverCount: 0
-  equipmentList: 
   isStun: 0
   isPoson: 0
   isSlow: 0
   initTeamColorPlayer: 0
   objectKind: 0
+  playerLocalVariables: {fileID: 0}
   LevelText: {fileID: 114931929673100294}
   Status_PhysicalAttack: {fileID: 114694470694511090}
   Status_SpecialAttack: {fileID: 114180850884876838}
