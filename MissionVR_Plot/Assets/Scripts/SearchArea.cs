@@ -11,7 +11,7 @@ public class SearchArea : Photon.MonoBehaviour
         aiBase = transform.parent.GetComponent<AIBase>();
     }
 
-    private void OnTriggerStay( Collider other )
+    private void OnTriggerEnter( Collider other )
     {
         EntityBase entity = other.GetComponent<EntityBase>();
         if ( entity )

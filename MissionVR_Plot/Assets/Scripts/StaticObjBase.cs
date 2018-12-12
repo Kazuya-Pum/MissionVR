@@ -5,7 +5,7 @@ using UnityEngine;
 public class StaticObjBase : EntityBase
 {
     [PunRPC]
-    protected override void RotateToTarget( Vector3 to )
+    public override void RotateToTarget( Vector3 to )
     {
         head.LookAt( to );
     }

@@ -11,6 +11,9 @@ public class MobBase : EntityBase
     protected bool dashFlag = false;
 
     [SerializeField] protected Transform modelRotate;
+
+    private Rigidbody rbCache;
+    private Vector3 vector;
     #endregion
 
 
@@ -19,18 +22,25 @@ public class MobBase : EntityBase
         base.Awake();
         moveSpeed = ( moveSpeed <= 0 ) ? 1 : moveSpeed;
         dashRate = ( dashRate < 1 ) ? 1 : dashRate;
+        rbCache = GetComponent<Rigidbody>();
+    }
+
+    protected void FixedUpdate()
+    {
+        if ( vector.magnitude > 0 || rbCache.velocity.magnitude > 0 )
+        {
+            rbCache.AddForce( vector * moveSpeed - rbCache.velocity, ForceMode.VelocityChange );
+        }
     }
 
     [PunRPC]
-    protected virtual void Move( float x, float z )
+    protected virtual void Move( Vector3 vector )
     {
         if ( dashFlag )
         {
-            x *= dashRate;
-            z *= dashRate;
+            vector *= dashRate;
         }
-
-        tfCache.Translate( x * moveSpeed, 0, z * moveSpeed );
+        this.vector = vector;
     }
 
     [PunRPC]
@@ -47,7 +57,7 @@ public class MobBase : EntityBase
     }
 
     [PunRPC]
-    protected override void RotateToTarget( Vector3 to )
+    public override void RotateToTarget( Vector3 to )
     {
         base.RotateToTarget( to );
         modelRotate.localRotation = head.localRotation;

@@ -17,10 +17,16 @@ public class PlayerController : Photon.MonoBehaviour
 
     private bool enable = false;
 
+    private Vector3 vector;
+
     public Camera miniMapCamera;
     private Transform tfMiniMapCamera;
     private float miniMapPosY;
     [SerializeField] private RawImage miniMapImage;
+
+    private Vector3 mapCameraPos;
+    private Vector2 mapPos;
+    private Vector2 mapSize;
 
     // TODO 設定ファイル等に移設
     public float sensitivity;
@@ -95,12 +101,13 @@ public class PlayerController : Photon.MonoBehaviour
     {
         if ( enable )
         {
-            GetKey();
             OnChange_HP_MANA();
+            GetKey();
 
             if ( PlayerState != PlayerState.BIGMAP )
             {
-                tfMiniMapCamera.position = new Vector3( player.tfCache.position.x, miniMapPosY, player.tfCache.position.z );
+                mapCameraPos.Set( player.tfCache.position.x, miniMapPosY, player.tfCache.position.z );
+                tfMiniMapCamera.position = mapCameraPos;
             }
         }
 
@@ -118,7 +125,12 @@ public class PlayerController : Photon.MonoBehaviour
 
         if ( x != 0 || z != 0 )
         {
-            player.photonView.RPC( "Move", PhotonTargets.AllViaServer, x, z );
+            vector = Vector3.Normalize( player.tfCache.forward * z + player.tfCache.right * x );
+            player.photonView.RPC( "Move", PhotonTargets.All, vector );
+        }
+        else if ( vector.magnitude > 0 )
+        {
+            player.photonView.RPC( "Move", PhotonTargets.All, Vector3.zero );
         }
 
         float mouse_x = Input.GetAxis( "Mouse X" ) * Time.deltaTime;
@@ -126,7 +138,7 @@ public class PlayerController : Photon.MonoBehaviour
 
         if ( mouse_x != 0 || mouse_y != 0 )
         {
-            player.photonView.RPC( "Rotate", PhotonTargets.AllViaServer, mouse_x, mouse_y );
+            player.photonView.RPC( "Rotate", PhotonTargets.All, mouse_x, mouse_y );
         }
 
         if ( Input.GetKeyDown( KeyCode.LeftShift ) )
@@ -153,26 +165,32 @@ public class PlayerController : Photon.MonoBehaviour
             {
                 PlayerState = PlayerState.BIGMAP;
 
-                miniMapCamera.orthographicSize = 180;
-                miniMapImage.rectTransform.anchoredPosition = new Vector3( -400, -250, 0 );
-                miniMapImage.rectTransform.sizeDelta = new Vector2( 450, 450 );
+                mapCameraPos.Set( 0, miniMapPosY, 0 );
+                mapPos.Set( -400, -250 );
+                mapSize.Set( 450, 450 );
 
-                tfMiniMapCamera.position = new Vector3( 0, miniMapPosY, 0 );
+                miniMapCamera.orthographicSize = 180;
+                miniMapImage.rectTransform.anchoredPosition = mapPos;
+                miniMapImage.rectTransform.sizeDelta = mapSize;
+
+                tfMiniMapCamera.position = mapCameraPos;
             }
             else if ( PlayerState == PlayerState.BIGMAP )
             {
                 PlayerState = PlayerState.PLAY;
 
+                mapPos.Set( -60, -60 );
+                mapSize.Set( 100, 100 );
+
                 miniMapCamera.orthographicSize = 50;
-                miniMapImage.rectTransform.anchoredPosition = new Vector3( -60, -60, 0 );
-                miniMapImage.rectTransform.sizeDelta = new Vector2( 100, 100 );
+                miniMapImage.rectTransform.anchoredPosition = mapPos;
+                miniMapImage.rectTransform.sizeDelta = mapSize;
             }
         }
     }
 
     public void OnStatusChanged()
     {
-        OnChange_HP_MANA();
         OnGetReward();
 
         levelText.text = ( "Lv." + player.Level );
@@ -182,11 +200,19 @@ public class PlayerController : Photon.MonoBehaviour
         statusSpeed.fillAmount = player.MoveSpeed * 0.1f;
     }
 
-    // TODO 動きを滑らかにしたい
     public void OnChange_HP_MANA()
     {
-        hpBar.fillAmount = (float)player.Hp / player.MaxHp;
-        manaBar.fillAmount = (float)player.Mana / player.MaxMana;
+        float hp = (float)player.Hp / player.MaxHp;
+        float mana = (float)player.Mana / player.MaxMana;
+
+        if ( !Mathf.Approximately( hpBar.fillAmount, hp ) )
+        {
+            hpBar.fillAmount = Mathf.Lerp( hpBar.fillAmount, hp, 0.25f );
+        }
+        if ( !Mathf.Approximately( manaBar.fillAmount, mana ) )
+        {
+            manaBar.fillAmount = Mathf.Lerp( manaBar.fillAmount, mana, 0.25f );
+        }
     }
 
     public void OnGetReward()

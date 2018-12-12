@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public enum GameState { WAIT, COUNT_DOWN, GAME }
 
 public enum AnounceType { LEVEL, PlAYER_DEATH, DESTROY }
 
-public class GameManager : Photon.MonoBehaviour
+public class GameManager : Photon.MonoBehaviour, IPunObservable
 {
     public static GameManager instance;
 
@@ -16,11 +17,12 @@ public class GameManager : Photon.MonoBehaviour
 
     [SerializeField] private DataBaseFormat dataBase;
 
-    [HideInInspector] public Transform[] spawnPoint;
+    public Transform whiteSpawnPoint;
+    public Transform blackSpawnPoint;
     [SerializeField] private float setRespawnTime;
     public WaitForSeconds respawnTime;
 
-    public GameState gameState;
+    private GameState gameState;
 
     [SerializeField] private Text countDownText;
     [SerializeField] private int countDownTime;
@@ -39,14 +41,30 @@ public class GameManager : Photon.MonoBehaviour
         }
     }
 
+    public GameState GameState
+    {
+        get
+        {
+            return gameState;
+        }
+
+        set
+        {
+            gameState =  value ;
+            if(value == GameState.GAME )
+            {
+                ToStart();
+            }
+        }
+    }
+
     public Queue<BulletBase> bullets = new Queue<BulletBase>();
+    public HashSet<EntityBase>[] minions;
 
     [SerializeField] private Text anounceText;
     [SerializeField] private float setAnounceSpeed;
     private WaitForSeconds anounceSpeed;
     private Queue<string> anounceTask = new Queue<string>();
-
-    public Transform[] projectorPos;
 
     void Awake()
     {
@@ -65,12 +83,12 @@ public class GameManager : Photon.MonoBehaviour
 
         respawnTime = new WaitForSeconds( setRespawnTime );
         anounceSpeed = new WaitForSeconds( setAnounceSpeed );
-    }
 
-    private void Start()
-    {
-        spawnPoint[0] = GameObject.Find( "WhitePlayerSpawnPoint" ).transform;
-        spawnPoint[1] = GameObject.Find( "BlackPlayerSpawnPoint" ).transform;
+        minions = new HashSet<EntityBase>[DataBase.entityInfos.Length];
+        for ( int i = 0; i < minions.Length; i++ )
+        {
+            minions[i] = new HashSet<EntityBase>();
+        }
     }
 
     private void OnDestroy()
@@ -109,7 +127,7 @@ public class GameManager : Photon.MonoBehaviour
     [PunRPC]
     protected void CheckStart()
     {
-        if ( ( PhotonNetwork.room.PlayerCount == maxPlayers || ( maxPlayers == 0 && PhotonNetwork.room.PlayerCount == 8 ) ) && gameState == GameState.WAIT )
+        if ( ( PhotonNetwork.room.PlayerCount == maxPlayers || ( maxPlayers == 0 && PhotonNetwork.room.PlayerCount == 8 ) ) && GameState == GameState.WAIT )
         {
             photonView.RPC( "GameStart", PhotonTargets.AllViaServer );
         }
@@ -118,7 +136,7 @@ public class GameManager : Photon.MonoBehaviour
     [PunRPC]
     protected void GameStart()
     {
-        gameState = GameState.COUNT_DOWN;
+        GameState = GameState.COUNT_DOWN;
         StartCoroutine( "CountDown" );
     }
 
@@ -134,8 +152,7 @@ public class GameManager : Photon.MonoBehaviour
 
         if ( PhotonNetwork.isMasterClient )
         {
-            // TODO Masterがゲームから抜けるとバッファが破棄されるため要対策
-            photonView.RPC( "FetchGameState", PhotonTargets.AllBufferedViaServer );
+            photonView.RPC( "FetchGameState", PhotonTargets.AllViaServer );
             onGameStart();
         }
     }
@@ -143,7 +160,11 @@ public class GameManager : Photon.MonoBehaviour
     [PunRPC]
     protected void FetchGameState()
     {
-        gameState = GameState.GAME;
+        GameState = GameState.GAME;
+    }
+
+    private void ToStart()
+    {
         countDownText.transform.parent.gameObject.SetActive( false );
         if ( PlayerController.instance.player )
         {
@@ -153,22 +174,39 @@ public class GameManager : Photon.MonoBehaviour
 
     private void InstantiatePlayer( Team team )
     {
-        Vector3 shiftedPosition = spawnPoint[(int)team].position;
+        Transform spawnPoint = GetSpawnPoint( team );
+
+        Vector3 shiftedPosition = spawnPoint.position;
         shiftedPosition.x += Random.Range( -5, 10 );
         shiftedPosition.z += Random.Range( -5, 10 );
 
-        PlayerController.instance.player = PhotonNetwork.Instantiate( "CapsulePlayer", shiftedPosition, spawnPoint[(int)team].rotation, 0 ).GetComponent<PlayerBase>();
-        PlayerController.instance.player.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
-        PlayerController.instance.player.photonView.RPC( "FetchSetting", PhotonTargets.AllBuffered, PlayerController.instance.sensitivity );
+        PlayerController.instance.player = PhotonNetwork.Instantiate( "CapsulePlayer", shiftedPosition, spawnPoint.rotation, 0 ).GetComponent<PlayerBase>();
+        PlayerController.instance.player.localSensitivity = PlayerController.instance.sensitivity;
+        PlayerController.instance.player.team = team;
 
         PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
-        if ( gameState == GameState.GAME )
+        if ( GameState == GameState.GAME )
         {
-            PlayerController.instance.PlayerState = PlayerState.PLAY;
+            ToStart();
         }
 
         onSetPlayer();
+    }
+
+    public Transform GetSpawnPoint( Team team )
+    {
+        Transform spawnPoint;
+        if ( team == Team.WHITE )
+        {
+            spawnPoint = this.whiteSpawnPoint;
+        }
+        else
+        {
+            spawnPoint = this.blackSpawnPoint;
+        }
+
+        return spawnPoint;
     }
 
     /// <summary>
@@ -184,8 +222,18 @@ public class GameManager : Photon.MonoBehaviour
         if ( PhotonNetwork.isMasterClient )
         {
             EntityBase entity;
-            entity = PhotonNetwork.InstantiateSceneObject( DataBase.entityInfos[index].name, point.position, point.rotation, 0, null ).GetComponent<EntityBase>();
-            entity.photonView.RPC( "FetchTeam", PhotonTargets.AllBuffered, team );
+            if ( minions[index].Any() )
+            {
+                entity = minions[index].First();
+                minions[index].Remove( entity );
+            }
+            else
+            {
+                entity = PhotonNetwork.InstantiateSceneObject( DataBase.entityInfos[index].name, point.position, point.rotation, 0, null ).GetComponent<EntityBase>();
+            }
+
+            entity.photonView.RPC( "ToActiveSetting", PhotonTargets.All, team, point.position, point.rotation );
+            entity.index = index;
             return entity;
         }
         else
@@ -243,6 +291,18 @@ public class GameManager : Photon.MonoBehaviour
         else
         {
             SceneManager.LoadSceneAsync( "Result" );
+        }
+    }
+
+    public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    {
+        if ( stream.isWriting )
+        {
+            stream.SendNext( GameState );
+        }
+        else
+        {
+            GameState = (GameState)stream.ReceiveNext();
         }
     }
 }
