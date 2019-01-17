@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Linq;
 
 public enum MinionLane : byte { TOP, MID, BOT }
 
 [RequireComponent( typeof( NavMeshAgent ) )]
-public class MinionAI : AIBase
+public class MinionAI : AIBase, IPunObservable
 {
-    public List<Transform> lanePoints;
-    private NavMeshAgent agent;
-    [SerializeField] private int destPoint = 0;
+    public List<Vector3> lanePoints;
+    public NavMeshAgent agent;
+    public int destPoint = 0;
     public MinionLane minionLane;
 
     protected override void Awake()
@@ -20,23 +21,57 @@ public class MinionAI : AIBase
         agent = GetComponent<NavMeshAgent>();
     }
 
-    void Start()
+    [PunRPC]
+    protected void SetValue( MinionLane lane, Vector3 point, Team team )
     {
-        int teamNum = (int)GetComponent<EntityBase>().team;
+        minionLane = lane;
+        lanePoints.Clear();
 
-        //switch ( minionLane )
-        //{
-        //    case MinionLane.TOP:
-        //        lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
-        //        break;
-        //    case MinionLane.MID:
-        //        lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
-        //        break;
-        //    case MinionLane.BOT:
-        //        lanePoints.Add( GameManager.instance.projectorPos[teamNum] );
-        //        break;
-        //}
-        agent.destination = lanePoints[destPoint].position;
+        switch ( minionLane )
+        {
+            case MinionLane.TOP:
+                foreach ( Transform item in MinionSpawnController.instance.rootTopPoints )
+                {
+                    if ( team == Team.WHITE )
+                    {
+                        lanePoints.Add( item.position );
+                    }
+                    else
+                    {
+                        lanePoints.Insert( 0, item.position );
+                    }
+                }
+                break;
+            case MinionLane.MID:
+                break;
+            case MinionLane.BOT:
+                foreach ( Transform item in MinionSpawnController.instance.rootBotPoints )
+                {
+                    if ( team == Team.WHITE )
+                    {
+                        lanePoints.Add( item.position );
+                    }
+                    else
+                    {
+                        lanePoints.Insert( 0, item.position );
+                    }
+                }
+                break;
+        }
+
+        if ( team == Team.WHITE )
+        {
+            lanePoints.Add( MinionSpawnController.instance.blackProjector.position );
+        }
+        else
+        {
+            lanePoints.Add( MinionSpawnController.instance.whileProjector.position );
+        }
+        entities.Clear();
+        aiState = AI_STATE.MOVE;
+        agent.Warp( point );
+        agent.destination = lanePoints[0];
+        destPoint = 0;
     }
 
     protected override void Update()
@@ -54,18 +89,18 @@ public class MinionAI : AIBase
     {
         base.RpcChangeState( to );
 
-        if ( GameManager.instance.gameState == GameState.GAME )
+        if ( GameManager.instance.GameState == GameState.GAME && gameObject.activeInHierarchy )
         {
             switch ( to )
             {
                 case AI_STATE.MOVE:
-                    agent.destination = lanePoints[destPoint].position;
+                    agent.destination = lanePoints[destPoint];
                     agent.isStopped = false;
                     break;
                 case AI_STATE.WARNING:
                     if ( tmpTarget )
                     {
-                        agent.destination = tmpTarget.transform.position;
+                        agent.destination = tmpTarget.tfCache.position;
                     }
                     agent.isStopped = false;
                     break;
@@ -78,15 +113,45 @@ public class MinionAI : AIBase
 
     void GotoNextPoint()
     {
-        // 地点がなにも設定されていないときに返す
-        if ( lanePoints.Count == 0 || destPoint >= lanePoints.Count - 1 )
+        if ( PhotonNetwork.isMasterClient && lanePoints.Any() && destPoint < lanePoints.Count - 1 )
         {
-            return;
+            destPoint++;
+
+            photonView.RPC( "SetDestination", PhotonTargets.AllViaServer, lanePoints[destPoint] );
         }
+    }
 
-        destPoint++;
+    [PunRPC]
+    protected void SetDestination( Vector3 target )
+    {
+        if ( gameObject.activeInHierarchy )
+        {
+            agent.SetDestination( target );
+        }
+    }
 
-        // エージェントが現在設定された目標地点に行くように設定
-        agent.destination = lanePoints[destPoint].position;
+    Vector3 networkDistination;
+    bool networkIsStopped;
+
+    public void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    {
+        if ( stream.isWriting )
+        {
+            stream.SendNext( minionLane );
+            stream.SendNext( agent.destination );
+            stream.SendNext( agent.isStopped );
+        }
+        else
+        {
+            minionLane = (MinionLane)stream.ReceiveNext();
+
+            networkDistination = (Vector3)stream.ReceiveNext();
+            networkIsStopped = (bool)stream.ReceiveNext();
+            if ( agent.isActiveAndEnabled )
+            {
+                agent.destination = networkDistination;
+                agent.isStopped = networkIsStopped;
+            }
+        }
     }
 }

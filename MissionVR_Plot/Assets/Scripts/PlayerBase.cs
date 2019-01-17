@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBase : MobBase
+public class PlayerBase : MobBase, IPunObservable
 {
     [SerializeField] private int myExp;
     [SerializeField] private int myMoney;
@@ -13,7 +13,7 @@ public class PlayerBase : MobBase
 
     protected Collider playerCollider;
 
-    private float localSensitivity;
+    public float localSensitivity;
 
     protected override void Awake()
     {
@@ -26,6 +26,7 @@ public class PlayerBase : MobBase
 
         if ( photonView.isMine )
         {
+            // TODO プレイヤーのプレハブに非アクティブで配置しておくより、シーンに一つあらかじめ置いておいてPlayerControllerから子オブジェクトに移動させた方がよさげ
             head.Find( "Main Camera" ).gameObject.SetActive( true );
         }
 
@@ -124,11 +125,12 @@ public class PlayerBase : MobBase
     /// <para>prev:Master->All</para>
     /// </summary>
     [PunRPC]
-    protected void ToDeathState()
+    protected override void ToDeathState()
     {
         GameManager.instance.SetAnounce( AnounceType.PlAYER_DEATH, team );
         entityState = EntityState.DEATH;
         playerCollider.enabled = false;
+        trigger = false;
 
         if ( photonView.isMine )
         {
@@ -156,8 +158,11 @@ public class PlayerBase : MobBase
     protected void ToAliveState()
     {
         Hp = maxHp;
-        tfCache.position = GameManager.instance.spawnPoint[(int)team].position;
-        tfCache.localRotation = GameManager.instance.spawnPoint[(int)team].localRotation;
+
+        Transform spawnPoint = GameManager.instance.GetSpawnPoint( team );
+
+        tfCache.position = spawnPoint.position;
+        tfCache.localRotation = spawnPoint.localRotation;
         head.localEulerAngles = Vector3.zero;
         modelRotate.localRotation = head.localRotation;
 
@@ -246,11 +251,6 @@ public class PlayerBase : MobBase
         set
         {
             base.Hp = value;
-
-            if ( photonView.isMine )
-            {
-                PlayerController.instance.OnChange_HP_MANA();
-            }
         }
     }
 
@@ -272,11 +272,6 @@ public class PlayerBase : MobBase
         set
         {
             base.Mana = value;
-
-            if ( photonView.isMine )
-            {
-                PlayerController.instance.OnChange_HP_MANA();
-            }
         }
     }
 
@@ -341,6 +336,20 @@ public class PlayerBase : MobBase
         get
         {
             return myExp;
+        }
+    }
+
+    public override void OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo info )
+    {
+        base.OnPhotonSerializeView( stream, info );
+
+        if ( stream.isWriting )
+        {
+            stream.SendNext( localSensitivity );
+        }
+        else
+        {
+            localSensitivity = (float)stream.ReceiveNext();
         }
     }
 }

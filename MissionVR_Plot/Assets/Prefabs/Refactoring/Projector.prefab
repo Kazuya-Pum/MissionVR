@@ -20,9 +20,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4192143512782886}
   - component: {fileID: 114816875205294386}
+  - component: {fileID: 114356423700976570}
   - component: {fileID: 64940792607457054}
   - component: {fileID: 205089753653825982}
-  - component: {fileID: 114356423700976570}
   - component: {fileID: 114069012491055922}
   - component: {fileID: 135947467417504404}
   m_Layer: 8
@@ -668,7 +668,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRange: 50
   aiState: 0
-  entities: []
 --- !u!114 &114091066026591602
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -758,7 +757,7 @@ MonoBehaviour:
   onSerializeRigidBodyOption: 2
   ownershipTransfer: 0
   ObservedComponents:
-  - {fileID: 0}
+  - {fileID: 114816875205294386}
   ObservedComponentsFoldoutOpen: 1
   viewIdField: 0
   instantiationId: -1
@@ -872,6 +871,7 @@ MonoBehaviour:
   trigger: 0
   head: {fileID: 4301703100167706}
   muzzle: {fileID: 4469022264079884}
+  index: 0
 --- !u!135 &135352861483610048
 SphereCollider:
   m_ObjectHideFlags: 1

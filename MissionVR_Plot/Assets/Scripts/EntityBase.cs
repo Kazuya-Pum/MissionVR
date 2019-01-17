@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public enum DamageType : byte { PHYSICAL, MAGIC, THROUGH }
 
@@ -9,7 +10,7 @@ public enum Team : byte { WHITE, BLACK }
 
 public enum EntityType : byte { CHANPION, MINION, TOWER, PROJECTOR, BULLET }
 
-// 状態異常をここに追加するか別でenum作るかは要検討
+// TODO 状態異常をここに追加するか別でenum作るかは要検討
 public enum EntityState : byte { ALIVE, DEATH }
 
 public class EntityBase : Photon.MonoBehaviour, IPunObservable
@@ -41,7 +42,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     protected Image miniMapPoint;
 
-    [SerializeField] private int gunIndex;
+    public int gunIndex;
     protected GunInfo gunInfo;
     [HideInInspector] public bool trigger;
 
@@ -53,6 +54,8 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     /// 銃撃時の銃弾の生成位置
     /// </summary>
     [HideInInspector] public Transform muzzle;
+
+    [HideInInspector] public int index;
 
     public virtual int Hp
     {
@@ -119,8 +122,15 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     protected virtual void Start()
     {
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         Hp = maxHp;
         Mana = maxMana;
+
+        entityState = EntityState.ALIVE;
 
         gunInfo = GameManager.instance.DataBase.gunInfos[gunIndex];
 
@@ -132,6 +142,16 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         {
             GameManager.instance.onSetPlayer += OnSetPlayer;
         }
+    }
+
+    [PunRPC]
+    protected void ToActiveSetting( Team team, Vector3 position, Quaternion rotation )
+    {
+        gameObject.SetActive( true );
+        this.team = team;
+        Initialize();
+        tfCache.position = position;
+        tfCache.rotation = rotation;
     }
 
     private void OnSetPlayer()
@@ -152,12 +172,6 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         {
             UpdateRotation();
         }
-    }
-
-    [PunRPC]
-    protected void FetchTeam( Team remoteTeam )
-    {
-        team = remoteTeam;
     }
 
     float interval;
@@ -186,7 +200,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {
         BulletBase bulletBase;
 
-        if ( GameManager.instance.bullets.Count > 0 )
+        if ( GameManager.instance.bullets.Any() )
         {
             bulletBase = GameManager.instance.bullets.Dequeue();
             bulletBase.transform.position = muzzle.position;
@@ -219,7 +233,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
     {
         if ( target.team != team )
         {
-            target.photonView.RPC( "Damaged", PhotonTargets.All, (float)damageValue, damageType, photonView.viewID );
+            target.photonView.RPC( "Damaged", PhotonTargets.AllViaServer, (float)damageValue, damageType, photonView.viewID );
         }
     }
 
@@ -264,7 +278,19 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     protected virtual void Death()
     {
-        PhotonNetwork.Destroy( gameObject );
+        photonView.RPC( "ToDeathState", PhotonTargets.All );
+    }
+
+    [PunRPC]
+    protected virtual void ToDeathState()
+    {
+        if ( PhotonNetwork.isMasterClient )
+        {
+            GameManager.instance.minions[index].Add( this );
+        }
+        trigger = false;
+        gameObject.SetActive( false );
+        entityState = EntityState.DEATH;
     }
 
     private void SetBarColor( Team playerTeam )
@@ -281,20 +307,29 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
         }
     }
 
+    Vector3 rotateX;
+    Vector3 rotateY;
+
     [PunRPC]
     protected virtual void Rotate( float x = 0, float y = 0 )
     {
-        tfCache.localEulerAngles = new Vector3( 0, tfCache.localEulerAngles.y + x, 0 );
-        head.localEulerAngles = new Vector3( head.localEulerAngles.x - y, 0, 0 );   // TODO 角度の上限作成
+        rotateX.x = head.localEulerAngles.x - y;
+        rotateY.y = tfCache.localEulerAngles.y + x;
+
+        tfCache.localEulerAngles = rotateY;
+        head.localEulerAngles = rotateX;  // TODO 角度の上限作成
     }
 
     [PunRPC]
-    protected virtual void RotateToTarget( Vector3 to )
+    public virtual void RotateToTarget( Vector3 to )
     {
         Vector3 diff = Quaternion.LookRotation( to - head.position ).eulerAngles;
 
-        head.localEulerAngles = new Vector3( diff.x, 0, 0 );
-        tfCache.localEulerAngles = new Vector3( 0, diff.y, 0 );
+        rotateX.x = diff.x;
+        rotateY.y = diff.y;
+
+        tfCache.localEulerAngles = rotateY;
+        head.localEulerAngles = rotateX;
     }
 
     Quaternion networkHeadRotation;
@@ -312,6 +347,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
                 stream.SendNext( maxHp );
                 stream.SendNext( Hp );
             }
+            stream.SendNext( team );
             stream.SendNext( head.localRotation );
             networkHeadRotation = head.localRotation;
         }
@@ -322,6 +358,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
                 maxHp = (int)stream.ReceiveNext();
                 Hp = (int)stream.ReceiveNext();
             }
+            team = (Team)stream.ReceiveNext();
             networkHeadRotation = (Quaternion)stream.ReceiveNext();
         }
     }
