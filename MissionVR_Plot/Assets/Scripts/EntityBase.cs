@@ -156,7 +156,7 @@ public class EntityBase : Photon.MonoBehaviour, IPunObservable
 
     private void OnSetPlayer()
     {
-        playerCamera = PlayerController.instance.playerCamera;
+        playerCamera = Camera.main.transform;
         SetBarColor( PlayerController.instance.player.team );
     }
 

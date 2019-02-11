@@ -24,11 +24,11 @@ public class PlayerBase : MobBase, IPunObservable
 
         entityType = EntityType.CHANPION;
 
-        if ( photonView.isMine )
-        {
-            // TODO プレイヤーのプレハブに非アクティブで配置しておくより、シーンに一つあらかじめ置いておいてPlayerControllerから子オブジェクトに移動させた方がよさげ
-            head.Find( "Main Camera" ).gameObject.SetActive( true );
-        }
+        //if ( photonView.isMine )
+        //{
+        //    // TODO プレイヤーのプレハブに非アクティブで配置しておくより、シーンに一つあらかじめ置いておいてPlayerControllerから子オブジェクトに移動させた方がよさげ
+        //    head.Find( "Main Camera" ).gameObject.SetActive( true );
+        //}
 
         playerCollider = GetComponent<Collider>();
     }
