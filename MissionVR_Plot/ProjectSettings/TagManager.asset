@@ -4,6 +4,7 @@
 TagManager:
   serializedVersion: 2
   tags:
+  - IVRCamera
   - Enemy
   - Tower
   - Black
@@ -19,6 +20,7 @@ TagManager:
   - firstButton
   - Controller
   - Target
+  - SvrCamera
   layers:
   - Default
   - TransparentFX
@@ -32,7 +34,7 @@ TagManager:
   - Search
   - MiniMap
   - Bullet
-  - 
+  - Overlay_Object
   - 
   - 
   - 

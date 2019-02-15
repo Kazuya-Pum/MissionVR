@@ -184,9 +184,10 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
         PlayerController.instance.player.localSensitivity = PlayerController.instance.sensitivity;
         PlayerController.instance.player.team = team;
 
-        Camera.main.transform.parent = PlayerController.instance.player.head.Find( "CameraPos" );
-        Camera.main.transform.localPosition = Vector3.zero;
-        Camera.main.transform.localEulerAngles = Vector3.zero;
+        PlayerController.instance.playerCamera.parent = PlayerController.instance.player.head.Find( "CameraPos" );
+        PlayerController.instance.playerCamera.localPosition = Vector3.zero;
+        PlayerController.instance.playerCamera.localEulerAngles = Vector3.zero;
+
         //PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
         if ( GameState == GameState.GAME )
