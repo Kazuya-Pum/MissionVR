@@ -739,8 +739,8 @@ public class Chara : Photon.MonoBehaviour ,IPlayer{
         horizontaoRotate.transform.Rotate(-y * senci, 0, 0);
 #endif
 #if UNITY_EDITOR
-        //float x = Input.GetAxis("Mouse X");
-        //float y = Input.GetAxis("Mouse Y");
+        float x = Input.GetAxis("Mouse X");
+        float y = Input.GetAxis("Mouse Y");
 
         verticalRotate.transform.Rotate(0, x, 0);
         horizontaoRotate.transform.Rotate(-y, 0, 0);

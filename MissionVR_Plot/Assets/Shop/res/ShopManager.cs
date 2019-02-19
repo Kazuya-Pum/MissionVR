@@ -80,7 +80,7 @@ public class ShopManager : MonoBehaviour
         firstButton = GameObject.FindGameObjectWithTag("firstButton").GetComponent<Button>();
         firstButton.Select();
 
-        ChackCanBuy();
+        CheckCanBuy();
         yield break;
     }
 
@@ -141,14 +141,14 @@ public class ShopManager : MonoBehaviour
 
         //Debug.Log("残金:" + s_money);
         textMoney.text = "残金：" + s_money;
-        ChackCanBuy(index);
+        CheckCanBuy(index);
     }
 
     /// <summary>
     /// 購入可能かどうか
     /// </summary>
     /// <param name="n">選択していたボタンが購入不可になった場合に選択をずらす</param>
-    public void ChackCanBuy(int n = -1)
+    public void CheckCanBuy(int n = -1)
     {
         zeroIDIndex = -1;//アイテムIDが０、つまりアイテム欄に空きがあるとき、そのアイテム欄のインデックスを記録する
         //Debug.Log(chara);

@@ -9,12 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 985d620d3019f43448a50f12b4a7dd1f, type: 3}
-  m_Name: item2
+  m_Name: battery
   m_EditorClassIdentifier: 
   m_type: 0
-  m_name: 
-  m_cost: 0
-  m_sellcost: 0
-  m_icon: {fileID: 0}
+  m_name: battery
+  m_cost: 300
+  m_sellcost: 150
+  m_icon: {fileID: 21300000, guid: ee939f654a1211b46831f8a2d5aaf3a1, type: 3}
   m_baseitem: []
   m_effect: []
