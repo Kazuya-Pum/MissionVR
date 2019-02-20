@@ -32,7 +32,7 @@ public class ItemBase : ScriptableObject {
     [System.Serializable]
     public class EffectTable
     {
-        public enum EffectType { HP, MANA, PATK, PDEF, MATK, MDEF }
+        public enum EffectType { HP, MANA, PATK, PDEF, MATK, MDEF , SPEED }
         [SerializeField]
         EffectType m_key;
         public EffectType Key { get { return m_key; } }

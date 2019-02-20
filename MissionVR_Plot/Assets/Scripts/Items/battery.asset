@@ -17,4 +17,6 @@ MonoBehaviour:
   m_sellcost: 150
   m_icon: {fileID: 21300000, guid: ee939f654a1211b46831f8a2d5aaf3a1, type: 3}
   m_baseitem: []
-  m_effect: []
+  m_effect:
+  - m_key: 0
+    m_value: 0

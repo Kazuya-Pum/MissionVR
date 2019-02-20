@@ -154,6 +154,7 @@ public class Chara : Photon.MonoBehaviour ,IPlayer{
     //public int killCount;
     //public int deathCount;
     public int[] havingItemID;//所持しているアイテムのIDを格納
+    public List<ItemBase> havingItems;//所持しているアイテムのリスト
     //public int[] havingItemCount;//所持しているアイテムの個数を格納
     private float[] manaToUseSkill;/*スキル使用に必要なマナ*/
 //    public float hpPlayer;/*プレイヤーの体力*/
@@ -226,6 +227,7 @@ public class Chara : Photon.MonoBehaviour ,IPlayer{
             rigidbody.constraints = RigidbodyConstraints.FreezeAll;
             usePosition = ImageSkillParent.transform.localPosition;
             standbyPosition = ImageItemParent.transform.localPosition;
+            havingItems = new List<ItemBase>();
             useScale.x = 1;
             useScale.y = 1;
             standbyScale.x = 0.6f;

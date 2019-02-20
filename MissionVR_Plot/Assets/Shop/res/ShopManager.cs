@@ -22,6 +22,7 @@ public class ShopManager : MonoBehaviour
     [SerializeField] private Text textMoney;
     [SerializeField] private int s_money;
     public ShopItem[] shopItem;
+    public ItemBase[] shopItems;
 
     private Button firstButton;
     private int zeroIDIndex;
