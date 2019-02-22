@@ -14,6 +14,7 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
     public static GameManager instance;
 
     [SerializeField] private byte maxPlayers;
+    public int selectedPlayer = 0;
 
     [SerializeField] private DataBaseFormat dataBase;
 
@@ -50,8 +51,8 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
 
         set
         {
-            gameState =  value ;
-            if(value == GameState.GAME )
+            gameState = value;
+            if ( value == GameState.GAME )
             {
                 ToStart();
             }
@@ -180,15 +181,13 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
         shiftedPosition.x += Random.Range( -5, 10 );
         shiftedPosition.z += Random.Range( -5, 10 );
 
-        PlayerController.instance.player = PhotonNetwork.Instantiate( "CapsulePlayer", shiftedPosition, spawnPoint.rotation, 0 ).GetComponent<PlayerBase>();
+        PlayerController.instance.player = PhotonNetwork.Instantiate( dataBase.playerType[selectedPlayer], shiftedPosition, spawnPoint.rotation, 0 ).GetComponent<PlayerBase>();
         PlayerController.instance.player.localSensitivity = PlayerController.instance.sensitivity;
         PlayerController.instance.player.team = team;
 
         PlayerController.instance.playerCamera.parent = PlayerController.instance.player.head.Find( "CameraPos" );
         PlayerController.instance.playerCamera.localPosition = Vector3.zero;
         PlayerController.instance.playerCamera.localEulerAngles = Vector3.zero;
-
-        //PlayerController.instance.playerCamera = PlayerController.instance.player.head.Find( "Main Camera" ).transform;
 
         if ( GameState == GameState.GAME )
         {
@@ -320,6 +319,8 @@ public class DataBaseFormat
     public GunInfo[] gunInfos;
 
     public GameObject[] entityInfos;
+
+    public string[] playerType;
 }
 
 [System.Serializable]

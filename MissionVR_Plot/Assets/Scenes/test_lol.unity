@@ -2799,6 +2799,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114812698032941520, guid: 68a71a0f608883b4caafba341225b628,
+        type: 2}
+      propertyPath: dataBase.playerType.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4906932216112678, guid: 68a71a0f608883b4caafba341225b628, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2910,6 +2915,21 @@ Prefab:
         type: 2}
       propertyPath: m_CullingMask.m_Bits
       value: 4294966271
+      objectReference: {fileID: 0}
+    - target: {fileID: 114812698032941520, guid: 68a71a0f608883b4caafba341225b628,
+        type: 2}
+      propertyPath: selectedPlayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114812698032941520, guid: 68a71a0f608883b4caafba341225b628,
+        type: 2}
+      propertyPath: dataBase.playerType.Array.data[0]
+      value: CapsulePlayer
+      objectReference: {fileID: 0}
+    - target: {fileID: 114812698032941520, guid: 68a71a0f608883b4caafba341225b628,
+        type: 2}
+      propertyPath: dataBase.playerType.Array.data[1]
+      value: PlayerB
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 68a71a0f608883b4caafba341225b628, type: 2}
