@@ -92,6 +92,21 @@ public class ShopManager : MonoBehaviour
     /// <param name="index">アイテムの番号</param>
     public void Buy(int index)
     {
+        //すでに同じアイテムを所持している場合
+        foreach(ItemBase item in chara.havingItems)
+        {
+            if(shopItems[index] == item)
+            {
+                //個数を追加する
+                item.count++;
+                //購入
+                s_money -= shopItems[index].Cost;
+                return;
+            }
+        }
+
+        //新しいアイテムの場合
+       
         
         
         //アイテム枠に空きがないとき

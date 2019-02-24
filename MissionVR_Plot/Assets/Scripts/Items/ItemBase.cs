@@ -22,6 +22,7 @@ public class ItemBase : ScriptableObject {
     [SerializeField]
     Sprite m_icon;
     public Sprite Icon { get { return m_icon; } }
+    public int count;//所持数
     [SerializeField]
     List<ItemBase> m_baseitem;//コスト軽減に必要なアイテム
     public List<ItemBase> BaseItem { get { return m_baseitem; } }
