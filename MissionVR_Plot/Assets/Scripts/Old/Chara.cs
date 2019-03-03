@@ -742,8 +742,8 @@ public class Chara : Photon.MonoBehaviour ,IPlayer{
         //float x = Input.GetAxis("Mouse X");
         //float y = Input.GetAxis("Mouse Y");
 
-        verticalRotate.transform.Rotate(0, x, 0);
-        horizontaoRotate.transform.Rotate(-y, 0, 0);
+        //verticalRotate.transform.Rotate(0, x, 0);
+        //horizontaoRotate.transform.Rotate(-y, 0, 0);
 #endif
     }
     
