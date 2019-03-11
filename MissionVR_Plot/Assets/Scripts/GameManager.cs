@@ -11,7 +11,7 @@ public enum AnounceType { LEVEL, PlAYER_DEATH, DESTROY }
 
 public class GameManager : Photon.MonoBehaviour, IPunObservable
 {
-    public static GameManager instance;
+    public static GameManager instance { get; private set; }
 
     [SerializeField] private byte maxPlayers;
     public int selectedPlayer = 0;
@@ -293,7 +293,7 @@ public class GameManager : Photon.MonoBehaviour, IPunObservable
         }
         else
         {
-            SceneManager.LoadSceneAsync( "Result" );
+            SceneManager.LoadScene( "Result" );
         }
     }
 
